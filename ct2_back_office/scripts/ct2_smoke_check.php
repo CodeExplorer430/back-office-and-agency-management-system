@@ -9,6 +9,8 @@ $ct2RequiredFiles = [
     __DIR__ . '/../config/ct2_UploadService.php',
     __DIR__ . '/ct2_db_smoke_check.php',
     __DIR__ . '/ct2_regression_probe.php',
+    __DIR__ . '/ct2_api_post_regression_check.sh',
+    __DIR__ . '/ct2_nfr_sanity_check.sh',
     __DIR__ . '/ct2_runtime_hardening_check.sh',
     __DIR__ . '/ct2_route_matrix_check.sh',
     __DIR__ . '/../assets/css/ct2_styles.css',
@@ -43,6 +45,8 @@ $ct2RequiredFiles = [
     __DIR__ . '/../../docs/ct2_requirements_traceability_matrix.md',
     __DIR__ . '/../../docs/ct2_requirements_audit_backlog.md',
     __DIR__ . '/../../docs/ct2_nfr_evidence.md',
+    __DIR__ . '/../../docs/ct2_performance_accessibility_evidence.md',
+    __DIR__ . '/../../docs/ct2_windows_xampp_validation_pack.md',
     __DIR__ . '/../../docs/ct2_deployment_guide.md',
     __DIR__ . '/../../docs/ct2_operator_runbook.md',
 ];

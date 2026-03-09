@@ -9,7 +9,7 @@ This guide is the client-facing handoff for deploying `CORE TRANSACTION 2: Back-
 - Database schema and seed data: `ct2_back_office/ct2_setup.sql`
 - Runtime config template: `ct2_back_office/config/ct2_local.php.example`
 - Approved release summary: `docs/ct2_release_summary_2026-03-10.md`
-- Post-install validation: `docs/ct2_manual_qa_pack.md` and `docs/ct2_api_validation.md`
+- Post-install validation: `docs/ct2_manual_qa_pack.md`, `docs/ct2_api_validation.md`, and `docs/ct2_windows_xampp_validation_pack.md`
 
 ## Supported Runtime
 - PHP with `PDO` and `pdo_mysql` enabled
@@ -52,6 +52,14 @@ Run these commands from the repo root:
 
 `php ct2_back_office/scripts/ct2_db_smoke_check.php`
 
+`bash ct2_back_office/scripts/ct2_route_matrix_check.sh`
+
+`bash ct2_back_office/scripts/ct2_runtime_hardening_check.sh`
+
+`bash ct2_back_office/scripts/ct2_api_post_regression_check.sh`
+
+`bash ct2_back_office/scripts/ct2_nfr_sanity_check.sh`
+
 ### 5. Open the application
 1. Serve `ct2_back_office/` through Apache, the PHP built-in server, or XAMPP.
 2. Open `ct2_back_office/ct2_index.php`.
@@ -69,6 +77,7 @@ Run these commands from the repo root:
 - Confirm `php_pdo_mysql` is enabled in the active XAMPP `php.ini`.
 - Keep upload and session folders writable by the Apache service account.
 - Use the same `ct2_local.php` contract as LAMP; no Windows-specific code path is required.
+- Use `docs/ct2_windows_xampp_validation_pack.md` as the execution and evidence template for Windows validation.
 
 ## Post-Install Acceptance
 Run the acceptance flow in this order:
@@ -79,6 +88,7 @@ Run the acceptance flow in this order:
 5. Export one seeded financial CSV.
 6. Follow `docs/ct2_manual_qa_pack.md` for the full browser walkthrough.
 7. Follow `docs/ct2_api_validation.md` for representative JSON endpoint checks.
+8. On Windows XAMPP targets, complete the evidence table in `docs/ct2_windows_xampp_validation_pack.md`.
 
 ## Initial Credentials And Security
 - Seeded accounts exist only to support first-time validation and UAT.

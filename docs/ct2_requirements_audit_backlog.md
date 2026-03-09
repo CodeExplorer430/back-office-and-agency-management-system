@@ -4,16 +4,16 @@
 This backlog captures the remaining repo-owned actions surfaced by `docs/ct2_requirements_traceability_matrix.md`. It excludes upstream documentation work that belongs to other teams and focuses on the validation debt that can still be closed inside this repository.
 
 ## Priority 1
-### Add formal performance and accessibility evidence
+### Add executed keyboard/focus accessibility evidence and broader load sampling
 - Type: Validation gap
-- Impact: Security, audit, and representative runtime hardening now have direct evidence, but performance and accessibility still rely on code inspection and manual usability impressions.
+- Impact: Local performance sanity and structural form/heading checks are now directly evidenced, but keyboard navigation, focus order, focus visibility, and broader load behavior still rely on manual or absent validation.
 - Expected work:
-  define lightweight but real accessibility checks such as keyboard navigation and heading/form-label review;
-  add a reproducible performance sanity check for the seeded local environment;
-  record those results in `docs/ct2_nfr_evidence.md`.
+  execute a real browser-based keyboard walkthrough on the supported runtime targets;
+  add a slightly broader reproducible load or repeated-request sample beyond the current single-user sanity timing pass;
+  record the results in `docs/ct2_performance_accessibility_evidence.md` and `docs/ct2_nfr_evidence.md`.
 - Acceptance criteria:
-  the audit matrix can upgrade performance/accessibility from `Partially Implemented` to `Implemented`,
-  and the repo contains a repeatable method to demonstrate those NFRs.
+  the repo contains direct keyboard/focus evidence rather than only structural markup checks,
+  and the remaining performance note is stronger than a single-seeded sanity sample.
 
 ## Priority 2
 ### Add executed Windows XAMPP runtime evidence
@@ -27,18 +27,20 @@ This backlog captures the remaining repo-owned actions surfaced by `docs/ct2_req
   and cross-platform compatibility is no longer only code-aligned and documented.
 
 ## Priority 3
-### Add broader scripted coverage for API POST mutations and role-specific UAT paths
+### Add narrower role-specific UAT evidence for business judgment flows
 - Type: Validation gap
-- Impact: Core browser routes, seeded filters, exports, and major mutation flows are now script-covered, but API write paths and role-specific business walkthroughs still rely more heavily on manual execution.
+- Impact: Stable browser and API mutation flows are now script-covered, but role-specific browser walkthroughs still require human judgment and documentation.
 - Expected work:
-  add targeted scripted checks for stable API POST mutation endpoints and preserve a shorter manual pack for role-driven UAT steps that require human judgment.
+  keep the current scripted baseline and tighten the manual QA pack around role-driven UAT scenarios such as approvals judgment, visa operator handling, and accounting/operator signoff.
 - Acceptance criteria:
-  representative browser and API mutation flows are both repeatable under the seeded environment,
-  and the remaining manual QA surface is explicitly limited to usability or business-judgment checks.
+  the remaining manual QA surface is explicitly limited to usability or business-judgment checks,
+  and each role-specific scenario has a clear evidence trail in the QA report.
 
 ## Resolved In Repo
 - Broaden automated regression coverage beyond the earlier representative smoke checks.
 - Add a broader warning-free route sweep for major module routes, seeded filters, representative JSON GET endpoints, and financial export breadth.
+- Add broader scripted coverage for stable API POST mutations across CT2.
+- Add local performance sanity samples and structural accessibility checks.
 
 ## External Dependency Note
 - Upstream CT2 diagrams and requirements packs are still absent from `docs/diagrams/`, but that source-of-truth gap is owned by the documentation teams rather than this CT2 implementation workstream.

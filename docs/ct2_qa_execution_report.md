@@ -154,3 +154,41 @@ This report records the first live execution of the CT2 manual QA pack against t
 ### Expanded rerun conclusion
 - No new blocker or regression was found during the CT2-wide scripted coverage expansion.
 - The remaining validation debt is now concentrated in performance/accessibility evidence, executed Windows XAMPP runtime evidence, and a small set of less-used manual/API mutation paths rather than the core CT2 browser workflows.
+
+## API POST Regression Rerun
+- Date: March 10, 2026
+- Branch: `develop`
+- Validation entrypoint: `bash ct2_back_office/scripts/ct2_api_post_regression_check.sh`
+- Scope: stable CT2 JSON write endpoints, malformed-payload handling, representative permission boundaries, and API log/audit evidence
+
+### API POST regression results
+| Scenario Family | Actor | Result | Evidence |
+| --- | --- | --- | --- |
+| Auth and anonymous denial | `ct2admin`, anonymous | Pass | API login returned `200` for seeded admin, `401` for bad credentials, and anonymous `POST /api/ct2_agents.php` returned clean JSON `403`. |
+| Agents, approvals, and staff writes | `ct2admin` | Pass | Agent create, approval decision, and staff create all returned JSON `200`; malformed payloads returned `422`; audit rows and search/readbacks matched the created records. |
+| Supplier API writes | `ct2admin` | Pass | Supplier create, onboarding update, contract create, and KPI create all returned JSON `200`; malformed payloads returned `422`; persisted values and audit rows matched expectations. |
+| Availability API writes | `ct2admin` | Pass | Resource create, allocation create, and dispatch create all returned JSON `200`; malformed payloads returned `422`; created resource/allocation/dispatch data was visible in follow-up reads. |
+| Marketing API writes | `ct2admin` | Pass | Campaign, promotion, voucher, and affiliate creates all returned JSON `200`; malformed payloads returned `422`; created codes were visible in follow-up reads and audit rows matched. |
+| Visa API writes | `ct2admin` | Pass | Visa application, checklist metadata update, payment create, and status update all returned JSON `200`; malformed payloads returned `422`; checklist status, document metadata, payment reference, and application status persisted correctly. |
+| Financial API writes and permissions | `ct2admin`, `ct2desk` | Pass | Financial report create and reconciliation-flag update returned JSON `200`; malformed payloads returned `422`; `ct2desk` received clean JSON `403` on protected financial POST paths. |
+
+### API POST rerun conclusion
+- No JSON write blocker was found in the stable CT2 POST endpoints covered by the new regression script.
+- The remaining API validation debt is now narrower and mostly limited to less-used endpoint families or business-judgment scenarios rather than baseline contract safety.
+
+## NFR Sanity Rerun
+- Date: March 10, 2026
+- Branch: `develop`
+- Validation entrypoint: `bash ct2_back_office/scripts/ct2_nfr_sanity_check.sh`
+- Scope: structural heading/label checks plus local seeded timing samples
+
+### NFR sanity results
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Structural heading coverage | Pass | Core auth, dashboard, agents, staff, suppliers, availability, marketing, financial, visa, and approvals views all retained primary `h2` headings. |
+| Structural form-label coverage | Pass | Core form-heavy auth, agents, staff, suppliers, availability, marketing, financial, and visa views all retained label markup. |
+| Seeded local timing samples | Pass | `login_get=0.002305s`, `login_post=0.394561s`, `dashboard=0.014834s`, `agents_filtered=0.006942s`, `module_status_api=0.009459s`, all below the current `5.00s` sanity ceiling. |
+
+### NFR sanity conclusion
+- Performance sanity is now directly evidenced for the seeded local environment.
+- Accessibility evidence is stronger than before, but keyboard-only navigation and focus-behavior evidence still require a real browser walkthrough on the supported runtime targets.

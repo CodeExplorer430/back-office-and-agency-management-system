@@ -41,6 +41,28 @@ try {
             echo (string) ct2ProbeScalar($ct2Pdo, $ct2Sql, $ct2Params);
             break;
 
+        case 'api-log-count':
+            $ct2EndpointName = $argv[2] ?? '';
+            if ($ct2EndpointName === '') {
+                throw new InvalidArgumentException('api-log-count requires an endpoint name.');
+            }
+
+            $ct2Sql = 'SELECT COUNT(*) FROM ct2_api_logs WHERE endpoint_name = :endpoint_name';
+            $ct2Params = ['endpoint_name' => $ct2EndpointName];
+
+            if (($argv[3] ?? '') !== '') {
+                $ct2Sql .= ' AND http_method = :http_method';
+                $ct2Params['http_method'] = strtoupper((string) $argv[3]);
+            }
+
+            if (($argv[4] ?? '') !== '') {
+                $ct2Sql .= ' AND status_code = :status_code';
+                $ct2Params['status_code'] = (int) $argv[4];
+            }
+
+            echo (string) ct2ProbeScalar($ct2Pdo, $ct2Sql, $ct2Params);
+            break;
+
         case 'agent-id':
             echo (string) ct2ProbeIdByCode($ct2Pdo, 'ct2_agents', 'ct2_agent_id', 'agent_code', $argv[2] ?? '', 'agent');
             break;

@@ -38,6 +38,8 @@ This repository contains the `CORE TRANSACTION 2: Back-Office and Agency Managem
 - Run `bash ct2_back_office/scripts/ct2_lint.sh` before every commit.
 - Run `php ct2_back_office/scripts/ct2_smoke_check.php` before every commit.
 - Run `php ct2_back_office/scripts/ct2_db_smoke_check.php` whenever local DB-backed behavior, seeds, or schema compatibility are part of the work.
+- Run `bash ct2_back_office/scripts/ct2_api_post_regression_check.sh` whenever JSON API write contracts, validation, or permission boundaries change.
+- Run `bash ct2_back_office/scripts/ct2_nfr_sanity_check.sh` before releases or when auth, dashboard, route performance, or shared form markup changes.
 - Run `bash ct2_back_office/scripts/ct2_runtime_hardening_check.sh` whenever auth, CSRF, session, upload, approval, audit-log, or financial export behavior changes.
 - Run `bash ct2_back_office/scripts/ct2_route_matrix_check.sh` whenever route rendering, filter behavior, representative JSON GET coverage, or export breadth changes.
 - Import `ct2_back_office/ct2_setup.sql` into a clean MySQL database before claiming schema work is complete.
@@ -45,6 +47,7 @@ This repository contains the `CORE TRANSACTION 2: Back-Office and Agency Managem
 - Keep `docs/ct2_qa_execution_report.md` and `docs/ct2_qa_fix_queue.md` updated after live QA passes so validated behavior and open defects stay explicit.
 - Keep `docs/ct2_requirements_traceability_matrix.md` and `docs/ct2_requirements_audit_backlog.md` updated whenever CT2 scope, validation evidence, or source-of-truth assumptions change.
 - Keep `docs/ct2_nfr_evidence.md` aligned with the current hardening scripts and the non-functional claims used in release or audit documents.
+- Keep `docs/ct2_performance_accessibility_evidence.md` and `docs/ct2_windows_xampp_validation_pack.md` aligned with the active seeded validation workflow and the supported runtime contract.
 - Keep `docs/ct2_deployment_guide.md` and `docs/ct2_operator_runbook.md` aligned with the active `develop` release process and supported LAMP/XAMPP runtime expectations.
 - Do not merge code that emits PHP warnings, notices, or fatal errors under `E_ALL`.
 
@@ -78,7 +81,9 @@ This repository contains the `CORE TRANSACTION 2: Back-Office and Agency Managem
 - Validate the full route set on local PHP/Apache:
   dashboard, agents, suppliers, availability, marketing, financial, visa, staff, approvals.
 - Validate representative JSON endpoints under `ct2_back_office/api/` and confirm JSON envelopes, HTTP status codes, and audit/API log creation remain correct.
+- Run `bash ct2_back_office/scripts/ct2_api_post_regression_check.sh` after API write changes so representative success, `422`, and permission-denied paths stay JSON-only under the seeded environment.
 - Run `bash ct2_back_office/scripts/ct2_route_matrix_check.sh` after major UI or filter changes so all module index/filter/export routes stay warning-free under the seeded environment.
+- Use `docs/ct2_windows_xampp_validation_pack.md` as the handoff packet for Windows evidence collection rather than maintaining a separate Windows-only runtime path in code.
 
 ## Review Focus
 - Security regressions first: authentication, authorization, CSRF, SQL safety, output escaping.

@@ -35,6 +35,8 @@ $ct2RequiredFiles = [
     __DIR__ . '/../ct2_setup.sql',
     __DIR__ . '/../../docs/ct2_manual_qa_pack.md',
     __DIR__ . '/../../docs/ct2_api_validation.md',
+    __DIR__ . '/../../docs/ct2_deployment_guide.md',
+    __DIR__ . '/../../docs/ct2_operator_runbook.md',
 ];
 
 $ct2MissingFiles = [];

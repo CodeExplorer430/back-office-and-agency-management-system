@@ -3,6 +3,8 @@
 ## Purpose
 Use this guide to validate the integrated `CORE TRANSACTION 2: Back-Office and Agency Management System` on a clean LAMP or Windows XAMPP environment. The same seeded database supports both client-facing UAT and internal technical smoke coverage.
 
+Read this after completing the install flow in `docs/ct2_deployment_guide.md`.
+
 ## Environment Setup
 1. Copy `ct2_back_office/config/ct2_local.php.example` to `ct2_back_office/config/ct2_local.php` and set TCP MySQL credentials.
 2. Import `ct2_back_office/ct2_setup.sql` into a clean `ct2_back_office` database.

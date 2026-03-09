@@ -25,6 +25,21 @@ final class CT2_Database
             }
         }
 
+        $ct2EnvironmentOverrides = [
+            'host' => getenv('CT2_DB_HOST'),
+            'port' => getenv('CT2_DB_PORT'),
+            'name' => getenv('CT2_DB_NAME'),
+            'username' => getenv('CT2_DB_USER'),
+            'password' => getenv('CT2_DB_PASS'),
+            'charset' => getenv('CT2_DB_CHARSET'),
+        ];
+
+        foreach ($ct2EnvironmentOverrides as $ct2Key => $ct2Value) {
+            if ($ct2Value !== false) {
+                $ct2Config[$ct2Key] = $ct2Value;
+            }
+        }
+
         return $ct2Config;
     }
 

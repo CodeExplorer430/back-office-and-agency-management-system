@@ -8,9 +8,9 @@ final class CT2_DocumentRegistryModel extends CT2_BaseModel
     {
         $ct2Statement = $this->ct2Pdo->prepare(
             'INSERT INTO ct2_documents (
-                entity_type, entity_id, file_name, file_path, mime_type, uploaded_by
+                entity_type, entity_id, file_name, file_path, mime_type, file_size_bytes, uploaded_by
             ) VALUES (
-                :entity_type, :entity_id, :file_name, :file_path, :mime_type, :uploaded_by
+                :entity_type, :entity_id, :file_name, :file_path, :mime_type, :file_size_bytes, :uploaded_by
             )'
         );
         $ct2Statement->execute(
@@ -20,6 +20,7 @@ final class CT2_DocumentRegistryModel extends CT2_BaseModel
                 'file_name' => $ct2Payload['file_name'],
                 'file_path' => $ct2Payload['file_path'],
                 'mime_type' => $ct2Payload['mime_type'],
+                'file_size_bytes' => $ct2Payload['file_size_bytes'] ?? 0,
                 'uploaded_by' => $ct2UserId,
             ]
         );

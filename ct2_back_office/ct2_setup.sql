@@ -108,6 +108,7 @@ CREATE TABLE IF NOT EXISTS ct2_documents (
     file_name VARCHAR(255) NOT NULL,
     file_path VARCHAR(255) NOT NULL,
     mime_type VARCHAR(120) NOT NULL,
+    file_size_bytes INT UNSIGNED NOT NULL DEFAULT 0,
     uploaded_by INT UNSIGNED NULL,
     uploaded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_ct2_documents_entity (entity_type, entity_id),

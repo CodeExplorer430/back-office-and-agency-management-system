@@ -18,6 +18,24 @@ final class CT2_VisaChecklistModel extends CT2_BaseModel
         return $ct2Checklist !== false ? (int) $ct2Checklist['ct2_visa_application_id'] : null;
     }
 
+    public function getChecklistUploadContext(int $ct2ApplicationChecklistId): ?array
+    {
+        $ct2Statement = $this->ct2Pdo->prepare(
+            'SELECT
+                ac.ct2_visa_application_id,
+                ci.file_size_limit_mb,
+                ci.item_name
+             FROM ct2_application_checklist AS ac
+             INNER JOIN ct2_visa_checklist_items AS ci ON ci.ct2_visa_checklist_item_id = ac.ct2_visa_checklist_item_id
+             WHERE ac.ct2_application_checklist_id = :ct2_application_checklist_id
+             LIMIT 1'
+        );
+        $ct2Statement->execute(['ct2_application_checklist_id' => $ct2ApplicationChecklistId]);
+        $ct2Context = $ct2Statement->fetch();
+
+        return $ct2Context !== false ? $ct2Context : null;
+    }
+
     public function getTemplateItems(?int $ct2VisaTypeId = null): array
     {
         $ct2Sql = 'SELECT ci.*, vt.visa_code, vt.country_name, vt.visa_category
@@ -73,7 +91,8 @@ final class CT2_VisaChecklistModel extends CT2_BaseModel
                 ci.requires_original,
                 d.file_name,
                 d.file_path,
-                d.mime_type
+                d.mime_type,
+                d.file_size_bytes
             FROM ct2_application_checklist AS ac
             INNER JOIN ct2_visa_applications AS va ON va.ct2_visa_application_id = ac.ct2_visa_application_id
             INNER JOIN ct2_visa_checklist_items AS ci ON ci.ct2_visa_checklist_item_id = ac.ct2_visa_checklist_item_id

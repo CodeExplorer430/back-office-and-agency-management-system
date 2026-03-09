@@ -149,7 +149,7 @@ $ct2ApplicationForm = $ct2ApplicationForEdit ?? null;
 
     <article class="ct2-panel">
         <h3>Document And Checklist Verification</h3>
-        <form method="post" action="<?= htmlspecialchars(ct2_url(['module' => 'visa', 'action' => 'saveDocumentChecklist']), ENT_QUOTES, 'UTF-8'); ?>" class="ct2-form">
+        <form method="post" action="<?= htmlspecialchars(ct2_url(['module' => 'visa', 'action' => 'saveDocumentChecklist']), ENT_QUOTES, 'UTF-8'); ?>" class="ct2-form" enctype="multipart/form-data">
             <input type="hidden" name="ct2_csrf_token" value="<?= htmlspecialchars(ct2_csrf_token(), ENT_QUOTES, 'UTF-8'); ?>">
             <label class="ct2-label">Application</label>
             <select class="ct2-select" name="ct2_visa_application_id" required>
@@ -171,12 +171,8 @@ $ct2ApplicationForm = $ct2ApplicationForEdit ?? null;
                     <option value="<?= $ct2Option; ?>"><?= htmlspecialchars(ucfirst($ct2Option), ENT_QUOTES, 'UTF-8'); ?></option>
                 <?php endforeach; ?>
             </select>
-            <label class="ct2-label">File Name</label>
-            <input class="ct2-input" name="file_name" placeholder="passport-copy.pdf">
-            <label class="ct2-label">File Path</label>
-            <input class="ct2-input" name="file_path" placeholder="uploads/visa/passport-copy.pdf">
-            <label class="ct2-label">Mime Type</label>
-            <input class="ct2-input" name="mime_type" placeholder="application/pdf">
+            <label class="ct2-label">Upload Document</label>
+            <input class="ct2-input" name="ct2_document_file" type="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
             <label class="ct2-label">Verification Notes</label>
             <textarea class="ct2-textarea" name="verification_notes" rows="3"></textarea>
             <button class="ct2-btn ct2-btn-primary" type="submit">Save Checklist Update</button>
@@ -284,7 +280,7 @@ $ct2ApplicationForm = $ct2ApplicationForEdit ?? null;
         <h3>Workflow Guardrails</h3>
         <ul class="ct2-checklist">
             <li>Customer, agent, and payment source records stay external and are linked only by ID.</li>
-            <li>Document uploads are represented as `ct2_documents` metadata until a real file transport layer is added.</li>
+            <li>Visa uploads now store real files in CT2-managed storage while keeping `ct2_documents` as the shared metadata registry.</li>
             <li>Approval requests are reserved for escalated-review cases or explicit exception handling.</li>
             <li>Payment status is recalculated from completed payment records against the visa type base fee.</li>
         </ul>
@@ -417,6 +413,7 @@ $ct2ApplicationForm = $ct2ApplicationForEdit ?? null;
                     <th>Application</th>
                     <th>File</th>
                     <th>Path</th>
+                    <th>Size</th>
                     <th>Mime</th>
                 </tr>
                 </thead>
@@ -426,11 +423,12 @@ $ct2ApplicationForm = $ct2ApplicationForEdit ?? null;
                         <td><?= htmlspecialchars((string) ($ct2Document['application_reference'] ?? '-'), ENT_QUOTES, 'UTF-8'); ?></td>
                         <td><?= htmlspecialchars((string) $ct2Document['file_name'], ENT_QUOTES, 'UTF-8'); ?></td>
                         <td><?= htmlspecialchars((string) $ct2Document['file_path'], ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?= number_format(((int) ($ct2Document['file_size_bytes'] ?? 0)) / 1024, 1); ?> KB</td>
                         <td><?= htmlspecialchars((string) $ct2Document['mime_type'], ENT_QUOTES, 'UTF-8'); ?></td>
                     </tr>
                 <?php endforeach; ?>
                 <?php if ($ct2Documents === []): ?>
-                    <tr><td colspan="4">No visa documents registered yet.</td></tr>
+                    <tr><td colspan="5">No visa documents registered yet.</td></tr>
                 <?php endif; ?>
                 </tbody>
             </table>

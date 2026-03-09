@@ -11,6 +11,7 @@ if (!extension_loaded('pdo_mysql')) {
 
 $ct2Config = CT2_Database::getConfig();
 $ct2SessionPath = CT2_BASE_PATH . '/storage/sessions';
+$ct2UploadPath = CT2_BASE_PATH . '/storage/uploads';
 
 if (!is_dir($ct2SessionPath)) {
     fwrite(STDERR, "Session path does not exist: {$ct2SessionPath}\n");
@@ -19,6 +20,16 @@ if (!is_dir($ct2SessionPath)) {
 
 if (!is_writable($ct2SessionPath)) {
     fwrite(STDERR, "Session path is not writable: {$ct2SessionPath}\n");
+    exit(1);
+}
+
+if (!is_dir($ct2UploadPath)) {
+    fwrite(STDERR, "Upload path does not exist: {$ct2UploadPath}\n");
+    exit(1);
+}
+
+if (!is_writable($ct2UploadPath)) {
+    fwrite(STDERR, "Upload path is not writable: {$ct2UploadPath}\n");
     exit(1);
 }
 
@@ -81,6 +92,26 @@ foreach ($ct2RequiredTables as $ct2RequiredTable) {
 
 if ($ct2MissingTables !== []) {
     fwrite(STDERR, "Missing CT2 tables:\n" . implode("\n", $ct2MissingTables) . "\n");
+    exit(1);
+}
+
+$ct2ColumnStatement = $ct2Pdo->prepare(
+    'SELECT COUNT(*)
+     FROM information_schema.columns
+     WHERE table_schema = :table_schema
+       AND table_name = :table_name
+       AND column_name = :column_name'
+);
+$ct2ColumnStatement->execute(
+    [
+        'table_schema' => $ct2CurrentDatabase,
+        'table_name' => 'ct2_documents',
+        'column_name' => 'file_size_bytes',
+    ]
+);
+
+if ((int) $ct2ColumnStatement->fetchColumn() !== 1) {
+    fwrite(STDERR, "ct2_documents.file_size_bytes is missing from the active CT2 schema.\n");
     exit(1);
 }
 

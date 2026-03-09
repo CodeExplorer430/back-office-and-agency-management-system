@@ -174,16 +174,40 @@ final class CT2_VisaController extends CT2_BaseController
             throw new InvalidArgumentException('Document verification requires an application and checklist item.');
         }
 
-        $ct2ChecklistApplicationId = $this->ct2VisaChecklistModel->findApplicationIdByChecklistId($ct2ApplicationChecklistId);
-        if ($ct2ChecklistApplicationId === null || $ct2ChecklistApplicationId !== $ct2VisaApplicationId) {
+        $ct2ChecklistContext = $this->ct2VisaChecklistModel->getChecklistUploadContext($ct2ApplicationChecklistId);
+        if ($ct2ChecklistContext === null || (int) $ct2ChecklistContext['ct2_visa_application_id'] !== $ct2VisaApplicationId) {
             throw new InvalidArgumentException('Checklist item does not match the selected visa application.');
         }
 
         $ct2FileName = trim((string) ($_POST['file_name'] ?? ''));
         $ct2FilePath = trim((string) ($_POST['file_path'] ?? ''));
         $ct2MimeType = trim((string) ($_POST['mime_type'] ?? ''));
+        $ct2UploadFile = $_FILES['ct2_document_file'] ?? null;
+        $ct2HasUploadedFile = is_array($ct2UploadFile)
+            && isset($ct2UploadFile['error'])
+            && (int) $ct2UploadFile['error'] !== UPLOAD_ERR_NO_FILE;
 
-        if ($ct2FileName !== '' || $ct2FilePath !== '' || $ct2MimeType !== '') {
+        if ($ct2HasUploadedFile) {
+            $ct2UploadService = new CT2_UploadService();
+            $ct2StoredDocument = $ct2UploadService->storeUploadedFile(
+                $ct2UploadFile,
+                'visa_application',
+                $ct2VisaApplicationId,
+                (int) ($ct2ChecklistContext['file_size_limit_mb'] ?? 5)
+            );
+
+            $ct2Payload['ct2_document_id'] = $this->ct2DocumentRegistryModel->create(
+                [
+                    'entity_type' => 'visa_application',
+                    'entity_id' => $ct2VisaApplicationId,
+                    'file_name' => $ct2StoredDocument['file_name'],
+                    'file_path' => $ct2StoredDocument['file_path'],
+                    'mime_type' => $ct2StoredDocument['mime_type'],
+                    'file_size_bytes' => $ct2StoredDocument['file_size_bytes'],
+                ],
+                (int) ct2_current_user_id()
+            );
+        } elseif ($ct2FileName !== '' || $ct2FilePath !== '' || $ct2MimeType !== '') {
             foreach (['file_name' => $ct2FileName, 'file_path' => $ct2FilePath, 'mime_type' => $ct2MimeType] as $ct2FieldKey => $ct2FieldValue) {
                 if ($ct2FieldValue === '') {
                     throw new InvalidArgumentException('Incomplete document metadata. Provide file name, file path, and mime type together.');
@@ -197,6 +221,7 @@ final class CT2_VisaController extends CT2_BaseController
                     'file_name' => $ct2FileName,
                     'file_path' => $ct2FilePath,
                     'mime_type' => $ct2MimeType,
+                    'file_size_bytes' => 0,
                 ],
                 (int) ct2_current_user_id()
             );

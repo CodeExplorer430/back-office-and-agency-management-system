@@ -26,6 +26,7 @@ This repository contains the `CORE TRANSACTION 2: Back-Office and Agency Managem
 - Use `password_hash` and `password_verify` for credentials.
 - Enforce CSRF checks on state-changing form requests.
 - Return JSON only from `/api/*` with `Content-Type: application/json`.
+- Keep browser file uploads inside controller/form flows; do not switch `/api/*` endpoints to multipart without an explicit new contract.
 
 ## Database Standards
 - All CT2 tables must be created in `ct2_setup.sql`.
@@ -62,6 +63,7 @@ This repository contains the `CORE TRANSACTION 2: Back-Office and Agency Managem
 
 ## Local Runtime Validation
 - Copy `ct2_back_office/config/ct2_local.php.example` to `ct2_back_office/config/ct2_local.php` and set explicit TCP MySQL credentials for either LAMP or Windows XAMPP.
+- Environment variables must override `ct2_local.php` when both are present.
 - Import `ct2_back_office/ct2_setup.sql` into a clean `ct2_back_office` database before browser testing.
 - Run `php ct2_back_office/scripts/ct2_db_smoke_check.php` after import and before browser testing.
 - Use the seeded administrator account for first login:

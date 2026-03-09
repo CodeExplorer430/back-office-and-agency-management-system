@@ -113,29 +113,29 @@
 </section>
 
 <section class="ct2-grid-3">
-    <article class="ct2-placeholder-card">
+    <article class="ct2-module-card">
         <h3>Supplier and Partner Management</h3>
-        <p>Supplier onboarding, contract tracking, KPI scoring, and relationship notes are now available as the second CT2 module slice.</p>
-        <a class="ct2-link" href="<?= htmlspecialchars(ct2_url(['module' => 'suppliers', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Open module</a>
+        <p>Manage supplier onboarding, contract exposure, KPI scoring, and relationship history from one operational workspace.</p>
+        <a class="ct2-link" href="<?= htmlspecialchars(ct2_url(['module' => 'suppliers', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Open suppliers</a>
     </article>
-    <article class="ct2-placeholder-card">
+    <article class="ct2-module-card">
         <h3>Tour Availability and Resource Planning</h3>
-        <p>Resource planning, soft-block availability checks, seasonal blocks, and dispatch support are now available as a CT2 module.</p>
-        <a class="ct2-link" href="<?= htmlspecialchars(ct2_url(['module' => 'availability', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Open module</a>
+        <p>Coordinate resource allocation, soft-block conflict checks, seasonal blocks, and dispatch activity for active tours.</p>
+        <a class="ct2-link" href="<?= htmlspecialchars(ct2_url(['module' => 'availability', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Open availability</a>
     </article>
-    <article class="ct2-placeholder-card">
+    <article class="ct2-module-card">
         <h3>Marketing and Promotions Management</h3>
-        <p>Campaign management, promotions, voucher tracking, affiliates, and attribution reporting are now available as a CT2 module.</p>
-        <a class="ct2-link" href="<?= htmlspecialchars(ct2_url(['module' => 'marketing', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Open module</a>
+        <p>Run campaigns, promotions, vouchers, affiliate referrals, and attribution reporting without leaving CT2.</p>
+        <a class="ct2-link" href="<?= htmlspecialchars(ct2_url(['module' => 'marketing', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Open marketing</a>
     </article>
-    <article class="ct2-placeholder-card">
+    <article class="ct2-module-card">
         <h3>Document and Visa Assistance</h3>
-        <p>Visa intake, checklist verification, payment references, and notification tracking are now available as a CT2 module.</p>
-        <a class="ct2-link" href="<?= htmlspecialchars(ct2_url(['module' => 'visa', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Open module</a>
+        <p>Track visa intake, checklist verification, uploaded documents, payment references, and outbound notifications.</p>
+        <a class="ct2-link" href="<?= htmlspecialchars(ct2_url(['module' => 'visa', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Open visa</a>
     </article>
-    <article class="ct2-placeholder-card">
+    <article class="ct2-module-card">
         <h3>Financial Reporting and Analytics</h3>
-        <p>Operational report definitions, reconciliation flags, financial snapshots, and CSV exports are now available for CT2 users with finance permissions.</p>
-        <a class="ct2-link" href="<?= htmlspecialchars(ct2_url(['module' => 'financial', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Open module</a>
+        <p>Review operational financial snapshots, reconciliation flags, and CSV-ready reporting across CT2 activity.</p>
+        <a class="ct2-link" href="<?= htmlspecialchars(ct2_url(['module' => 'financial', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Open financial</a>
     </article>
 </section>

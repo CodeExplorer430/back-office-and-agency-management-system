@@ -36,7 +36,7 @@ body.ct2-body {
 .ct2-nav,
 .ct2-panel,
 .ct2-stat-card,
-.ct2-placeholder-card,
+.ct2-module-card,
 .ct2-auth-card {
     background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(6px);
@@ -145,7 +145,7 @@ body.ct2-body {
 }
 
 .ct2-stat-card,
-.ct2-placeholder-card,
+.ct2-module-card,
 .ct2-panel {
     padding: 22px;
     border-radius: var(--ct2-radius);

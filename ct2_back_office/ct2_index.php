@@ -18,7 +18,6 @@ $ct2ControllerMap = [
     'visa' => CT2_VisaController::class,
     'staff' => CT2_StaffController::class,
     'approvals' => CT2_ApprovalController::class,
-    'placeholders' => CT2_PlaceholderController::class,
 ];
 
 if (!isset($ct2ControllerMap[$ct2Module])) {

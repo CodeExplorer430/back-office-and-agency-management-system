@@ -37,6 +37,8 @@ $ct2RequiredFiles = [
     __DIR__ . '/../../docs/ct2_api_validation.md',
     __DIR__ . '/../../docs/ct2_qa_execution_report.md',
     __DIR__ . '/../../docs/ct2_qa_fix_queue.md',
+    __DIR__ . '/../../docs/ct2_requirements_traceability_matrix.md',
+    __DIR__ . '/../../docs/ct2_requirements_audit_backlog.md',
     __DIR__ . '/../../docs/ct2_deployment_guide.md',
     __DIR__ . '/../../docs/ct2_operator_runbook.md',
 ];

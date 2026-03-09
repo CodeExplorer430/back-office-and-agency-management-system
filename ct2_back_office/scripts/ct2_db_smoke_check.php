@@ -162,6 +162,45 @@ if ((int) $ct2PermissionStatement->fetchColumn() < 3) {
     exit(1);
 }
 
+$ct2RequiredUsers = [
+    'ct2admin',
+    'ct2manager',
+    'ct2lead',
+    'ct2desk',
+    'ct2finance',
+];
+
+$ct2RequiredUserStatement = $ct2Pdo->prepare(
+    'SELECT COUNT(*)
+     FROM ct2_users
+     WHERE username = :username'
+);
+
+foreach ($ct2RequiredUsers as $ct2RequiredUser) {
+    $ct2RequiredUserStatement->execute(['username' => $ct2RequiredUser]);
+    if ((int) $ct2RequiredUserStatement->fetchColumn() !== 1) {
+        fwrite(STDERR, "Required QA user seed is missing: {$ct2RequiredUser}\n");
+        exit(1);
+    }
+}
+
+$ct2SeedChecks = [
+    'SELECT COUNT(*) FROM ct2_agents WHERE agent_code = "AGT-CT2-001"' => 'Seeded agent AGT-CT2-001 is missing.',
+    'SELECT COUNT(*) FROM ct2_suppliers WHERE supplier_code = "SUP-CT2-001"' => 'Seeded supplier SUP-CT2-001 is missing.',
+    'SELECT COUNT(*) FROM ct2_tour_packages WHERE package_name = "Northern Luzon Discovery QA"' => 'Seeded tour package is missing.',
+    'SELECT COUNT(*) FROM ct2_campaigns WHERE campaign_code = "CT2-MKT-001"' => 'Seeded marketing campaign CT2-MKT-001 is missing.',
+    'SELECT COUNT(*) FROM ct2_visa_applications WHERE application_reference = "VISA-APP-001"' => 'Seeded visa application VISA-APP-001 is missing.',
+    'SELECT COUNT(*) FROM ct2_report_runs WHERE run_label = "QA Baseline Cross-Module Run"' => 'Seeded financial report run is missing.',
+    'SELECT COUNT(*) FROM ct2_approval_workflows WHERE approval_status = "pending"' => 'Seeded pending approval workflows are missing.',
+];
+
+foreach ($ct2SeedChecks as $ct2Query => $ct2Error) {
+    if ((int) $ct2Pdo->query($ct2Query)->fetchColumn() < 1) {
+        fwrite(STDERR, $ct2Error . "\n");
+        exit(1);
+    }
+}
+
 echo "CT2 DB smoke check passed.\n";
 echo "Database: {$ct2CurrentDatabase}\n";
 echo "Host: {$ct2Config['host']}:{$ct2Config['port']}\n";

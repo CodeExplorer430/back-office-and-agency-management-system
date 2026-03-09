@@ -33,6 +33,8 @@ $ct2RequiredFiles = [
     __DIR__ . '/../api/ct2_dispatch_orders.php',
     __DIR__ . '/../api/ct2_module_status.php',
     __DIR__ . '/../ct2_setup.sql',
+    __DIR__ . '/../../docs/ct2_manual_qa_pack.md',
+    __DIR__ . '/../../docs/ct2_api_validation.md',
 ];
 
 $ct2MissingFiles = [];

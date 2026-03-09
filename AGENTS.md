@@ -39,6 +39,7 @@ This repository contains the `CORE TRANSACTION 2: Back-Office and Agency Managem
 - Run `php ct2_back_office/scripts/ct2_smoke_check.php` before every commit.
 - Run `php ct2_back_office/scripts/ct2_db_smoke_check.php` whenever local DB-backed behavior, seeds, or schema compatibility are part of the work.
 - Import `ct2_back_office/ct2_setup.sql` into a clean MySQL database before claiming schema work is complete.
+- Keep `docs/ct2_manual_qa_pack.md` and `docs/ct2_api_validation.md` in sync with seeded roles, demo records, and validation flows whenever QA behavior changes.
 - Do not merge code that emits PHP warnings, notices, or fatal errors under `E_ALL`.
 
 ## Definition Of Done

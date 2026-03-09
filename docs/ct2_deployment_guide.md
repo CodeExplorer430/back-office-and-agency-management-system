@@ -8,6 +8,7 @@ This guide is the client-facing handoff for deploying `CORE TRANSACTION 2: Back-
 - Entry point: `ct2_back_office/ct2_index.php`
 - Database schema and seed data: `ct2_back_office/ct2_setup.sql`
 - Runtime config template: `ct2_back_office/config/ct2_local.php.example`
+- Approved release summary: `docs/ct2_release_summary_2026-03-10.md`
 - Post-install validation: `docs/ct2_manual_qa_pack.md` and `docs/ct2_api_validation.md`
 
 ## Supported Runtime
@@ -19,7 +20,7 @@ This guide is the client-facing handoff for deploying `CORE TRANSACTION 2: Back-
   `ct2_back_office/storage/uploads/`
 
 ## Pre-Install Checklist
-1. Check out the integrated `develop` branch or the approved release branch derived from it.
+1. Check out the approved `main` branch or the tagged release state derived from it.
 2. Create a MySQL database named `ct2_back_office`.
 3. Confirm the target host can reach MySQL over TCP, typically `127.0.0.1:3306`.
 4. Confirm PHP can write to `ct2_back_office/storage/`.
@@ -86,6 +87,6 @@ Run the acceptance flow in this order:
 - Review role permissions before exposing the system to non-test users.
 
 ## Release Baseline
-- `develop` is the integrated CT2 baseline.
-- `main` remains the release branch and should only receive promoted, validated work.
-- If a client release is cut, tag or branch from a validated state rather than deploying arbitrary local changes.
+- `develop` remains the integration baseline for ongoing CT2 work.
+- `main` is the approved release branch.
+- The current validated CT2 release is summarized in `docs/ct2_release_summary_2026-03-10.md`.

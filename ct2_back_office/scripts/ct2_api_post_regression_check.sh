@@ -704,6 +704,7 @@ assert_json_response '422' "$CT2_HEADERS" "$CT2_BODY" 'false' "Financial snapsho
 assert_equals "$((CT2_FLAGS_422_BEFORE + 1))" "$(api_log_count ct2_financial_snapshots 422)" "Financial snapshots API 422 log count did not increment"
 
 CT2_FLAGS_200_BEFORE="$(api_log_count ct2_financial_snapshots 200)"
+CT2_FLAG_AUDIT_BEFORE="$(probe audit-count financial.api_flag_update reconciliation_flag "$CT2_FLAG_ID")"
 http_post_json "$CT2_COOKIE_ADMIN" "$CT2_API_BASE_URL/ct2_financial_snapshots.php" "{
   \"ct2_reconciliation_flag_id\":$CT2_FLAG_ID,
   \"flag_status\":\"acknowledged\",
@@ -711,7 +712,7 @@ http_post_json "$CT2_COOKIE_ADMIN" "$CT2_API_BASE_URL/ct2_financial_snapshots.ph
 }" "$CT2_HEADERS" "$CT2_BODY" >/dev/null
 assert_json_response '200' "$CT2_HEADERS" "$CT2_BODY" 'true' "Financial snapshots API update did not return JSON 200"
 assert_equals "$((CT2_FLAGS_200_BEFORE + 1))" "$(api_log_count ct2_financial_snapshots 200)" "Financial snapshots API 200 log count did not increment"
-assert_equals "1" "$(probe audit-count financial.api_flag_update reconciliation_flag "$CT2_FLAG_ID")" "Financial snapshots API audit row was not recorded"
+assert_equals "$((CT2_FLAG_AUDIT_BEFORE + 1))" "$(probe audit-count financial.api_flag_update reconciliation_flag "$CT2_FLAG_ID")" "Financial snapshots API audit row did not increment"
 assert_equals "acknowledged" "$(probe flag-field suppliers SUP-CT2-002 flag_status)" "Financial snapshots API did not persist the flag status"
 assert_equals "$CT2_FLAG_NOTE" "$(probe flag-field suppliers SUP-CT2-002 resolution_notes)" "Financial snapshots API did not persist the resolution note"
 

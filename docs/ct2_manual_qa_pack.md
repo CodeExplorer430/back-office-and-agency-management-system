@@ -13,7 +13,10 @@ Read this after completing the install flow in `docs/ct2_deployment_guide.md`.
    `php ct2_back_office/scripts/ct2_smoke_check.php`
    `php ct2_back_office/scripts/ct2_db_smoke_check.php`
    `bash ct2_back_office/scripts/ct2_api_post_regression_check.sh`
+   `bash ct2_back_office/scripts/ct2_browser_accessibility_check.sh`
+   `bash ct2_back_office/scripts/ct2_load_profile_check.sh`
    `bash ct2_back_office/scripts/ct2_nfr_sanity_check.sh`
+   `bash ct2_back_office/scripts/ct2_role_uat_check.sh`
    `bash ct2_back_office/scripts/ct2_route_matrix_check.sh`
    `bash ct2_back_office/scripts/ct2_runtime_hardening_check.sh`
 4. Start the app and sign in through `ct2_back_office/ct2_index.php`.
@@ -100,10 +103,13 @@ All seeded users use the same initial password: `ChangeMe123!`
 ## Technical Validation Appendix
 ### Scripted baseline
 - `ct2_api_post_regression_check.sh` now covers the stable JSON write endpoints for auth, agents, staff, suppliers, approvals, availability, marketing, visa, and financial flows.
+- `ct2_browser_accessibility_check.sh` now covers real keyboard tab order and focus visibility for login, dashboard navigation, agents, approvals, visa upload, and the financial export trigger.
+- `ct2_load_profile_check.sh` now covers repeated seeded timing samples for login, dashboard, filtered agents, module status, and financial export metadata.
 - `ct2_nfr_sanity_check.sh` now covers structural heading/label checks plus seeded local timing samples for login, dashboard, filtered agent search, and the module-status API.
+- `ct2_role_uat_check.sh` now covers seeded manager, front-desk, and accounting browser-role expectations, including approval access, visa access, financial denial, and CSV export.
 - `ct2_route_matrix_check.sh` now covers breadth for the main module routes, seeded filter variants, representative JSON GET endpoints, and financial CSV export.
 - `ct2_runtime_hardening_check.sh` now covers representative positive and negative writes across agents, suppliers, approvals, availability, marketing, visa, and financial workflows with direct audit-log assertions.
-- Manual QA should now focus on role-driven UAT behavior, operator judgment, and end-to-end sequencing rather than re-proving basic route health or representative persistence.
+- Manual QA should now focus on operator judgment, end-to-end sequencing, and Windows-target confirmation rather than re-proving baseline route health, keyboard reachability, or representative persistence.
 
 ### Route coverage
 - Validate navigation for: `dashboard`, `agents`, `suppliers`, `availability`, `marketing`, `financial`, `visa`, `staff`, `approvals`.

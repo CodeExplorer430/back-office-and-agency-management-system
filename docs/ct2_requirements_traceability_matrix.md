@@ -52,7 +52,7 @@ This matrix traces the current `CORE TRANSACTION 2: Back-Office and Agency Manag
 | NFR-07 | Runtime supports LAMP and Windows XAMPP through the same config contract. | Deployment guide, operator runbook | TCP-first DB config, local override template, upload/session paths | Local LAMP validation plus deployment docs | Implemented | Windows compatibility is documented rather than directly executed in the repo evidence. |
 | NFR-08 | Release and deployment process is documented and repeatable. | Release summary, deployment guide, operator runbook | Release tag, GitHub release, release docs, smoke scripts | Published GitHub release and local release verification | Implemented | Release state is now represented in repo docs and GitHub. |
 | NFR-09 | No warnings, notices, or fatal errors under normal validated flows. | `AGENTS.md`, NFR evidence | Smoke scripts, route matrix script, runtime hardening script, recent CSV export fix | `docs/ct2_qa_execution_report.md`, `docs/ct2_nfr_evidence.md` | Implemented | Proved on major module routes, seeded filters, representative JSON GET endpoints, upload, approval, and export flows; not intended as exhaustive fuzzing evidence. |
-| NFR-10 | Performance, accessibility, and load characteristics are explicitly evidenced. | NFR evidence need | `ct2_back_office/scripts/ct2_nfr_sanity_check.sh`, `docs/ct2_performance_accessibility_evidence.md`, `docs/ct2_nfr_evidence.md` | NFR sanity section in `docs/ct2_qa_execution_report.md` | Partially Implemented | Local performance sanity and structural accessibility are now directly evidenced, but keyboard navigation, focus behavior, and broader load evidence still remain unproven. |
+| NFR-10 | Performance, accessibility, and load characteristics are explicitly evidenced. | NFR evidence need | `ct2_back_office/scripts/ct2_nfr_sanity_check.sh`, `ct2_back_office/scripts/ct2_browser_accessibility_check.sh`, `ct2_back_office/scripts/ct2_load_profile_check.sh`, `docs/ct2_performance_accessibility_evidence.md`, `docs/ct2_nfr_evidence.md` | NFR sanity, browser accessibility, and repeated load sections in `docs/ct2_qa_execution_report.md` | Implemented | Evidence is now explicit for local repeated timings and real keyboard/focus traversal on the supported runtime; this is still not a formal certification claim. |
 
 ## Feature And Source Coverage Notes
 | ID | Requirement | Source Artifact | Implementation Evidence | Validation Evidence | Status | Notes |
@@ -63,7 +63,5 @@ This matrix traces the current `CORE TRANSACTION 2: Back-Office and Agency Manag
 
 ## Overall Assessment
 - CT2 is strongly implemented and release-validated for the repo-defined scope.
-- The main remaining repo-owned gaps are now concentrated in two areas:
-  executed keyboard/accessibility and broader load evidence,
-  and executed Windows XAMPP runtime evidence.
+- The main remaining repo-owned gap is now the executed Windows XAMPP runtime evidence.
 - Upstream diagram traceability remains an external dependency rather than an active CT2 implementation gap in this repository.

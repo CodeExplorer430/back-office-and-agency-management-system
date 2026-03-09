@@ -52,6 +52,10 @@ Run these commands from the repo root:
 
 `php ct2_back_office/scripts/ct2_db_smoke_check.php`
 
+`bash ct2_back_office/scripts/ct2_browser_accessibility_check.sh`
+
+`bash ct2_back_office/scripts/ct2_load_profile_check.sh`
+
 `bash ct2_back_office/scripts/ct2_route_matrix_check.sh`
 
 `bash ct2_back_office/scripts/ct2_runtime_hardening_check.sh`
@@ -59,6 +63,8 @@ Run these commands from the repo root:
 `bash ct2_back_office/scripts/ct2_api_post_regression_check.sh`
 
 `bash ct2_back_office/scripts/ct2_nfr_sanity_check.sh`
+
+`bash ct2_back_office/scripts/ct2_role_uat_check.sh`
 
 ### 5. Open the application
 1. Serve `ct2_back_office/` through Apache, the PHP built-in server, or XAMPP.
@@ -88,7 +94,8 @@ Run the acceptance flow in this order:
 5. Export one seeded financial CSV.
 6. Follow `docs/ct2_manual_qa_pack.md` for the full browser walkthrough.
 7. Follow `docs/ct2_api_validation.md` for representative JSON endpoint checks.
-8. On Windows XAMPP targets, complete the evidence table in `docs/ct2_windows_xampp_validation_pack.md`.
+8. On Linux or LAMP targets, record the browser accessibility, repeated load, and role-UAT results in the current QA and NFR docs if you are refreshing repo evidence.
+9. On Windows XAMPP targets, complete the evidence table in `docs/ct2_windows_xampp_validation_pack.md`.
 
 ## Initial Credentials And Security
 - Seeded accounts exist only to support first-time validation and UAT.

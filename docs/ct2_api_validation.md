@@ -7,6 +7,7 @@ Use this checklist after importing the seeded CT2 database to verify representat
 - Import `ct2_back_office/ct2_setup.sql`.
 - Run `php ct2_back_office/scripts/ct2_db_smoke_check.php`.
 - Run `bash ct2_back_office/scripts/ct2_api_post_regression_check.sh` for the scripted POST regression pass.
+- Run `bash ct2_back_office/scripts/ct2_role_uat_check.sh` when permission-boundary behavior is part of the validation pass.
 - Authenticate with a seeded account that has `api.access`, or use the browser session after logging in with `ct2admin`.
 
 ## Core API Expectations
@@ -80,4 +81,5 @@ Use this checklist after importing the seeded CT2 database to verify representat
 
 ## Scripted Baseline
 - `ct2_api_post_regression_check.sh` now covers representative success, malformed-payload, and permission-boundary checks for the stable CT2 POST endpoints.
-- Manual API validation should focus on role-specific business intent and any endpoint family not yet included in the scripted regression pass.
+- `ct2_role_uat_check.sh` complements the API pass by proving the seeded browser-side permission boundaries for manager, front desk, and accounting roles.
+- Manual API validation should focus on endpoint families not yet included in the scripted regression pass or on business-intent interpretation beyond raw contract safety.

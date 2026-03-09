@@ -39,7 +39,10 @@ This repository contains the `CORE TRANSACTION 2: Back-Office and Agency Managem
 - Run `php ct2_back_office/scripts/ct2_smoke_check.php` before every commit.
 - Run `php ct2_back_office/scripts/ct2_db_smoke_check.php` whenever local DB-backed behavior, seeds, or schema compatibility are part of the work.
 - Run `bash ct2_back_office/scripts/ct2_api_post_regression_check.sh` whenever JSON API write contracts, validation, or permission boundaries change.
+- Run `bash ct2_back_office/scripts/ct2_browser_accessibility_check.sh` whenever navigation order, shared forms, focus behavior, or keyboard reachability changes and a local Chrome binary is available.
+- Run `bash ct2_back_office/scripts/ct2_load_profile_check.sh` before releases or when auth, dashboard, filtered lists, or export metadata behavior changes.
 - Run `bash ct2_back_office/scripts/ct2_nfr_sanity_check.sh` before releases or when auth, dashboard, route performance, or shared form markup changes.
+- Run `bash ct2_back_office/scripts/ct2_role_uat_check.sh` whenever seeded role permissions, approval access, visa access, or financial access/export boundaries change.
 - Run `bash ct2_back_office/scripts/ct2_runtime_hardening_check.sh` whenever auth, CSRF, session, upload, approval, audit-log, or financial export behavior changes.
 - Run `bash ct2_back_office/scripts/ct2_route_matrix_check.sh` whenever route rendering, filter behavior, representative JSON GET coverage, or export breadth changes.
 - Import `ct2_back_office/ct2_setup.sql` into a clean MySQL database before claiming schema work is complete.
@@ -82,7 +85,10 @@ This repository contains the `CORE TRANSACTION 2: Back-Office and Agency Managem
   dashboard, agents, suppliers, availability, marketing, financial, visa, staff, approvals.
 - Validate representative JSON endpoints under `ct2_back_office/api/` and confirm JSON envelopes, HTTP status codes, and audit/API log creation remain correct.
 - Run `bash ct2_back_office/scripts/ct2_api_post_regression_check.sh` after API write changes so representative success, `422`, and permission-denied paths stay JSON-only under the seeded environment.
+- Run `bash ct2_back_office/scripts/ct2_browser_accessibility_check.sh` after shared navigation or form changes so real keyboard tab order and focus visibility stay documented on the supported local runtime.
+- Run `bash ct2_back_office/scripts/ct2_load_profile_check.sh` after performance-sensitive route changes so repeated seeded timings remain explicit instead of relying on one-off samples.
 - Run `bash ct2_back_office/scripts/ct2_route_matrix_check.sh` after major UI or filter changes so all module index/filter/export routes stay warning-free under the seeded environment.
+- Run `bash ct2_back_office/scripts/ct2_role_uat_check.sh` after role/permission changes so manager, front desk, and accounting seeded walkthroughs remain directly evidenced.
 - Use `docs/ct2_windows_xampp_validation_pack.md` as the handoff packet for Windows evidence collection rather than maintaining a separate Windows-only runtime path in code.
 
 ## Review Focus

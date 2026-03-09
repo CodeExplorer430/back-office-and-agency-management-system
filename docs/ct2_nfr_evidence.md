@@ -8,7 +8,10 @@ This document records the direct non-functional evidence that currently exists i
 - `php ct2_back_office/scripts/ct2_smoke_check.php`
 - `php ct2_back_office/scripts/ct2_db_smoke_check.php`
 - `bash ct2_back_office/scripts/ct2_api_post_regression_check.sh`
+- `bash ct2_back_office/scripts/ct2_browser_accessibility_check.sh`
+- `bash ct2_back_office/scripts/ct2_load_profile_check.sh`
 - `bash ct2_back_office/scripts/ct2_nfr_sanity_check.sh`
+- `bash ct2_back_office/scripts/ct2_role_uat_check.sh`
 - `bash ct2_back_office/scripts/ct2_route_matrix_check.sh`
 - `bash ct2_back_office/scripts/ct2_runtime_hardening_check.sh`
 - `docs/ct2_performance_accessibility_evidence.md`
@@ -103,6 +106,10 @@ This document records the direct non-functional evidence that currently exists i
   seeded search/filter variants,
   representative JSON GET entrypoints,
   and financial CSV export headers/body shape.
+- The role-specific UAT script now directly proves:
+  `ct2manager` access to approvals and marketing plus a live approval decision submission,
+  `ct2desk` access to visa with financial denial,
+  and `ct2finance` access to financial reporting plus CSV export.
 
 ### Cross-platform runtime contract
 - The application still uses the same TCP-first MySQL configuration contract for LAMP and Windows XAMPP:
@@ -111,22 +118,17 @@ This document records the direct non-functional evidence that currently exists i
 - The repo now includes a Windows XAMPP validation pack that mirrors the native Linux validation flow without introducing Windows-specific code behavior.
 
 ## Partially Proven
-### Browser and module breadth
-- All primary CT2 module routes, seeded filter variants, representative JSON GET endpoints, and major mutation flows are now script-covered.
-- Remaining manual-heavy coverage is concentrated in role-specific UAT sequencing, browser focus behavior, and operator judgment around workflow usability rather than basic persistence or route health.
-
 ### Warning-free runtime scope
 - Warning-free execution is directly proven for the route matrix, the expanded hardening flows, DB smoke, and the previously executed manual QA scenarios.
 - It is still not claimed as exhaustive for every reachable route/action pair or arbitrary parameter combination in CT2.
 
-### Accessibility and performance
-- Local performance sanity is now directly measured through `ct2_nfr_sanity_check.sh` and recorded in `docs/ct2_performance_accessibility_evidence.md`.
-- Accessibility evidence is stronger than before because structural heading and form-label checks are now automated, but keyboard-only navigation, focus visibility, screen-reader behavior, and load behavior still remain outside the current direct evidence.
+### Cross-platform execution breadth
+- The Linux-side runtime, keyboard/focus, repeated load, and role/UAT evidence is now directly captured in-repo.
+- The remaining cross-platform gap is the executed Windows XAMPP run, which still relies on the prepared validation packet rather than a completed in-repo evidence import.
 
 ## Remaining Gaps
-- Accessibility keyboard/focus evidence and broader load behavior remain validation gaps.
 - Cross-platform compatibility is documented and code-aligned, but runtime evidence in-repo is still strongest on the local Linux LAMP environment rather than an executed Windows XAMPP run.
 
 ## Current Recommendation
-- Treat CT2 security, audit, API write coverage, route breadth, and runtime-hardening evidence as materially stronger than the earlier release-only state.
-- Treat keyboard/accessibility follow-up, broader load evidence, and executed Windows XAMPP evidence as the main remaining repo-owned non-functional debt.
+- Treat CT2 security, audit, API write coverage, route breadth, keyboard/focus reachability, repeated load sanity, and role/UAT evidence as materially stronger than the earlier release-only state.
+- Treat the executed Windows XAMPP run as the main remaining repo-owned non-functional validation debt.

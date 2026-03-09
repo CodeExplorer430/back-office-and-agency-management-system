@@ -23,10 +23,13 @@ This runbook is for the technical deployment or support team responsible for ope
    `bash ct2_back_office/scripts/ct2_lint.sh`
    `php ct2_back_office/scripts/ct2_smoke_check.php`
    `php ct2_back_office/scripts/ct2_db_smoke_check.php`
+   `bash ct2_back_office/scripts/ct2_browser_accessibility_check.sh`
+   `bash ct2_back_office/scripts/ct2_load_profile_check.sh`
    `bash ct2_back_office/scripts/ct2_route_matrix_check.sh`
    `bash ct2_back_office/scripts/ct2_runtime_hardening_check.sh`
    `bash ct2_back_office/scripts/ct2_api_post_regression_check.sh`
    `bash ct2_back_office/scripts/ct2_nfr_sanity_check.sh`
+   `bash ct2_back_office/scripts/ct2_role_uat_check.sh`
 6. Execute the acceptance flow from `docs/ct2_manual_qa_pack.md`.
 
 ### Update deployment
@@ -63,7 +66,7 @@ This runbook is for the technical deployment or support team responsible for ope
 - Confirm dashboard loads without PHP warnings.
 - Confirm approval queue renders.
 - Confirm a representative JSON endpoint returns valid JSON.
-- Confirm the API POST regression and NFR sanity scripts still pass on the active deployment target when release scope includes API or layout/runtime changes.
+- Confirm the API POST regression, browser accessibility, repeated load, role-UAT, and NFR sanity scripts still pass on the active deployment target when release scope includes API, permission, or layout/runtime changes.
 - Confirm financial CSV export still downloads.
 - Confirm visa upload still writes to `storage/uploads/`.
 

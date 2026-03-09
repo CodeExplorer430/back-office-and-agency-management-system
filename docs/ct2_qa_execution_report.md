@@ -191,4 +191,68 @@ This report records the first live execution of the CT2 manual QA pack against t
 
 ### NFR sanity conclusion
 - Performance sanity is now directly evidenced for the seeded local environment.
-- Accessibility evidence is stronger than before, but keyboard-only navigation and focus-behavior evidence still require a real browser walkthrough on the supported runtime targets.
+- Accessibility evidence is stronger than before, and the later browser accessibility rerun in this report closes the keyboard/focus gap on the supported local runtime.
+
+## Browser Accessibility Rerun
+- Date: March 10, 2026
+- Branch: `develop`
+- Validation entrypoint: `bash ct2_back_office/scripts/ct2_browser_accessibility_check.sh`
+- Scope: real keyboard tab traversal on the live CT2 pages through headless Chrome
+
+### Browser accessibility results
+| Scenario | Actor | Result | Evidence |
+| --- | --- | --- | --- |
+| Login keyboard order | `ct2admin` | Pass | `Tab` order reached `username`, `password`, then `Sign In`, with visible focus indicators on each control. |
+| Dashboard navigation keyboard order | `ct2admin` | Pass | `Tab` order reached `Sign Out`, then `Dashboard`, `Agents`, and `Suppliers` in the top navigation with visible focus indicators. |
+| Agents form keyboard reachability | `ct2admin` | Pass | `Tab` order reached the search box, `agent_code`, `agency_name`, and `Save Agent` without skipping the primary data-entry controls. |
+| Approval decision keyboard reachability | `ct2admin` | Pass | `Tab` order reached `approval_status`, `decision_notes`, and `Save` on the shared approval queue. |
+| Visa upload keyboard reachability | `ct2admin` | Pass | `Tab` order reached `ct2_document_file` and `Save Checklist Update` on the checklist verification form. |
+| Financial export keyboard reachability | `ct2admin` | Pass | `Tab` order reached the report filters and the `Export CSV` trigger on the seeded financial run page. |
+
+### Browser accessibility conclusion
+- CT2 now has direct browser-driven evidence for keyboard reachability and focus visibility across the main login, navigation, approval, visa upload, and financial export surfaces.
+- The remaining accessibility caveat is now limited to optional screen-reader follow-up rather than missing keyboard/focus proof.
+
+## Repeated Load Profile Rerun
+- Date: March 10, 2026
+- Branch: `develop`
+- Validation entrypoint: `bash ct2_back_office/scripts/ct2_load_profile_check.sh`
+- Scope: repeated seeded timing samples across authenticated and unauthenticated CT2 routes
+
+### Repeated load profile results
+| Request Family | Result | Evidence |
+| --- | --- | --- |
+| Login page GET | Pass | `5` samples, `avg=0.002594s`, `max=0.003047s`. |
+| Login form POST | Pass | `5` samples, `avg=0.294092s`, `max=0.312372s`. |
+| Dashboard GET | Pass | `5` samples, `avg=0.012770s`, `max=0.016579s`. |
+| Agents filtered GET | Pass | `5` samples, `avg=0.006920s`, `max=0.009535s`. |
+| Module status API GET | Pass | `5` samples, `avg=0.022098s`, `max=0.028918s`. |
+| Financial export metadata GET | Pass | `5` samples, `avg=0.022938s`, `max=0.026010s`. |
+
+### Repeated load conclusion
+- CT2 now has stronger local performance evidence than the earlier single-run sanity sample because the same seeded request families were exercised repeatedly under one validation run.
+- The current evidence remains local and lightweight by design; it is not intended as a concurrency benchmark.
+
+## Role-Specific UAT Rerun
+- Date: March 10, 2026
+- Branch: `develop`
+- Validation entrypoint: `bash ct2_back_office/scripts/ct2_role_uat_check.sh`
+- Scope: seeded manager, front-desk, and accounting browser-role expectations
+
+### Role-specific UAT results
+| Scenario | Actor | Result | Evidence |
+| --- | --- | --- | --- |
+| Approval queue and approval action | `ct2manager` | Pass | Approvals page loaded, decision form rendered, and a live approval decision submission completed successfully. |
+| Marketing operational access | `ct2manager` | Pass | Marketing page loaded successfully after manager login. |
+| Visa operational access | `ct2desk` | Pass | Visa module loaded successfully for the front-desk account. |
+| Financial denial for front desk | `ct2desk` | Pass | Financial module returned `403 Forbidden` for the front-desk account. |
+| Financial reporting access | `ct2finance` | Pass | Financial module loaded successfully for the accounting account. |
+| Financial CSV export | `ct2finance` | Pass | Export route returned `Content-Type: text/csv` for the accounting account on the seeded run. |
+
+### Role-specific UAT conclusion
+- CT2 now has direct seeded browser-role evidence for manager approvals access, front-desk visa access and financial denial, and accounting financial/export access.
+- The remaining manual UAT work is now mostly about operator judgment and target-environment confirmation rather than unproven role boundaries.
+
+## Latest Validation Recommendation
+- CT2 now has direct Linux-side evidence for route breadth, browser hardening, JSON write safety, keyboard/focus reachability, repeated load sanity, and role-specific browser UAT.
+- The main remaining repo-owned validation gap is the executed Windows XAMPP run captured through `docs/ct2_windows_xampp_validation_pack.md`.

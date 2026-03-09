@@ -27,6 +27,11 @@
             <strong><?= (int) ($ct2SupplierSummary['total_suppliers'] ?? 0); ?></strong>
             <span>Pending supplier approvals: <?= (int) ($ct2SupplierSummary['pending_suppliers'] ?? 0); ?></span>
         </article>
+        <article class="ct2-stat-card">
+            <h3>Tour Resources</h3>
+            <strong><?= (int) ($ct2ResourceSummary['total_resources'] ?? 0); ?></strong>
+            <span>Available now: <?= (int) ($ct2ResourceSummary['available_resources'] ?? 0); ?></span>
+        </article>
     </div>
 </section>
 
@@ -63,28 +68,28 @@
 
     <article class="ct2-panel">
         <div class="ct2-section-header">
-            <h3>Recent Supplier Contracts</h3>
-            <a class="ct2-link" href="<?= htmlspecialchars(ct2_url(['module' => 'suppliers', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Open supplier module</a>
+            <h3>Recent Dispatch Orders</h3>
+            <a class="ct2-link" href="<?= htmlspecialchars(ct2_url(['module' => 'availability', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Open availability module</a>
         </div>
         <div class="ct2-table-wrap">
             <table class="ct2-table">
                 <thead>
                 <tr>
-                    <th>Supplier</th>
-                    <th>Contract</th>
+                    <th>Booking</th>
+                    <th>Vehicle</th>
                     <th>Status</th>
                 </tr>
                 </thead>
                 <tbody>
-                <?php foreach ($ct2SupplierContracts as $ct2Contract): ?>
+                <?php foreach ($ct2DispatchOrders as $ct2DispatchOrder): ?>
                     <tr>
-                        <td><?= htmlspecialchars((string) $ct2Contract['supplier_name'], ENT_QUOTES, 'UTF-8'); ?></td>
-                        <td><?= htmlspecialchars((string) $ct2Contract['contract_title'], ENT_QUOTES, 'UTF-8'); ?></td>
-                        <td><?= htmlspecialchars((string) $ct2Contract['contract_status'], ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?= htmlspecialchars((string) ($ct2DispatchOrder['external_booking_id'] ?? 'Manual'), ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?= htmlspecialchars((string) $ct2DispatchOrder['plate_number'], ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?= htmlspecialchars((string) $ct2DispatchOrder['dispatch_status'], ENT_QUOTES, 'UTF-8'); ?></td>
                     </tr>
                 <?php endforeach; ?>
-                <?php if ($ct2SupplierContracts === []): ?>
-                    <tr><td colspan="3">No supplier contracts recorded yet.</td></tr>
+                <?php if ($ct2DispatchOrders === []): ?>
+                    <tr><td colspan="3">No dispatch orders recorded yet.</td></tr>
                 <?php endif; ?>
                 </tbody>
             </table>
@@ -100,8 +105,8 @@
     </article>
     <article class="ct2-placeholder-card">
         <h3>Tour Availability and Resource Planning</h3>
-        <p>Operational references are reserved without taking ownership from CT1 booking and itinerary records.</p>
-        <a class="ct2-link" href="<?= htmlspecialchars(ct2_url(['module' => 'placeholders', 'action' => 'show', 'feature' => 'tour-availability-resource-planning']), ENT_QUOTES, 'UTF-8'); ?>">View placeholder</a>
+        <p>Resource planning, soft-block availability checks, seasonal blocks, and dispatch support are now available as a CT2 module.</p>
+        <a class="ct2-link" href="<?= htmlspecialchars(ct2_url(['module' => 'availability', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Open module</a>
     </article>
     <article class="ct2-placeholder-card">
         <h3>Document and Visa Assistance</h3>

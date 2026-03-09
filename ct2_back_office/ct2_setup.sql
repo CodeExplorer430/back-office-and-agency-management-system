@@ -369,6 +369,166 @@ CREATE TABLE IF NOT EXISTS ct2_supplier_relationship_notes (
         ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS ct2_tour_packages (
+    ct2_package_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    package_name VARCHAR(190) NOT NULL UNIQUE,
+    base_price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    margin_percentage DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    created_by INT UNSIGNED NULL,
+    updated_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_tour_packages_created_by
+        FOREIGN KEY (created_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_ct2_tour_packages_updated_by
+        FOREIGN KEY (updated_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_inventory_resources (
+    ct2_resource_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_supplier_id INT UNSIGNED NOT NULL,
+    resource_name VARCHAR(190) NOT NULL,
+    resource_type ENUM('transport', 'hotel', 'guide', 'equipment', 'other') NOT NULL DEFAULT 'other',
+    capacity INT UNSIGNED NOT NULL DEFAULT 0,
+    base_cost DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    status ENUM('available', 'maintenance', 'inactive') NOT NULL DEFAULT 'available',
+    notes TEXT NULL,
+    created_by INT UNSIGNED NULL,
+    updated_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_inventory_resources_supplier
+        FOREIGN KEY (ct2_supplier_id) REFERENCES ct2_suppliers (ct2_supplier_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ct2_inventory_resources_created_by
+        FOREIGN KEY (created_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_ct2_inventory_resources_updated_by
+        FOREIGN KEY (updated_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_package_resources (
+    ct2_package_resource_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_package_id INT UNSIGNED NOT NULL,
+    ct2_resource_id INT UNSIGNED NOT NULL,
+    units_required INT UNSIGNED NOT NULL DEFAULT 1,
+    UNIQUE KEY uniq_ct2_package_resource (ct2_package_id, ct2_resource_id),
+    CONSTRAINT fk_ct2_package_resources_package
+        FOREIGN KEY (ct2_package_id) REFERENCES ct2_tour_packages (ct2_package_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ct2_package_resources_resource
+        FOREIGN KEY (ct2_resource_id) REFERENCES ct2_inventory_resources (ct2_resource_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_resource_allocations (
+    ct2_allocation_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_resource_id INT UNSIGNED NOT NULL,
+    ct2_package_id INT UNSIGNED NULL,
+    external_booking_id VARCHAR(120) NOT NULL,
+    allocation_date DATE NOT NULL,
+    pax_count INT UNSIGNED NOT NULL DEFAULT 1,
+    reserved_units INT UNSIGNED NOT NULL DEFAULT 1,
+    allocation_status ENUM('reserved', 'soft_blocked', 'released') NOT NULL DEFAULT 'reserved',
+    notes TEXT NULL,
+    created_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_resource_allocations_resource
+        FOREIGN KEY (ct2_resource_id) REFERENCES ct2_inventory_resources (ct2_resource_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ct2_resource_allocations_package
+        FOREIGN KEY (ct2_package_id) REFERENCES ct2_tour_packages (ct2_package_id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_ct2_resource_allocations_created_by
+        FOREIGN KEY (created_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_seasonal_blocks (
+    ct2_block_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_resource_id INT UNSIGNED NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    reason VARCHAR(190) NOT NULL,
+    block_type ENUM('maintenance', 'peak_hold', 'supplier_hold', 'manual_soft_block') NOT NULL DEFAULT 'manual_soft_block',
+    created_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_seasonal_blocks_resource
+        FOREIGN KEY (ct2_resource_id) REFERENCES ct2_inventory_resources (ct2_resource_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ct2_seasonal_blocks_created_by
+        FOREIGN KEY (created_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_dispatch_vehicles (
+    ct2_vehicle_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    plate_number VARCHAR(60) NOT NULL UNIQUE,
+    model_name VARCHAR(120) NOT NULL,
+    capacity INT UNSIGNED NOT NULL DEFAULT 0,
+    current_mileage INT UNSIGNED NOT NULL DEFAULT 0,
+    status ENUM('available', 'maintenance', 'inactive') NOT NULL DEFAULT 'available',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_dispatch_drivers (
+    ct2_driver_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(190) NOT NULL,
+    license_expiry DATE NOT NULL,
+    status ENUM('available', 'assigned', 'inactive') NOT NULL DEFAULT 'available',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_dispatch_orders (
+    ct2_dispatch_order_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_allocation_id INT UNSIGNED NULL,
+    ct2_vehicle_id INT UNSIGNED NOT NULL,
+    ct2_driver_id INT UNSIGNED NOT NULL,
+    dispatch_date DATE NOT NULL,
+    dispatch_time DATETIME NOT NULL,
+    return_time DATETIME NULL,
+    start_mileage INT UNSIGNED NOT NULL DEFAULT 0,
+    end_mileage INT UNSIGNED NULL,
+    dispatch_status ENUM('scheduled', 'en_route', 'completed', 'cancelled') NOT NULL DEFAULT 'scheduled',
+    created_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_dispatch_orders_allocation
+        FOREIGN KEY (ct2_allocation_id) REFERENCES ct2_resource_allocations (ct2_allocation_id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_ct2_dispatch_orders_vehicle
+        FOREIGN KEY (ct2_vehicle_id) REFERENCES ct2_dispatch_vehicles (ct2_vehicle_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ct2_dispatch_orders_driver
+        FOREIGN KEY (ct2_driver_id) REFERENCES ct2_dispatch_drivers (ct2_driver_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ct2_dispatch_orders_created_by
+        FOREIGN KEY (created_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_maintenance_logs (
+    ct2_maintenance_log_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_vehicle_id INT UNSIGNED NOT NULL,
+    service_date DATE NOT NULL,
+    service_type VARCHAR(120) NOT NULL,
+    mechanic_notes TEXT NULL,
+    cost DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    created_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_maintenance_logs_vehicle
+        FOREIGN KEY (ct2_vehicle_id) REFERENCES ct2_dispatch_vehicles (ct2_vehicle_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ct2_maintenance_logs_created_by
+        FOREIGN KEY (created_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
 INSERT INTO ct2_roles (role_key, role_name, description)
 VALUES
     ('system_admin', 'System Admin', 'Full CT2 platform administration'),
@@ -395,6 +555,9 @@ FROM (
     UNION ALL SELECT 'system_admin', 'suppliers.view'
     UNION ALL SELECT 'system_admin', 'suppliers.manage'
     UNION ALL SELECT 'system_admin', 'suppliers.approve'
+    UNION ALL SELECT 'system_admin', 'availability.view'
+    UNION ALL SELECT 'system_admin', 'availability.manage'
+    UNION ALL SELECT 'system_admin', 'availability.dispatch'
     UNION ALL SELECT 'system_admin', 'api.access'
     UNION ALL SELECT 'back_office_manager', 'dashboard.view'
     UNION ALL SELECT 'back_office_manager', 'agents.view'
@@ -408,6 +571,9 @@ FROM (
     UNION ALL SELECT 'back_office_manager', 'suppliers.view'
     UNION ALL SELECT 'back_office_manager', 'suppliers.manage'
     UNION ALL SELECT 'back_office_manager', 'suppliers.approve'
+    UNION ALL SELECT 'back_office_manager', 'availability.view'
+    UNION ALL SELECT 'back_office_manager', 'availability.manage'
+    UNION ALL SELECT 'back_office_manager', 'availability.dispatch'
     UNION ALL SELECT 'back_office_manager', 'api.access'
     UNION ALL SELECT 'team_lead', 'dashboard.view'
     UNION ALL SELECT 'team_lead', 'agents.view'
@@ -416,10 +582,13 @@ FROM (
     UNION ALL SELECT 'team_lead', 'approvals.view'
     UNION ALL SELECT 'team_lead', 'suppliers.view'
     UNION ALL SELECT 'team_lead', 'suppliers.manage'
+    UNION ALL SELECT 'team_lead', 'availability.view'
+    UNION ALL SELECT 'team_lead', 'availability.manage'
     UNION ALL SELECT 'front_desk_agent', 'dashboard.view'
     UNION ALL SELECT 'front_desk_agent', 'agents.view'
     UNION ALL SELECT 'front_desk_agent', 'staff.view'
     UNION ALL SELECT 'front_desk_agent', 'suppliers.view'
+    UNION ALL SELECT 'front_desk_agent', 'availability.view'
     UNION ALL SELECT 'accounting_staff', 'dashboard.view'
     UNION ALL SELECT 'accounting_staff', 'approvals.view'
     UNION ALL SELECT 'accounting_staff', 'suppliers.view'

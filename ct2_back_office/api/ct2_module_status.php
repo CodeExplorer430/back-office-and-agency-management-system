@@ -24,8 +24,8 @@ $ct2Modules = [
     [
         'module_key' => 'tour-availability-resource-planning',
         'title' => 'Tour Availability and Resource Planning',
-        'status' => 'scaffolded',
-        'routes' => [ct2_app_url(['module' => 'placeholders', 'action' => 'show', 'feature' => 'tour-availability-resource-planning'])],
+        'status' => 'implemented',
+        'routes' => [ct2_app_url(['module' => 'availability', 'action' => 'index'])],
     ],
     [
         'module_key' => 'marketing-promotions-management',

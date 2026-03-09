@@ -8,13 +8,8 @@ final class CT2_PlaceholderController extends CT2_BaseController
     {
         ct2_require_auth();
 
-        $ct2ModuleKey = (string) ($_GET['feature'] ?? 'supplier-partner-management');
+        $ct2ModuleKey = (string) ($_GET['feature'] ?? 'marketing-promotions-management');
         $ct2Modules = [
-            'tour-availability-resource-planning' => [
-                'title' => 'Tour Availability and Resource Planning',
-                'status' => 'Scaffolded',
-                'summary' => 'Shared CT2 references are reserved for inventory and availability orchestration without taking ownership from CT1.',
-            ],
             'marketing-promotions-management' => [
                 'title' => 'Marketing and Promotions Management',
                 'status' => 'Scaffolded',

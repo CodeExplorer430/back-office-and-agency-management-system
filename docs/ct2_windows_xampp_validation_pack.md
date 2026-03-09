@@ -3,6 +3,7 @@
 ## Purpose
 Use this packet to collect the missing Windows XAMPP runtime evidence for CT2 without introducing a separate Windows-only code path. The application contract stays the same as LAMP: TCP MySQL, local `ct2_local.php`, seeded SQL import, native scripts, and browser/API verification.
 The next promotion from `develop` to `main` is gated on this packet being executed and the evidence being copied back into the repo docs.
+Use `docs/ct2_windows_xampp_result_template.md` as the required return format for the executed run.
 
 ## Target Environment
 - Windows machine with XAMPP installed
@@ -47,27 +48,10 @@ If Chrome automation is not available on the Windows host, execute the keyboard 
 - Complete one keyboard-only walkthrough for login, dashboard nav, approvals, visa upload, and the financial export trigger if the browser accessibility script is not executed directly
 - Confirm no PHP warnings, notices, or broken downloads appear in Apache/PHP output
 
-## Evidence Capture Template
-Fill this in after the Windows run and copy the results into:
-- `docs/ct2_nfr_evidence.md` for cross-platform/NFR evidence
-- `docs/ct2_performance_accessibility_evidence.md` for keyboard/load observations
-- `docs/ct2_qa_execution_report.md` for route, role, upload, and export outcomes
-
-| Check | Result | Notes |
-| --- | --- | --- |
-| `ct2_lint.sh` | `pass / fail` |  |
-| `ct2_smoke_check.php` | `pass / fail` |  |
-| `ct2_db_smoke_check.php` | `pass / fail` |  |
-| `ct2_browser_accessibility_check.sh` or manual keyboard walkthrough | `pass / fail` | Record whether the script ran directly or was completed manually. |
-| `ct2_load_profile_check.sh` | `pass / fail` | Capture summary timings if available. |
-| `ct2_route_matrix_check.sh` | `pass / fail` |  |
-| `ct2_runtime_hardening_check.sh` | `pass / fail` |  |
-| `ct2_api_post_regression_check.sh` | `pass / fail` |  |
-| `ct2_nfr_sanity_check.sh` | `pass / fail` |  |
-| `ct2_role_uat_check.sh` | `pass / fail` |  |
-| Dashboard/browser navigation | `pass / fail` |  |
-| Visa upload | `pass / fail` |  |
-| Financial CSV export | `pass / fail` |  |
+## Evidence Capture
+- Fill out `docs/ct2_windows_xampp_result_template.md` after the Windows run.
+- Do not return a partial narrative or screenshots alone; the completed template is the required intake format.
+- Copy the finished template back into the repo docs listed in its `Repo Copy-Back Targets` section.
 
 ## Windows-Specific Watch Items
 - Git Bash is needed for the `bash` scripts unless you translate them manually.
@@ -76,5 +60,5 @@ Fill this in after the Windows run and copy the results into:
 - If upload paths fail, confirm the Apache user can write to `ct2_back_office/storage/uploads/`.
 
 ## Expected Handoff Outcome
-- The completed table above is copied back into the repo docs named above so Windows execution becomes direct evidence rather than a pending packet.
+- The completed `docs/ct2_windows_xampp_result_template.md` is copied back into the repo docs named there so Windows execution becomes direct evidence rather than a pending packet.
 - Any Windows-only defect found is fixed in the repo rather than documented as an accepted divergence.

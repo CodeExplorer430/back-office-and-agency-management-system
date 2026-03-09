@@ -42,6 +42,7 @@ This runbook is for the technical deployment or support team responsible for ope
 6. Re-run lint, smoke, and DB smoke checks.
 7. Re-run the route/API validation steps most affected by the change.
 8. If the target is Windows XAMPP, update the evidence table in `docs/ct2_windows_xampp_validation_pack.md`.
+9. If the target is Windows XAMPP, return the completed `docs/ct2_windows_xampp_result_template.md` so the repo evidence can be updated without interpretation drift.
 
 ## Configuration Rules
 - Prefer explicit TCP MySQL values in `ct2_local.php`.

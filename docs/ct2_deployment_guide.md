@@ -95,7 +95,7 @@ Run the acceptance flow in this order:
 6. Follow `docs/ct2_manual_qa_pack.md` for the full browser walkthrough.
 7. Follow `docs/ct2_api_validation.md` for representative JSON endpoint checks.
 8. On Linux or LAMP targets, record the browser accessibility, repeated load, and role-UAT results in the current QA and NFR docs if you are refreshing repo evidence.
-9. On Windows XAMPP targets, complete the evidence table in `docs/ct2_windows_xampp_validation_pack.md`.
+9. On Windows XAMPP targets, complete `docs/ct2_windows_xampp_result_template.md` after following `docs/ct2_windows_xampp_validation_pack.md`.
 
 ## Initial Credentials And Security
 - Seeded accounts exist only to support first-time validation and UAT.

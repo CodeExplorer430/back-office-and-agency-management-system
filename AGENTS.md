@@ -51,6 +51,7 @@ This repository contains the `CORE TRANSACTION 2: Back-Office and Agency Managem
 - Keep `docs/ct2_requirements_traceability_matrix.md` and `docs/ct2_requirements_audit_backlog.md` updated whenever CT2 scope, validation evidence, or source-of-truth assumptions change.
 - Keep `docs/ct2_nfr_evidence.md` aligned with the current hardening scripts and the non-functional claims used in release or audit documents.
 - Keep `docs/ct2_performance_accessibility_evidence.md` and `docs/ct2_windows_xampp_validation_pack.md` aligned with the active seeded validation workflow and the supported runtime contract.
+- Keep `docs/ct2_windows_xampp_result_template.md` aligned with the Windows evidence-ingestion workflow so operators return executable results in one canonical format.
 - Keep `docs/ct2_deployment_guide.md` and `docs/ct2_operator_runbook.md` aligned with the active `develop` release process and supported LAMP/XAMPP runtime expectations.
 - Do not merge code that emits PHP warnings, notices, or fatal errors under `E_ALL`.
 

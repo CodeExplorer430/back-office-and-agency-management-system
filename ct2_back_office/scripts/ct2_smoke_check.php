@@ -50,6 +50,7 @@ $ct2RequiredFiles = [
     __DIR__ . '/../../docs/ct2_nfr_evidence.md',
     __DIR__ . '/../../docs/ct2_performance_accessibility_evidence.md',
     __DIR__ . '/../../docs/ct2_windows_xampp_validation_pack.md',
+    __DIR__ . '/../../docs/ct2_windows_xampp_result_template.md',
     __DIR__ . '/../../docs/ct2_deployment_guide.md',
     __DIR__ . '/../../docs/ct2_operator_runbook.md',
 ];

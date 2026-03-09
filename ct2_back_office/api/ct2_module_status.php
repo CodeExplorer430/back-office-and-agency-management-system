@@ -30,8 +30,8 @@ $ct2Modules = [
     [
         'module_key' => 'marketing-promotions-management',
         'title' => 'Marketing and Promotions Management',
-        'status' => 'scaffolded',
-        'routes' => [ct2_app_url(['module' => 'placeholders', 'action' => 'show', 'feature' => 'marketing-promotions-management'])],
+        'status' => 'implemented',
+        'routes' => [ct2_app_url(['module' => 'marketing', 'action' => 'index'])],
     ],
     [
         'module_key' => 'financial-reporting-analytics',

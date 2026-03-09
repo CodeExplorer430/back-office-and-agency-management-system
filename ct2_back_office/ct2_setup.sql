@@ -529,6 +529,206 @@ CREATE TABLE IF NOT EXISTS ct2_maintenance_logs (
         ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS ct2_campaigns (
+    ct2_campaign_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    campaign_code VARCHAR(80) NOT NULL UNIQUE,
+    campaign_name VARCHAR(190) NOT NULL,
+    campaign_type ENUM('seasonal', 'partner', 'voucher', 'affiliate', 'brand', 'other') NOT NULL DEFAULT 'other',
+    channel_type ENUM('email', 'social', 'search', 'direct', 'affiliate', 'hybrid') NOT NULL DEFAULT 'hybrid',
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    budget_amount DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+    status ENUM('draft', 'pending_approval', 'active', 'paused', 'completed', 'archived') NOT NULL DEFAULT 'pending_approval',
+    approval_status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
+    target_audience VARCHAR(255) NULL,
+    external_customer_segment_id VARCHAR(120) NULL,
+    source_system VARCHAR(80) NULL,
+    created_by INT UNSIGNED NULL,
+    updated_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_campaigns_created_by
+        FOREIGN KEY (created_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_ct2_campaigns_updated_by
+        FOREIGN KEY (updated_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_promotions (
+    ct2_promotion_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_campaign_id INT UNSIGNED NOT NULL,
+    promotion_code VARCHAR(80) NOT NULL UNIQUE,
+    promotion_name VARCHAR(190) NOT NULL,
+    promotion_type ENUM('percentage', 'fixed_amount', 'bundle', 'referral', 'loyalty', 'manual') NOT NULL DEFAULT 'percentage',
+    discount_value DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    eligibility_rule TEXT NULL,
+    valid_from DATE NOT NULL,
+    valid_until DATE NOT NULL,
+    usage_limit INT UNSIGNED NOT NULL DEFAULT 1,
+    promotion_status ENUM('draft', 'pending_approval', 'active', 'paused', 'expired', 'archived') NOT NULL DEFAULT 'pending_approval',
+    approval_status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
+    external_booking_scope VARCHAR(120) NULL,
+    source_system VARCHAR(80) NULL,
+    created_by INT UNSIGNED NULL,
+    updated_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_promotions_campaign
+        FOREIGN KEY (ct2_campaign_id) REFERENCES ct2_campaigns (ct2_campaign_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ct2_promotions_created_by
+        FOREIGN KEY (created_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_ct2_promotions_updated_by
+        FOREIGN KEY (updated_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_vouchers (
+    ct2_voucher_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_promotion_id INT UNSIGNED NULL,
+    voucher_code VARCHAR(80) NOT NULL UNIQUE,
+    voucher_name VARCHAR(190) NOT NULL,
+    customer_scope ENUM('single_use', 'multi_use', 'affiliate', 'open') NOT NULL DEFAULT 'single_use',
+    max_redemptions INT UNSIGNED NOT NULL DEFAULT 1,
+    redeemed_count INT UNSIGNED NOT NULL DEFAULT 0,
+    voucher_status ENUM('issued', 'active', 'redeemed', 'expired', 'cancelled') NOT NULL DEFAULT 'issued',
+    valid_from DATE NOT NULL,
+    valid_until DATE NOT NULL,
+    external_customer_id VARCHAR(120) NULL,
+    source_system VARCHAR(80) NULL,
+    created_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_vouchers_promotion
+        FOREIGN KEY (ct2_promotion_id) REFERENCES ct2_promotions (ct2_promotion_id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_ct2_vouchers_created_by
+        FOREIGN KEY (created_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_affiliates (
+    ct2_affiliate_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    affiliate_code VARCHAR(80) NOT NULL UNIQUE,
+    affiliate_name VARCHAR(190) NOT NULL,
+    contact_name VARCHAR(190) NOT NULL,
+    email VARCHAR(190) NOT NULL,
+    phone VARCHAR(60) NOT NULL,
+    affiliate_status ENUM('onboarding', 'active', 'paused', 'inactive') NOT NULL DEFAULT 'onboarding',
+    commission_rate DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+    payout_status ENUM('pending_setup', 'ready', 'hold') NOT NULL DEFAULT 'pending_setup',
+    referral_code VARCHAR(80) NOT NULL UNIQUE,
+    external_partner_id VARCHAR(120) NULL,
+    source_system VARCHAR(80) NULL,
+    created_by INT UNSIGNED NULL,
+    updated_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_affiliates_created_by
+        FOREIGN KEY (created_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_ct2_affiliates_updated_by
+        FOREIGN KEY (updated_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_referral_clicks (
+    ct2_referral_click_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_affiliate_id INT UNSIGNED NOT NULL,
+    ct2_campaign_id INT UNSIGNED NULL,
+    referral_code VARCHAR(80) NOT NULL,
+    click_date DATETIME NOT NULL,
+    landing_page VARCHAR(255) NULL,
+    external_customer_id VARCHAR(120) NULL,
+    external_booking_id VARCHAR(120) NULL,
+    attribution_status ENUM('clicked', 'qualified', 'booked', 'lost') NOT NULL DEFAULT 'clicked',
+    source_system VARCHAR(80) NULL,
+    created_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_referral_clicks_affiliate
+        FOREIGN KEY (ct2_affiliate_id) REFERENCES ct2_affiliates (ct2_affiliate_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ct2_referral_clicks_campaign
+        FOREIGN KEY (ct2_campaign_id) REFERENCES ct2_campaigns (ct2_campaign_id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_ct2_referral_clicks_created_by
+        FOREIGN KEY (created_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_redemption_logs (
+    ct2_redemption_log_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_campaign_id INT UNSIGNED NULL,
+    ct2_promotion_id INT UNSIGNED NULL,
+    ct2_voucher_id INT UNSIGNED NULL,
+    redemption_date DATETIME NOT NULL,
+    external_customer_id VARCHAR(120) NULL,
+    external_booking_id VARCHAR(120) NULL,
+    redeemed_amount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    redemption_status ENUM('pending', 'redeemed', 'reversed', 'expired') NOT NULL DEFAULT 'pending',
+    source_system VARCHAR(80) NULL,
+    created_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_redemption_logs_campaign
+        FOREIGN KEY (ct2_campaign_id) REFERENCES ct2_campaigns (ct2_campaign_id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_ct2_redemption_logs_promotion
+        FOREIGN KEY (ct2_promotion_id) REFERENCES ct2_promotions (ct2_promotion_id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_ct2_redemption_logs_voucher
+        FOREIGN KEY (ct2_voucher_id) REFERENCES ct2_vouchers (ct2_voucher_id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_ct2_redemption_logs_created_by
+        FOREIGN KEY (created_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_campaign_metrics (
+    ct2_campaign_metric_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_campaign_id INT UNSIGNED NOT NULL,
+    report_date DATE NOT NULL,
+    impressions_count INT UNSIGNED NOT NULL DEFAULT 0,
+    click_count INT UNSIGNED NOT NULL DEFAULT 0,
+    lead_count INT UNSIGNED NOT NULL DEFAULT 0,
+    conversion_count INT UNSIGNED NOT NULL DEFAULT 0,
+    attributed_revenue DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+    positive_reviews INT UNSIGNED NOT NULL DEFAULT 0,
+    neutral_reviews INT UNSIGNED NOT NULL DEFAULT 0,
+    negative_reviews INT UNSIGNED NOT NULL DEFAULT 0,
+    external_review_batch_id VARCHAR(120) NULL,
+    source_system VARCHAR(80) NULL,
+    created_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_campaign_metrics_campaign
+        FOREIGN KEY (ct2_campaign_id) REFERENCES ct2_campaigns (ct2_campaign_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ct2_campaign_metrics_created_by
+        FOREIGN KEY (created_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_marketing_notes (
+    ct2_marketing_note_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_campaign_id INT UNSIGNED NULL,
+    ct2_affiliate_id INT UNSIGNED NULL,
+    note_type ENUM('performance', 'partner_follow_up', 'review_summary', 'risk', 'handoff') NOT NULL DEFAULT 'performance',
+    note_title VARCHAR(190) NOT NULL,
+    note_body TEXT NOT NULL,
+    next_action_date DATE NULL,
+    created_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_marketing_notes_campaign
+        FOREIGN KEY (ct2_campaign_id) REFERENCES ct2_campaigns (ct2_campaign_id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_ct2_marketing_notes_affiliate
+        FOREIGN KEY (ct2_affiliate_id) REFERENCES ct2_affiliates (ct2_affiliate_id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_ct2_marketing_notes_created_by
+        FOREIGN KEY (created_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
 INSERT INTO ct2_roles (role_key, role_name, description)
 VALUES
     ('system_admin', 'System Admin', 'Full CT2 platform administration'),
@@ -558,6 +758,9 @@ FROM (
     UNION ALL SELECT 'system_admin', 'availability.view'
     UNION ALL SELECT 'system_admin', 'availability.manage'
     UNION ALL SELECT 'system_admin', 'availability.dispatch'
+    UNION ALL SELECT 'system_admin', 'marketing.view'
+    UNION ALL SELECT 'system_admin', 'marketing.manage'
+    UNION ALL SELECT 'system_admin', 'marketing.approve'
     UNION ALL SELECT 'system_admin', 'api.access'
     UNION ALL SELECT 'back_office_manager', 'dashboard.view'
     UNION ALL SELECT 'back_office_manager', 'agents.view'
@@ -574,6 +777,9 @@ FROM (
     UNION ALL SELECT 'back_office_manager', 'availability.view'
     UNION ALL SELECT 'back_office_manager', 'availability.manage'
     UNION ALL SELECT 'back_office_manager', 'availability.dispatch'
+    UNION ALL SELECT 'back_office_manager', 'marketing.view'
+    UNION ALL SELECT 'back_office_manager', 'marketing.manage'
+    UNION ALL SELECT 'back_office_manager', 'marketing.approve'
     UNION ALL SELECT 'back_office_manager', 'api.access'
     UNION ALL SELECT 'team_lead', 'dashboard.view'
     UNION ALL SELECT 'team_lead', 'agents.view'
@@ -584,14 +790,18 @@ FROM (
     UNION ALL SELECT 'team_lead', 'suppliers.manage'
     UNION ALL SELECT 'team_lead', 'availability.view'
     UNION ALL SELECT 'team_lead', 'availability.manage'
+    UNION ALL SELECT 'team_lead', 'marketing.view'
+    UNION ALL SELECT 'team_lead', 'marketing.manage'
     UNION ALL SELECT 'front_desk_agent', 'dashboard.view'
     UNION ALL SELECT 'front_desk_agent', 'agents.view'
     UNION ALL SELECT 'front_desk_agent', 'staff.view'
     UNION ALL SELECT 'front_desk_agent', 'suppliers.view'
     UNION ALL SELECT 'front_desk_agent', 'availability.view'
+    UNION ALL SELECT 'front_desk_agent', 'marketing.view'
     UNION ALL SELECT 'accounting_staff', 'dashboard.view'
     UNION ALL SELECT 'accounting_staff', 'approvals.view'
     UNION ALL SELECT 'accounting_staff', 'suppliers.view'
+    UNION ALL SELECT 'accounting_staff', 'marketing.view'
     UNION ALL SELECT 'accounting_staff', 'api.access'
 ) AS permission_seed
 INNER JOIN ct2_roles AS r ON r.role_key = permission_seed.role_key

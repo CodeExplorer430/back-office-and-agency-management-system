@@ -32,6 +32,11 @@
             <strong><?= (int) ($ct2ResourceSummary['total_resources'] ?? 0); ?></strong>
             <span>Available now: <?= (int) ($ct2ResourceSummary['available_resources'] ?? 0); ?></span>
         </article>
+        <article class="ct2-stat-card">
+            <h3>Marketing Campaigns</h3>
+            <strong><?= (int) ($ct2CampaignSummary['total_campaigns'] ?? 0); ?></strong>
+            <span>Pending approvals: <?= (int) ($ct2CampaignSummary['pending_campaigns'] ?? 0); ?></span>
+        </article>
     </div>
 </section>
 
@@ -107,6 +112,11 @@
         <h3>Tour Availability and Resource Planning</h3>
         <p>Resource planning, soft-block availability checks, seasonal blocks, and dispatch support are now available as a CT2 module.</p>
         <a class="ct2-link" href="<?= htmlspecialchars(ct2_url(['module' => 'availability', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Open module</a>
+    </article>
+    <article class="ct2-placeholder-card">
+        <h3>Marketing and Promotions Management</h3>
+        <p>Campaign management, promotions, voucher tracking, affiliates, and attribution reporting are now available as a CT2 module.</p>
+        <a class="ct2-link" href="<?= htmlspecialchars(ct2_url(['module' => 'marketing', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Open module</a>
     </article>
     <article class="ct2-placeholder-card">
         <h3>Document and Visa Assistance</h3>

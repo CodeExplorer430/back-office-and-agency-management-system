@@ -38,9 +38,10 @@ $ct2ErrorMessage = ct2_flash('error');
             <a href="<?= htmlspecialchars(ct2_url(['module' => 'agents', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Agents</a>
             <a href="<?= htmlspecialchars(ct2_url(['module' => 'suppliers', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Suppliers</a>
             <a href="<?= htmlspecialchars(ct2_url(['module' => 'availability', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Availability</a>
+            <a href="<?= htmlspecialchars(ct2_url(['module' => 'marketing', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Marketing</a>
             <a href="<?= htmlspecialchars(ct2_url(['module' => 'staff', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Staff</a>
             <a href="<?= htmlspecialchars(ct2_url(['module' => 'approvals', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Approvals</a>
-            <a href="<?= htmlspecialchars(ct2_url(['module' => 'placeholders', 'action' => 'show', 'feature' => 'marketing-promotions-management']), ENT_QUOTES, 'UTF-8'); ?>">Other Modules</a>
+            <a href="<?= htmlspecialchars(ct2_url(['module' => 'placeholders', 'action' => 'show', 'feature' => 'financial-reporting-analytics']), ENT_QUOTES, 'UTF-8'); ?>">Scaffolded</a>
         </nav>
     <?php endif; ?>
 

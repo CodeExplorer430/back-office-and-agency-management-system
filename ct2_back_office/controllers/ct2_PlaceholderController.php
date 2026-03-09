@@ -8,12 +8,12 @@ final class CT2_PlaceholderController extends CT2_BaseController
     {
         ct2_require_auth();
 
-        $ct2ModuleKey = (string) ($_GET['feature'] ?? 'marketing-promotions-management');
+        $ct2ModuleKey = (string) ($_GET['feature'] ?? 'financial-reporting-analytics');
         $ct2Modules = [
             'marketing-promotions-management' => [
                 'title' => 'Marketing and Promotions Management',
-                'status' => 'Scaffolded',
-                'summary' => 'Campaign, discount, and promotion integration seams are defined as placeholders for future implementation.',
+                'status' => 'Implemented',
+                'summary' => 'Campaign operations, promotions, vouchers, affiliates, and reporting are now available in the live CT2 module.',
             ],
             'financial-reporting-analytics' => [
                 'title' => 'Financial Reporting and Analytics',

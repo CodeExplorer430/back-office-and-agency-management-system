@@ -22,13 +22,13 @@ final class CT2_AffiliateModel extends CT2_BaseModel
         $ct2Parameters = [];
 
         if ($ct2Search !== null && $ct2Search !== '') {
-            $ct2Sql .= ' AND (
-                a.affiliate_name LIKE :search
-                OR a.affiliate_code LIKE :search
-                OR a.referral_code LIKE :search
-                OR a.contact_name LIKE :search
-            )';
-            $ct2Parameters['search'] = '%' . $ct2Search . '%';
+            $ct2SearchFilter = $this->ct2BuildLikeFilter(
+                ['a.affiliate_name', 'a.affiliate_code', 'a.referral_code', 'a.contact_name'],
+                $ct2Search,
+                'affiliate_search'
+            );
+            $ct2Sql .= ' AND (' . $ct2SearchFilter['sql'] . ')';
+            $ct2Parameters += $ct2SearchFilter['params'];
         }
 
         if ($ct2Status !== null && $ct2Status !== '') {

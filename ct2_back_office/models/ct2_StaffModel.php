@@ -11,11 +11,13 @@ final class CT2_StaffModel extends CT2_BaseModel
         $ct2Parameters = [];
 
         if ($ct2Search !== null && $ct2Search !== '') {
-            $ct2Sql .= ' WHERE full_name LIKE :search
-                OR staff_code LIKE :search
-                OR department LIKE :search
-                OR team_name LIKE :search';
-            $ct2Parameters['search'] = '%' . $ct2Search . '%';
+            $ct2SearchFilter = $this->ct2BuildLikeFilter(
+                ['full_name', 'staff_code', 'department', 'team_name'],
+                $ct2Search,
+                'staff_search'
+            );
+            $ct2Sql .= ' WHERE (' . $ct2SearchFilter['sql'] . ')';
+            $ct2Parameters += $ct2SearchFilter['params'];
         }
 
         $ct2Sql .= ' ORDER BY created_at DESC';

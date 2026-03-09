@@ -25,12 +25,13 @@ final class CT2_PromotionModel extends CT2_BaseModel
         $ct2Parameters = [];
 
         if ($ct2Search !== null && $ct2Search !== '') {
-            $ct2Sql .= ' AND (
-                p.promotion_name LIKE :search
-                OR p.promotion_code LIKE :search
-                OR c.campaign_name LIKE :search
-            )';
-            $ct2Parameters['search'] = '%' . $ct2Search . '%';
+            $ct2SearchFilter = $this->ct2BuildLikeFilter(
+                ['p.promotion_name', 'p.promotion_code', 'c.campaign_name'],
+                $ct2Search,
+                'promotion_search'
+            );
+            $ct2Sql .= ' AND (' . $ct2SearchFilter['sql'] . ')';
+            $ct2Parameters += $ct2SearchFilter['params'];
         }
 
         if ($ct2Status !== null && $ct2Status !== '') {

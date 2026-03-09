@@ -215,6 +215,24 @@ function ct2_json_response(bool $ct2Success, array $ct2Data = [], ?string $ct2Er
     exit;
 }
 
+function ct2_is_api_request(): bool
+{
+    $ct2ScriptFilename = realpath((string) ($_SERVER['SCRIPT_FILENAME'] ?? ''));
+    $ct2ApiPath = realpath(CT2_API_PATH);
+
+    return $ct2ScriptFilename !== false
+        && $ct2ApiPath !== false
+        && strpos($ct2ScriptFilename, $ct2ApiPath . DIRECTORY_SEPARATOR) === 0;
+}
+
+function ct2_current_api_endpoint_name(): string
+{
+    $ct2ScriptName = basename((string) ($_SERVER['SCRIPT_NAME'] ?? 'ct2_api.php'));
+    $ct2Endpoint = pathinfo($ct2ScriptName, PATHINFO_FILENAME);
+
+    return $ct2Endpoint !== '' ? $ct2Endpoint : 'ct2_api';
+}
+
 function ct2_record_api_log(string $ct2EndpointName, string $ct2Method, int $ct2StatusCode, array $ct2RequestSummary = [], array $ct2ResponseSummary = []): void
 {
     if (!class_exists('CT2_AuditLogModel')) {
@@ -229,5 +247,35 @@ function ct2_record_api_log(string $ct2EndpointName, string $ct2Method, int $ct2
         $ct2StatusCode,
         $ct2RequestSummary,
         $ct2ResponseSummary
+    );
+}
+
+if (ct2_is_api_request()) {
+    ini_set('display_errors', '0');
+
+    set_exception_handler(
+        static function (Throwable $ct2Exception): void {
+            $ct2EndpointName = ct2_current_api_endpoint_name();
+            $ct2Method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+
+            error_log(
+                sprintf(
+                    '[CT2 API ERROR] %s %s: %s',
+                    $ct2EndpointName,
+                    get_class($ct2Exception),
+                    $ct2Exception->getMessage()
+                )
+            );
+
+            ct2_record_api_log(
+                $ct2EndpointName,
+                $ct2Method,
+                500,
+                [],
+                ['exception' => get_class($ct2Exception)]
+            );
+
+            ct2_json_response(false, [], 'Internal server error.', 500);
+        }
     );
 }

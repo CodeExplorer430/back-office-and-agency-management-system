@@ -24,13 +24,18 @@ final class CT2_VisaApplicationModel extends CT2_BaseModel
         $ct2Parameters = [];
 
         if ($ct2Search !== null && $ct2Search !== '') {
-            $ct2Sql .= ' AND (
-                va.application_reference LIKE :search
-                OR va.external_customer_id LIKE :search
-                OR COALESCE(va.external_agent_id, "") LIKE :search
-                OR vt.country_name LIKE :search
-            )';
-            $ct2Parameters['search'] = '%' . $ct2Search . '%';
+            $ct2SearchFilter = $this->ct2BuildLikeFilter(
+                [
+                    'va.application_reference',
+                    'va.external_customer_id',
+                    'COALESCE(va.external_agent_id, "")',
+                    'vt.country_name',
+                ],
+                $ct2Search,
+                'visa_search'
+            );
+            $ct2Sql .= ' AND (' . $ct2SearchFilter['sql'] . ')';
+            $ct2Parameters += $ct2SearchFilter['params'];
         }
 
         if ($ct2Status !== null && $ct2Status !== '') {

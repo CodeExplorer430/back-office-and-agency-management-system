@@ -34,11 +34,13 @@ final class CT2_SupplierModel extends CT2_BaseModel
         $ct2Parameters = [];
 
         if ($ct2Search !== null && $ct2Search !== '') {
-            $ct2Sql .= ' WHERE s.supplier_name LIKE :search
-                OR s.supplier_code LIKE :search
-                OR s.primary_contact_name LIKE :search
-                OR s.service_category LIKE :search';
-            $ct2Parameters['search'] = '%' . $ct2Search . '%';
+            $ct2SearchFilter = $this->ct2BuildLikeFilter(
+                ['s.supplier_name', 's.supplier_code', 's.primary_contact_name', 's.service_category'],
+                $ct2Search,
+                'supplier_search'
+            );
+            $ct2Sql .= ' WHERE (' . $ct2SearchFilter['sql'] . ')';
+            $ct2Parameters += $ct2SearchFilter['params'];
         }
 
         $ct2Sql .= ' ORDER BY s.created_at DESC';

@@ -11,11 +11,13 @@ final class CT2_AgentModel extends CT2_BaseModel
         $ct2Parameters = [];
 
         if ($ct2Search !== null && $ct2Search !== '') {
-            $ct2Sql .= ' WHERE agency_name LIKE :search
-                OR contact_person LIKE :search
-                OR agent_code LIKE :search
-                OR region LIKE :search';
-            $ct2Parameters['search'] = '%' . $ct2Search . '%';
+            $ct2SearchFilter = $this->ct2BuildLikeFilter(
+                ['agency_name', 'contact_person', 'agent_code', 'region'],
+                $ct2Search,
+                'agent_search'
+            );
+            $ct2Sql .= ' WHERE (' . $ct2SearchFilter['sql'] . ')';
+            $ct2Parameters += $ct2SearchFilter['params'];
         }
 
         $ct2Sql .= ' ORDER BY created_at DESC';

@@ -201,6 +201,24 @@ foreach ($ct2SeedChecks as $ct2Query => $ct2Error) {
     }
 }
 
+$ct2SearchChecks = [
+    'agent search' => count((new CT2_AgentModel())->getAll('AGT-CT2-001')),
+    'staff search' => count((new CT2_StaffModel())->getAll('STF-CT2-001')),
+    'supplier search' => count((new CT2_SupplierModel())->getAll('SUP-CT2-001')),
+    'resource search' => count((new CT2_ResourceModel())->getAll('Skyline')),
+    'campaign search' => count((new CT2_MarketingCampaignModel())->getAll('CT2-MKT-001')),
+    'promotion search' => count((new CT2_PromotionModel())->getAll('PROMO-CT2-001')),
+    'affiliate search' => count((new CT2_AffiliateModel())->getAll('AFF-CT2-001')),
+    'visa application search' => count((new CT2_VisaApplicationModel())->getAll('VISA-APP-001')),
+];
+
+foreach ($ct2SearchChecks as $ct2SearchLabel => $ct2MatchCount) {
+    if ($ct2MatchCount < 1) {
+        fwrite(STDERR, "DB-backed CT2 {$ct2SearchLabel} regression check returned no rows.\n");
+        exit(1);
+    }
+}
+
 echo "CT2 DB smoke check passed.\n";
 echo "Database: {$ct2CurrentDatabase}\n";
 echo "Host: {$ct2Config['host']}:{$ct2Config['port']}\n";

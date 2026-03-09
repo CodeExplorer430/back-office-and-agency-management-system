@@ -32,13 +32,13 @@ final class CT2_MarketingCampaignModel extends CT2_BaseModel
         $ct2Parameters = [];
 
         if ($ct2Search !== null && $ct2Search !== '') {
-            $ct2Sql .= ' AND (
-                c.campaign_name LIKE :search
-                OR c.campaign_code LIKE :search
-                OR c.campaign_type LIKE :search
-                OR c.target_audience LIKE :search
-            )';
-            $ct2Parameters['search'] = '%' . $ct2Search . '%';
+            $ct2SearchFilter = $this->ct2BuildLikeFilter(
+                ['c.campaign_name', 'c.campaign_code', 'c.campaign_type', 'c.target_audience'],
+                $ct2Search,
+                'campaign_search'
+            );
+            $ct2Sql .= ' AND (' . $ct2SearchFilter['sql'] . ')';
+            $ct2Parameters += $ct2SearchFilter['params'];
         }
 
         if ($ct2Status !== null && $ct2Status !== '') {

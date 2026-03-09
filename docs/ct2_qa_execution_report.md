@@ -68,3 +68,34 @@ This report records the first live execution of the CT2 manual QA pack against t
 
 ## Release Recommendation
 - Do not promote `develop` to `main` until the search/filter defect is fixed and the QA pass is rerun for the affected modules and endpoints.
+
+## Rerun After Blocker Fix
+- Date: March 10, 2026
+- Branch: `develop`
+- Validation rerun completed after repairing multi-column search bindings, adding API exception wrapping, and extending DB-backed search regression checks.
+
+### Browser search rerun
+| Scenario | Actor | Result | Evidence |
+| --- | --- | --- | --- |
+| Search/filter on agents page | `ct2admin` | Pass | `module=agents&search=AGT-CT2-001` returned `200`, rendered the seeded match, and no longer emitted `CT2 application error`. |
+| Search/filter on suppliers page | `ct2admin` | Pass | `module=suppliers&search=SUP-CT2-001` returned `200` and rendered the seeded match. |
+| Search/filter on availability page | `ct2admin` | Pass | `module=availability&search=Skyline` returned `200` and rendered the seeded resource match. |
+| Search/filter on marketing page | `ct2admin` | Pass | `module=marketing&search=CT2-MKT-001` returned `200` and rendered the seeded campaign match. |
+| Search/filter on visa page | `ct2admin` | Pass | `module=visa&search=VISA-APP-001` returned `200` and rendered the seeded application match. |
+| Search/filter on staff page | `ct2admin` | Pass | `module=staff&search=STF-CT2-001` returned `200` and rendered the seeded staff match. |
+
+### API rerun
+| Scenario | Actor | Result | Evidence |
+| --- | --- | --- | --- |
+| Agents search endpoint | `ct2admin` | Pass | `/api/ct2_agents.php?search=AGT-CT2-001` returned `200` JSON with `success: true` and the seeded match. |
+| Suppliers search endpoint | `ct2admin` | Pass | `/api/ct2_suppliers.php?search=SUP-CT2-001` returned `200` JSON with no HTML fatal output. |
+| Marketing campaigns search endpoint | `ct2admin` | Pass | `/api/ct2_marketing_campaigns.php?search=CT2-MKT-001` returned `200` JSON with the seeded campaign match. |
+| Promotions search endpoint | `ct2admin` | Pass | `/api/ct2_promotions.php?search=PROMO-CT2-001` returned `200` JSON with the seeded promotion match. |
+| Affiliates search endpoint | `ct2admin` | Pass | `/api/ct2_affiliates.php?search=AFF-CT2-001` returned `200` JSON with the seeded affiliate match. |
+| Visa applications search endpoint | `ct2admin` | Pass | `/api/ct2_visa_applications.php?search=VISA-APP-001` returned `200` JSON with the seeded application match. |
+| Agents endpoint denies anonymous access | anonymous | Pass | `/api/ct2_agents.php` still returned `403` after the fix. |
+| Login endpoint rejects wrong method | anonymous | Pass | `GET /api/ct2_auth_login.php` still returned `405` after the fix. |
+
+## Current Recommendation
+- The search/filter blocker is resolved on `develop`.
+- The current local QA evidence supports moving to broader release signoff or final promotion review, assuming no additional issues are introduced outside this rerun scope.

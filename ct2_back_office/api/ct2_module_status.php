@@ -42,8 +42,8 @@ $ct2Modules = [
     [
         'module_key' => 'document-visa-assistance',
         'title' => 'Document and Visa Assistance Module',
-        'status' => 'scaffolded',
-        'routes' => [ct2_app_url(['module' => 'placeholders', 'action' => 'show', 'feature' => 'document-visa-assistance'])],
+        'status' => 'implemented',
+        'routes' => [ct2_app_url(['module' => 'visa', 'action' => 'index'])],
     ],
 ];
 

@@ -22,8 +22,8 @@ final class CT2_PlaceholderController extends CT2_BaseController
             ],
             'document-visa-assistance' => [
                 'title' => 'Document and Visa Assistance Module',
-                'status' => 'Scaffolded',
-                'summary' => 'Document indexing, application tracking, and compliance adapter seams are reserved for the next delivery wave.',
+                'status' => 'Implemented',
+                'summary' => 'Visa intake, checklist management, document metadata, payment references, and notification logging are now available in the live CT2 module.',
             ],
         ];
 

@@ -9,6 +9,7 @@ final class CT2_ApprovalController extends CT2_BaseController
     private CT2_SupplierModel $ct2SupplierModel;
     private CT2_MarketingCampaignModel $ct2CampaignModel;
     private CT2_PromotionModel $ct2PromotionModel;
+    private CT2_VisaApplicationModel $ct2VisaApplicationModel;
     private CT2_AuditLogModel $ct2AuditLogModel;
 
     public function __construct()
@@ -18,6 +19,7 @@ final class CT2_ApprovalController extends CT2_BaseController
         $this->ct2SupplierModel = new CT2_SupplierModel();
         $this->ct2CampaignModel = new CT2_MarketingCampaignModel();
         $this->ct2PromotionModel = new CT2_PromotionModel();
+        $this->ct2VisaApplicationModel = new CT2_VisaApplicationModel();
         $this->ct2AuditLogModel = new CT2_AuditLogModel();
     }
 
@@ -93,6 +95,18 @@ final class CT2_ApprovalController extends CT2_BaseController
             }
 
             $this->ct2PromotionModel->updateApprovalStatus(
+                (int) $ct2Decision['subject_id'],
+                $ct2Status,
+                (int) ct2_current_user_id()
+            );
+        }
+
+        if ($ct2Decision['subject_type'] === 'visa_application') {
+            if (!ct2_has_permission('visa.approve')) {
+                throw new InvalidArgumentException('You do not have permission to approve visa exception cases.');
+            }
+
+            $this->ct2VisaApplicationModel->updateApprovalStatus(
                 (int) $ct2Decision['subject_id'],
                 $ct2Status,
                 (int) ct2_current_user_id()

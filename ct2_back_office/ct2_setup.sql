@@ -729,6 +729,148 @@ CREATE TABLE IF NOT EXISTS ct2_marketing_notes (
         ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS ct2_visa_types (
+    ct2_visa_type_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    visa_code VARCHAR(80) NOT NULL UNIQUE,
+    country_name VARCHAR(120) NOT NULL,
+    visa_category VARCHAR(120) NOT NULL,
+    processing_days INT UNSIGNED NOT NULL DEFAULT 1,
+    biometrics_required TINYINT(1) NOT NULL DEFAULT 0,
+    validity_period_days INT UNSIGNED NOT NULL DEFAULT 1,
+    base_fee DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_visa_applications (
+    ct2_visa_application_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_visa_type_id INT UNSIGNED NOT NULL,
+    application_reference VARCHAR(100) NOT NULL UNIQUE,
+    external_customer_id VARCHAR(120) NOT NULL,
+    external_agent_id VARCHAR(120) NULL,
+    source_system VARCHAR(80) NULL,
+    status ENUM('draft', 'submitted', 'document_review', 'appointment_scheduled', 'processing', 'approved', 'released', 'rejected', 'cancelled', 'escalated_review') NOT NULL DEFAULT 'submitted',
+    submission_date DATE NOT NULL,
+    appointment_date DATETIME NULL,
+    embassy_reference VARCHAR(120) NULL,
+    approval_status ENUM('not_required', 'pending', 'approved', 'rejected') NOT NULL DEFAULT 'not_required',
+    documents_verified TINYINT(1) NOT NULL DEFAULT 0,
+    outstanding_item_count INT UNSIGNED NOT NULL DEFAULT 0,
+    payment_status ENUM('unpaid', 'partial', 'paid', 'refunded') NOT NULL DEFAULT 'unpaid',
+    remarks TEXT NULL,
+    created_by INT UNSIGNED NULL,
+    updated_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_visa_applications_type
+        FOREIGN KEY (ct2_visa_type_id) REFERENCES ct2_visa_types (ct2_visa_type_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ct2_visa_applications_created_by
+        FOREIGN KEY (created_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_ct2_visa_applications_updated_by
+        FOREIGN KEY (updated_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_visa_checklist_items (
+    ct2_visa_checklist_item_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_visa_type_id INT UNSIGNED NOT NULL,
+    item_name VARCHAR(190) NOT NULL,
+    item_description TEXT NULL,
+    is_mandatory TINYINT(1) NOT NULL DEFAULT 1,
+    file_size_limit_mb INT UNSIGNED NOT NULL DEFAULT 1,
+    requires_original TINYINT(1) NOT NULL DEFAULT 0,
+    display_order INT UNSIGNED NOT NULL DEFAULT 1,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_visa_checklist_items_type
+        FOREIGN KEY (ct2_visa_type_id) REFERENCES ct2_visa_types (ct2_visa_type_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_application_checklist (
+    ct2_application_checklist_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_visa_application_id INT UNSIGNED NOT NULL,
+    ct2_visa_checklist_item_id INT UNSIGNED NOT NULL,
+    checklist_status ENUM('pending', 'submitted', 'verified', 'rejected', 'waived') NOT NULL DEFAULT 'pending',
+    verification_notes TEXT NULL,
+    ct2_document_id INT UNSIGNED NULL,
+    verified_by INT UNSIGNED NULL,
+    verified_at DATETIME NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_ct2_application_checklist (ct2_visa_application_id, ct2_visa_checklist_item_id),
+    CONSTRAINT fk_ct2_application_checklist_application
+        FOREIGN KEY (ct2_visa_application_id) REFERENCES ct2_visa_applications (ct2_visa_application_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ct2_application_checklist_item
+        FOREIGN KEY (ct2_visa_checklist_item_id) REFERENCES ct2_visa_checklist_items (ct2_visa_checklist_item_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ct2_application_checklist_document
+        FOREIGN KEY (ct2_document_id) REFERENCES ct2_documents (ct2_document_id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_ct2_application_checklist_verified_by
+        FOREIGN KEY (verified_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_visa_payments (
+    ct2_visa_payment_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_visa_application_id INT UNSIGNED NOT NULL,
+    payment_reference VARCHAR(100) NOT NULL,
+    external_payment_id VARCHAR(120) NULL,
+    amount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    currency VARCHAR(10) NOT NULL DEFAULT 'PHP',
+    payment_method VARCHAR(80) NOT NULL DEFAULT 'Manual',
+    payment_status ENUM('pending', 'completed', 'refunded', 'voided') NOT NULL DEFAULT 'pending',
+    paid_at DATETIME NULL,
+    source_system VARCHAR(80) NULL,
+    created_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_visa_payments_application
+        FOREIGN KEY (ct2_visa_application_id) REFERENCES ct2_visa_applications (ct2_visa_application_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ct2_visa_payments_created_by
+        FOREIGN KEY (created_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_notification_logs (
+    ct2_notification_log_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_visa_application_id INT UNSIGNED NOT NULL,
+    notification_channel ENUM('email', 'sms', 'portal', 'manual') NOT NULL DEFAULT 'email',
+    recipient_reference VARCHAR(190) NOT NULL,
+    notification_subject VARCHAR(190) NOT NULL,
+    notification_message TEXT NOT NULL,
+    delivery_status ENUM('queued', 'sent', 'failed') NOT NULL DEFAULT 'queued',
+    sent_at DATETIME NULL,
+    created_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_notification_logs_application
+        FOREIGN KEY (ct2_visa_application_id) REFERENCES ct2_visa_applications (ct2_visa_application_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ct2_notification_logs_created_by
+        FOREIGN KEY (created_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_visa_notes (
+    ct2_visa_note_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_visa_application_id INT UNSIGNED NOT NULL,
+    note_type ENUM('review', 'client_update', 'risk', 'embassy', 'payment') NOT NULL DEFAULT 'review',
+    note_body TEXT NOT NULL,
+    next_action_date DATE NULL,
+    created_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_visa_notes_application
+        FOREIGN KEY (ct2_visa_application_id) REFERENCES ct2_visa_applications (ct2_visa_application_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ct2_visa_notes_created_by
+        FOREIGN KEY (created_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
 INSERT INTO ct2_roles (role_key, role_name, description)
 VALUES
     ('system_admin', 'System Admin', 'Full CT2 platform administration'),
@@ -761,6 +903,9 @@ FROM (
     UNION ALL SELECT 'system_admin', 'marketing.view'
     UNION ALL SELECT 'system_admin', 'marketing.manage'
     UNION ALL SELECT 'system_admin', 'marketing.approve'
+    UNION ALL SELECT 'system_admin', 'visa.view'
+    UNION ALL SELECT 'system_admin', 'visa.manage'
+    UNION ALL SELECT 'system_admin', 'visa.approve'
     UNION ALL SELECT 'system_admin', 'api.access'
     UNION ALL SELECT 'back_office_manager', 'dashboard.view'
     UNION ALL SELECT 'back_office_manager', 'agents.view'
@@ -780,6 +925,9 @@ FROM (
     UNION ALL SELECT 'back_office_manager', 'marketing.view'
     UNION ALL SELECT 'back_office_manager', 'marketing.manage'
     UNION ALL SELECT 'back_office_manager', 'marketing.approve'
+    UNION ALL SELECT 'back_office_manager', 'visa.view'
+    UNION ALL SELECT 'back_office_manager', 'visa.manage'
+    UNION ALL SELECT 'back_office_manager', 'visa.approve'
     UNION ALL SELECT 'back_office_manager', 'api.access'
     UNION ALL SELECT 'team_lead', 'dashboard.view'
     UNION ALL SELECT 'team_lead', 'agents.view'
@@ -792,16 +940,21 @@ FROM (
     UNION ALL SELECT 'team_lead', 'availability.manage'
     UNION ALL SELECT 'team_lead', 'marketing.view'
     UNION ALL SELECT 'team_lead', 'marketing.manage'
+    UNION ALL SELECT 'team_lead', 'visa.view'
+    UNION ALL SELECT 'team_lead', 'visa.manage'
     UNION ALL SELECT 'front_desk_agent', 'dashboard.view'
     UNION ALL SELECT 'front_desk_agent', 'agents.view'
     UNION ALL SELECT 'front_desk_agent', 'staff.view'
     UNION ALL SELECT 'front_desk_agent', 'suppliers.view'
     UNION ALL SELECT 'front_desk_agent', 'availability.view'
     UNION ALL SELECT 'front_desk_agent', 'marketing.view'
+    UNION ALL SELECT 'front_desk_agent', 'visa.view'
+    UNION ALL SELECT 'front_desk_agent', 'visa.manage'
     UNION ALL SELECT 'accounting_staff', 'dashboard.view'
     UNION ALL SELECT 'accounting_staff', 'approvals.view'
     UNION ALL SELECT 'accounting_staff', 'suppliers.view'
     UNION ALL SELECT 'accounting_staff', 'marketing.view'
+    UNION ALL SELECT 'accounting_staff', 'visa.view'
     UNION ALL SELECT 'accounting_staff', 'api.access'
 ) AS permission_seed
 INNER JOIN ct2_roles AS r ON r.role_key = permission_seed.role_key

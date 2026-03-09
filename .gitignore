@@ -7,3 +7,5 @@
 !/ct2_back_office/storage/sessions/.gitkeep
 !/ct2_back_office/storage/uploads/
 !/ct2_back_office/storage/uploads/.gitkeep
+/ct2_back_office/storage/uploads/*
+!/ct2_back_office/storage/uploads/.gitkeep

@@ -10,11 +10,6 @@ final class CT2_PlaceholderController extends CT2_BaseController
 
         $ct2ModuleKey = (string) ($_GET['feature'] ?? 'supplier-partner-management');
         $ct2Modules = [
-            'supplier-partner-management' => [
-                'title' => 'Supplier and Partner Management',
-                'status' => 'Scaffolded',
-                'summary' => 'Route and API contract placeholders are ready for onboarding, contract, and partner performance workflows.',
-            ],
             'tour-availability-resource-planning' => [
                 'title' => 'Tour Availability and Resource Planning',
                 'status' => 'Scaffolded',

@@ -235,6 +235,140 @@ CREATE TABLE IF NOT EXISTS ct2_activity_logs (
         ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS ct2_suppliers (
+    ct2_supplier_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    supplier_code VARCHAR(60) NOT NULL UNIQUE,
+    supplier_name VARCHAR(190) NOT NULL,
+    supplier_type ENUM('supplier', 'partner', 'hybrid') NOT NULL DEFAULT 'supplier',
+    primary_contact_name VARCHAR(190) NOT NULL,
+    email VARCHAR(190) NOT NULL UNIQUE,
+    phone VARCHAR(60) NOT NULL,
+    service_category VARCHAR(120) NOT NULL,
+    support_tier ENUM('standard', 'priority', 'strategic') NOT NULL DEFAULT 'standard',
+    approval_status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
+    onboarding_status ENUM('draft', 'in_review', 'approved', 'live', 'blocked') NOT NULL DEFAULT 'draft',
+    active_status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
+    risk_level ENUM('low', 'medium', 'high') NOT NULL DEFAULT 'low',
+    internal_owner_user_id INT UNSIGNED NULL,
+    external_supplier_id VARCHAR(120) NULL,
+    source_system VARCHAR(80) NULL,
+    created_by INT UNSIGNED NULL,
+    updated_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_suppliers_owner
+        FOREIGN KEY (internal_owner_user_id) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_ct2_suppliers_created_by
+        FOREIGN KEY (created_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_ct2_suppliers_updated_by
+        FOREIGN KEY (updated_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_supplier_contacts (
+    ct2_supplier_contact_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_supplier_id INT UNSIGNED NOT NULL,
+    contact_name VARCHAR(190) NOT NULL,
+    role_title VARCHAR(120) NOT NULL,
+    email VARCHAR(190) NOT NULL,
+    phone VARCHAR(60) NOT NULL,
+    is_primary TINYINT(1) NOT NULL DEFAULT 1,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_ct2_supplier_contact_primary (ct2_supplier_id, is_primary),
+    CONSTRAINT fk_ct2_supplier_contacts_supplier
+        FOREIGN KEY (ct2_supplier_id) REFERENCES ct2_suppliers (ct2_supplier_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_supplier_onboarding (
+    ct2_supplier_onboarding_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_supplier_id INT UNSIGNED NOT NULL,
+    checklist_status ENUM('not_started', 'collecting', 'review_ready', 'completed') NOT NULL DEFAULT 'not_started',
+    documents_status ENUM('missing', 'partial', 'complete') NOT NULL DEFAULT 'missing',
+    compliance_status ENUM('pending', 'cleared', 'flagged') NOT NULL DEFAULT 'pending',
+    review_notes TEXT NULL,
+    blocked_reason VARCHAR(255) NULL,
+    target_go_live_date DATE NULL,
+    completed_at DATETIME NULL,
+    updated_by INT UNSIGNED NULL,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_ct2_supplier_onboarding_supplier (ct2_supplier_id),
+    CONSTRAINT fk_ct2_supplier_onboarding_supplier
+        FOREIGN KEY (ct2_supplier_id) REFERENCES ct2_suppliers (ct2_supplier_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ct2_supplier_onboarding_user
+        FOREIGN KEY (updated_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_supplier_contracts (
+    ct2_supplier_contract_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_supplier_id INT UNSIGNED NOT NULL,
+    contract_code VARCHAR(80) NOT NULL UNIQUE,
+    contract_title VARCHAR(190) NOT NULL,
+    effective_date DATE NOT NULL,
+    expiry_date DATE NOT NULL,
+    renewal_status ENUM('not_started', 'renewal_due', 'renewed', 'expired') NOT NULL DEFAULT 'not_started',
+    contract_status ENUM('draft', 'pending_signature', 'active', 'expired', 'terminated') NOT NULL DEFAULT 'draft',
+    clause_summary TEXT NULL,
+    mock_signature_status ENUM('pending', 'sent', 'signed') NOT NULL DEFAULT 'pending',
+    finance_handoff_status ENUM('not_started', 'shared', 'confirmed') NOT NULL DEFAULT 'not_started',
+    created_by INT UNSIGNED NULL,
+    updated_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_supplier_contracts_supplier
+        FOREIGN KEY (ct2_supplier_id) REFERENCES ct2_suppliers (ct2_supplier_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ct2_supplier_contracts_created_by
+        FOREIGN KEY (created_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_ct2_supplier_contracts_updated_by
+        FOREIGN KEY (updated_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_supplier_kpis (
+    ct2_supplier_kpi_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_supplier_id INT UNSIGNED NOT NULL,
+    measurement_date DATE NOT NULL,
+    service_score DECIMAL(5,2) NOT NULL,
+    delivery_score DECIMAL(5,2) NOT NULL,
+    compliance_score DECIMAL(5,2) NOT NULL,
+    responsiveness_score DECIMAL(5,2) NOT NULL,
+    weighted_score DECIMAL(5,2) NOT NULL,
+    risk_flag ENUM('none', 'watch', 'critical') NOT NULL DEFAULT 'none',
+    notes TEXT NULL,
+    created_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_supplier_kpis_supplier
+        FOREIGN KEY (ct2_supplier_id) REFERENCES ct2_suppliers (ct2_supplier_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ct2_supplier_kpis_created_by
+        FOREIGN KEY (created_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_supplier_relationship_notes (
+    ct2_supplier_relationship_note_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_supplier_id INT UNSIGNED NOT NULL,
+    note_type ENUM('communication', 'escalation', 'improvement_plan', 'review') NOT NULL DEFAULT 'communication',
+    note_title VARCHAR(190) NOT NULL,
+    note_body TEXT NOT NULL,
+    next_action_date DATE NULL,
+    created_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_supplier_notes_supplier
+        FOREIGN KEY (ct2_supplier_id) REFERENCES ct2_suppliers (ct2_supplier_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ct2_supplier_notes_created_by
+        FOREIGN KEY (created_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
 INSERT INTO ct2_roles (role_key, role_name, description)
 VALUES
     ('system_admin', 'System Admin', 'Full CT2 platform administration'),
@@ -258,6 +392,9 @@ FROM (
     UNION ALL SELECT 'system_admin', 'assignments.manage'
     UNION ALL SELECT 'system_admin', 'approvals.view'
     UNION ALL SELECT 'system_admin', 'approvals.decide'
+    UNION ALL SELECT 'system_admin', 'suppliers.view'
+    UNION ALL SELECT 'system_admin', 'suppliers.manage'
+    UNION ALL SELECT 'system_admin', 'suppliers.approve'
     UNION ALL SELECT 'system_admin', 'api.access'
     UNION ALL SELECT 'back_office_manager', 'dashboard.view'
     UNION ALL SELECT 'back_office_manager', 'agents.view'
@@ -268,17 +405,24 @@ FROM (
     UNION ALL SELECT 'back_office_manager', 'assignments.manage'
     UNION ALL SELECT 'back_office_manager', 'approvals.view'
     UNION ALL SELECT 'back_office_manager', 'approvals.decide'
+    UNION ALL SELECT 'back_office_manager', 'suppliers.view'
+    UNION ALL SELECT 'back_office_manager', 'suppliers.manage'
+    UNION ALL SELECT 'back_office_manager', 'suppliers.approve'
     UNION ALL SELECT 'back_office_manager', 'api.access'
     UNION ALL SELECT 'team_lead', 'dashboard.view'
     UNION ALL SELECT 'team_lead', 'agents.view'
     UNION ALL SELECT 'team_lead', 'staff.view'
     UNION ALL SELECT 'team_lead', 'assignments.manage'
     UNION ALL SELECT 'team_lead', 'approvals.view'
+    UNION ALL SELECT 'team_lead', 'suppliers.view'
+    UNION ALL SELECT 'team_lead', 'suppliers.manage'
     UNION ALL SELECT 'front_desk_agent', 'dashboard.view'
     UNION ALL SELECT 'front_desk_agent', 'agents.view'
     UNION ALL SELECT 'front_desk_agent', 'staff.view'
+    UNION ALL SELECT 'front_desk_agent', 'suppliers.view'
     UNION ALL SELECT 'accounting_staff', 'dashboard.view'
     UNION ALL SELECT 'accounting_staff', 'approvals.view'
+    UNION ALL SELECT 'accounting_staff', 'suppliers.view'
     UNION ALL SELECT 'accounting_staff', 'api.access'
 ) AS permission_seed
 INNER JOIN ct2_roles AS r ON r.role_key = permission_seed.role_key

@@ -18,8 +18,8 @@ $ct2Modules = [
     [
         'module_key' => 'supplier-partner-management',
         'title' => 'Supplier and Partner Management',
-        'status' => 'scaffolded',
-        'routes' => [ct2_app_url(['module' => 'placeholders', 'action' => 'show', 'feature' => 'supplier-partner-management'])],
+        'status' => 'implemented',
+        'routes' => [ct2_app_url(['module' => 'suppliers', 'action' => 'index'])],
     ],
     [
         'module_key' => 'tour-availability-resource-planning',

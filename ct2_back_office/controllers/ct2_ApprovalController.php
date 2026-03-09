@@ -6,12 +6,14 @@ final class CT2_ApprovalController extends CT2_BaseController
 {
     private CT2_ApprovalModel $ct2ApprovalModel;
     private CT2_AgentModel $ct2AgentModel;
+    private CT2_SupplierModel $ct2SupplierModel;
     private CT2_AuditLogModel $ct2AuditLogModel;
 
     public function __construct()
     {
         $this->ct2ApprovalModel = new CT2_ApprovalModel();
         $this->ct2AgentModel = new CT2_AgentModel();
+        $this->ct2SupplierModel = new CT2_SupplierModel();
         $this->ct2AuditLogModel = new CT2_AuditLogModel();
     }
 
@@ -51,6 +53,18 @@ final class CT2_ApprovalController extends CT2_BaseController
 
         if ($ct2Decision['subject_type'] === 'agent') {
             $this->ct2AgentModel->updateApprovalStatus(
+                (int) $ct2Decision['subject_id'],
+                $ct2Status,
+                (int) ct2_current_user_id()
+            );
+        }
+
+        if ($ct2Decision['subject_type'] === 'supplier') {
+            if (!ct2_has_permission('suppliers.approve')) {
+                throw new InvalidArgumentException('You do not have permission to approve supplier records.');
+            }
+
+            $this->ct2SupplierModel->updateApprovalStatus(
                 (int) $ct2Decision['subject_id'],
                 $ct2Status,
                 (int) ct2_current_user_id()

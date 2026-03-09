@@ -11,6 +11,7 @@ $ct2ControllerMap = [
     'auth' => CT2_AuthController::class,
     'dashboard' => CT2_DashboardController::class,
     'agents' => CT2_AgentController::class,
+    'suppliers' => CT2_SupplierController::class,
     'staff' => CT2_StaffController::class,
     'approvals' => CT2_ApprovalController::class,
     'placeholders' => CT2_PlaceholderController::class,

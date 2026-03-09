@@ -23,9 +23,9 @@
             <span>Available now: <?= (int) ($ct2StaffSummary['available_staff'] ?? 0); ?></span>
         </article>
         <article class="ct2-stat-card">
-            <h3>Active Staff</h3>
-            <strong><?= (int) ($ct2StaffSummary['active_staff'] ?? 0); ?></strong>
-            <span>Ready for assignments</span>
+            <h3>Total Suppliers</h3>
+            <strong><?= (int) ($ct2SupplierSummary['total_suppliers'] ?? 0); ?></strong>
+            <span>Pending supplier approvals: <?= (int) ($ct2SupplierSummary['pending_suppliers'] ?? 0); ?></span>
         </article>
     </div>
 </section>
@@ -63,28 +63,28 @@
 
     <article class="ct2-panel">
         <div class="ct2-section-header">
-            <h3>Recent Agent Assignments</h3>
-            <a class="ct2-link" href="<?= htmlspecialchars(ct2_url(['module' => 'agents', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Manage assignments</a>
+            <h3>Recent Supplier Contracts</h3>
+            <a class="ct2-link" href="<?= htmlspecialchars(ct2_url(['module' => 'suppliers', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Open supplier module</a>
         </div>
         <div class="ct2-table-wrap">
             <table class="ct2-table">
                 <thead>
                 <tr>
-                    <th>Agent</th>
-                    <th>Staff</th>
-                    <th>Role</th>
+                    <th>Supplier</th>
+                    <th>Contract</th>
+                    <th>Status</th>
                 </tr>
                 </thead>
                 <tbody>
-                <?php foreach ($ct2Assignments as $ct2Assignment): ?>
+                <?php foreach ($ct2SupplierContracts as $ct2Contract): ?>
                     <tr>
-                        <td><?= htmlspecialchars((string) $ct2Assignment['agency_name'], ENT_QUOTES, 'UTF-8'); ?></td>
-                        <td><?= htmlspecialchars((string) $ct2Assignment['full_name'], ENT_QUOTES, 'UTF-8'); ?></td>
-                        <td><?= htmlspecialchars((string) $ct2Assignment['assignment_role'], ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?= htmlspecialchars((string) $ct2Contract['supplier_name'], ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?= htmlspecialchars((string) $ct2Contract['contract_title'], ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?= htmlspecialchars((string) $ct2Contract['contract_status'], ENT_QUOTES, 'UTF-8'); ?></td>
                     </tr>
                 <?php endforeach; ?>
-                <?php if ($ct2Assignments === []): ?>
-                    <tr><td colspan="3">No assignments recorded yet.</td></tr>
+                <?php if ($ct2SupplierContracts === []): ?>
+                    <tr><td colspan="3">No supplier contracts recorded yet.</td></tr>
                 <?php endif; ?>
                 </tbody>
             </table>
@@ -95,8 +95,8 @@
 <section class="ct2-grid-3">
     <article class="ct2-placeholder-card">
         <h3>Supplier and Partner Management</h3>
-        <p>Digital onboarding, partner scoring, and contract placeholders are scaffolded for the next implementation wave.</p>
-        <a class="ct2-link" href="<?= htmlspecialchars(ct2_url(['module' => 'placeholders', 'action' => 'show', 'feature' => 'supplier-partner-management']), ENT_QUOTES, 'UTF-8'); ?>">View placeholder</a>
+        <p>Supplier onboarding, contract tracking, KPI scoring, and relationship notes are now available as the second CT2 module slice.</p>
+        <a class="ct2-link" href="<?= htmlspecialchars(ct2_url(['module' => 'suppliers', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Open module</a>
     </article>
     <article class="ct2-placeholder-card">
         <h3>Tour Availability and Resource Planning</h3>

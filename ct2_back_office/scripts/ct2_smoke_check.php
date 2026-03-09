@@ -10,6 +10,10 @@ $ct2RequiredFiles = [
     __DIR__ . '/../api/ct2_agents.php',
     __DIR__ . '/../api/ct2_staff.php',
     __DIR__ . '/../api/ct2_approvals.php',
+    __DIR__ . '/../api/ct2_suppliers.php',
+    __DIR__ . '/../api/ct2_supplier_onboarding.php',
+    __DIR__ . '/../api/ct2_supplier_contracts.php',
+    __DIR__ . '/../api/ct2_supplier_kpis.php',
     __DIR__ . '/../api/ct2_module_status.php',
     __DIR__ . '/../ct2_setup.sql',
 ];

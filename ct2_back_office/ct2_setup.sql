@@ -1,0 +1,304 @@
+CREATE DATABASE IF NOT EXISTS ct2_back_office CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE ct2_back_office;
+
+CREATE TABLE IF NOT EXISTS ct2_users (
+    ct2_user_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100) NOT NULL UNIQUE,
+    email VARCHAR(190) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    display_name VARCHAR(190) NOT NULL,
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    last_login_at DATETIME NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_roles (
+    ct2_role_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    role_key VARCHAR(80) NOT NULL UNIQUE,
+    role_name VARCHAR(120) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_user_roles (
+    ct2_user_role_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_user_id INT UNSIGNED NOT NULL,
+    ct2_role_id INT UNSIGNED NOT NULL,
+    assigned_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_ct2_user_role (ct2_user_id, ct2_role_id),
+    CONSTRAINT fk_ct2_user_roles_user
+        FOREIGN KEY (ct2_user_id) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ct2_user_roles_role
+        FOREIGN KEY (ct2_role_id) REFERENCES ct2_roles (ct2_role_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_role_permissions (
+    ct2_role_permission_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_role_id INT UNSIGNED NOT NULL,
+    permission_key VARCHAR(120) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_ct2_role_permission (ct2_role_id, permission_key),
+    CONSTRAINT fk_ct2_role_permissions_role
+        FOREIGN KEY (ct2_role_id) REFERENCES ct2_roles (ct2_role_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_session_logs (
+    ct2_session_log_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_user_id INT UNSIGNED NOT NULL,
+    session_identifier VARCHAR(128) NOT NULL,
+    login_at DATETIME NOT NULL,
+    logout_at DATETIME NULL,
+    ip_address VARCHAR(64) NOT NULL DEFAULT '127.0.0.1',
+    user_agent VARCHAR(255) NOT NULL DEFAULT '',
+    CONSTRAINT fk_ct2_session_logs_user
+        FOREIGN KEY (ct2_user_id) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_audit_logs (
+    ct2_audit_log_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_user_id INT UNSIGNED NULL,
+    entity_type VARCHAR(120) NOT NULL,
+    entity_id INT UNSIGNED NULL,
+    action_key VARCHAR(120) NOT NULL,
+    details_json JSON NULL,
+    ip_address VARCHAR(64) NOT NULL DEFAULT '127.0.0.1',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_ct2_audit_entity (entity_type, entity_id),
+    CONSTRAINT fk_ct2_audit_logs_user
+        FOREIGN KEY (ct2_user_id) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_api_logs (
+    ct2_api_log_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_user_id INT UNSIGNED NULL,
+    endpoint_name VARCHAR(120) NOT NULL,
+    http_method VARCHAR(10) NOT NULL,
+    status_code SMALLINT UNSIGNED NOT NULL,
+    request_summary TEXT NULL,
+    response_summary TEXT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_api_logs_user
+        FOREIGN KEY (ct2_user_id) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_notifications (
+    ct2_notification_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_user_id INT UNSIGNED NOT NULL,
+    notification_type VARCHAR(80) NOT NULL,
+    notification_title VARCHAR(190) NOT NULL,
+    notification_body TEXT NOT NULL,
+    is_read TINYINT(1) NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_notifications_user
+        FOREIGN KEY (ct2_user_id) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_documents (
+    ct2_document_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    entity_type VARCHAR(120) NOT NULL,
+    entity_id INT UNSIGNED NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    file_path VARCHAR(255) NOT NULL,
+    mime_type VARCHAR(120) NOT NULL,
+    uploaded_by INT UNSIGNED NULL,
+    uploaded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_ct2_documents_entity (entity_type, entity_id),
+    CONSTRAINT fk_ct2_documents_user
+        FOREIGN KEY (uploaded_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_external_refs (
+    ct2_external_ref_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    entity_type VARCHAR(120) NOT NULL,
+    entity_id INT UNSIGNED NOT NULL,
+    source_system VARCHAR(80) NOT NULL,
+    external_identifier VARCHAR(190) NOT NULL,
+    metadata_json JSON NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_ct2_external_ref (entity_type, entity_id, source_system, external_identifier)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_staff (
+    ct2_staff_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_user_id INT UNSIGNED NULL,
+    staff_code VARCHAR(60) NOT NULL UNIQUE,
+    full_name VARCHAR(190) NOT NULL,
+    email VARCHAR(190) NOT NULL UNIQUE,
+    phone VARCHAR(60) NOT NULL,
+    department VARCHAR(120) NOT NULL,
+    position_title VARCHAR(120) NOT NULL,
+    employment_status ENUM('active', 'inactive', 'suspended') NOT NULL DEFAULT 'active',
+    availability_status ENUM('available', 'busy', 'on_leave') NOT NULL DEFAULT 'available',
+    team_name VARCHAR(120) NOT NULL,
+    notes TEXT NULL,
+    created_by INT UNSIGNED NULL,
+    updated_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_staff_user
+        FOREIGN KEY (ct2_user_id) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_ct2_staff_created_by
+        FOREIGN KEY (created_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_ct2_staff_updated_by
+        FOREIGN KEY (updated_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_agents (
+    ct2_agent_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    agent_code VARCHAR(60) NOT NULL UNIQUE,
+    agency_name VARCHAR(190) NOT NULL,
+    contact_person VARCHAR(190) NOT NULL,
+    email VARCHAR(190) NOT NULL UNIQUE,
+    phone VARCHAR(60) NOT NULL,
+    region VARCHAR(120) NOT NULL,
+    commission_rate DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+    support_level ENUM('standard', 'priority', 'strategic') NOT NULL DEFAULT 'standard',
+    approval_status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
+    active_status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
+    external_booking_id VARCHAR(120) NULL,
+    external_customer_id VARCHAR(120) NULL,
+    external_payment_id VARCHAR(120) NULL,
+    source_system VARCHAR(80) NULL,
+    created_by INT UNSIGNED NULL,
+    updated_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_agents_created_by
+        FOREIGN KEY (created_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_ct2_agents_updated_by
+        FOREIGN KEY (updated_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_agent_staff_assignments (
+    ct2_assignment_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_agent_id INT UNSIGNED NOT NULL,
+    ct2_staff_id INT UNSIGNED NOT NULL,
+    assignment_role VARCHAR(120) NOT NULL,
+    assignment_status ENUM('active', 'paused', 'completed') NOT NULL DEFAULT 'active',
+    start_date DATE NOT NULL,
+    end_date DATE NULL,
+    notes TEXT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_ct2_agent_staff_assignment (ct2_agent_id, ct2_staff_id, assignment_role),
+    CONSTRAINT fk_ct2_assignments_agent
+        FOREIGN KEY (ct2_agent_id) REFERENCES ct2_agents (ct2_agent_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ct2_assignments_staff
+        FOREIGN KEY (ct2_staff_id) REFERENCES ct2_staff (ct2_staff_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_approval_workflows (
+    ct2_approval_workflow_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    subject_type VARCHAR(120) NOT NULL,
+    subject_id INT UNSIGNED NOT NULL,
+    requested_by INT UNSIGNED NULL,
+    approver_user_id INT UNSIGNED NULL,
+    approval_status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
+    requested_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    decided_at DATETIME NULL,
+    decision_notes TEXT NULL,
+    INDEX idx_ct2_approvals_subject (subject_type, subject_id),
+    CONSTRAINT fk_ct2_approvals_requested_by
+        FOREIGN KEY (requested_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_ct2_approvals_approver_user
+        FOREIGN KEY (approver_user_id) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_activity_logs (
+    ct2_activity_log_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    subject_type VARCHAR(120) NOT NULL,
+    subject_id INT UNSIGNED NOT NULL,
+    activity_type VARCHAR(120) NOT NULL,
+    activity_summary VARCHAR(255) NOT NULL,
+    actor_user_id INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_ct2_activity_subject (subject_type, subject_id),
+    CONSTRAINT fk_ct2_activity_logs_user
+        FOREIGN KEY (actor_user_id) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+INSERT INTO ct2_roles (role_key, role_name, description)
+VALUES
+    ('system_admin', 'System Admin', 'Full CT2 platform administration'),
+    ('back_office_manager', 'Back Office Manager', 'Operational oversight and approvals'),
+    ('team_lead', 'Team Lead', 'Team supervision and queue management'),
+    ('front_desk_agent', 'Front Desk Agent', 'Daily agent support operations'),
+    ('accounting_staff', 'Accounting Staff', 'Finance-aligned CT2 operations')
+ON DUPLICATE KEY UPDATE
+    role_name = VALUES(role_name),
+    description = VALUES(description);
+
+INSERT INTO ct2_role_permissions (ct2_role_id, permission_key)
+SELECT r.ct2_role_id, permission_key
+FROM (
+    SELECT 'system_admin' AS role_key, 'dashboard.view' AS permission_key
+    UNION ALL SELECT 'system_admin', 'agents.view'
+    UNION ALL SELECT 'system_admin', 'agents.manage'
+    UNION ALL SELECT 'system_admin', 'agents.approve'
+    UNION ALL SELECT 'system_admin', 'staff.view'
+    UNION ALL SELECT 'system_admin', 'staff.manage'
+    UNION ALL SELECT 'system_admin', 'assignments.manage'
+    UNION ALL SELECT 'system_admin', 'approvals.view'
+    UNION ALL SELECT 'system_admin', 'approvals.decide'
+    UNION ALL SELECT 'system_admin', 'api.access'
+    UNION ALL SELECT 'back_office_manager', 'dashboard.view'
+    UNION ALL SELECT 'back_office_manager', 'agents.view'
+    UNION ALL SELECT 'back_office_manager', 'agents.manage'
+    UNION ALL SELECT 'back_office_manager', 'agents.approve'
+    UNION ALL SELECT 'back_office_manager', 'staff.view'
+    UNION ALL SELECT 'back_office_manager', 'staff.manage'
+    UNION ALL SELECT 'back_office_manager', 'assignments.manage'
+    UNION ALL SELECT 'back_office_manager', 'approvals.view'
+    UNION ALL SELECT 'back_office_manager', 'approvals.decide'
+    UNION ALL SELECT 'back_office_manager', 'api.access'
+    UNION ALL SELECT 'team_lead', 'dashboard.view'
+    UNION ALL SELECT 'team_lead', 'agents.view'
+    UNION ALL SELECT 'team_lead', 'staff.view'
+    UNION ALL SELECT 'team_lead', 'assignments.manage'
+    UNION ALL SELECT 'team_lead', 'approvals.view'
+    UNION ALL SELECT 'front_desk_agent', 'dashboard.view'
+    UNION ALL SELECT 'front_desk_agent', 'agents.view'
+    UNION ALL SELECT 'front_desk_agent', 'staff.view'
+    UNION ALL SELECT 'accounting_staff', 'dashboard.view'
+    UNION ALL SELECT 'accounting_staff', 'approvals.view'
+    UNION ALL SELECT 'accounting_staff', 'api.access'
+) AS permission_seed
+INNER JOIN ct2_roles AS r ON r.role_key = permission_seed.role_key
+ON DUPLICATE KEY UPDATE permission_key = VALUES(permission_key);
+
+INSERT INTO ct2_users (username, email, password_hash, display_name, is_active)
+VALUES (
+    'ct2admin',
+    'ct2admin@example.com',
+    '$2y$12$Ntbg7JaaJr34rIGv4xMhvOpbXMRSY0U0ODlHXEQPORTpQq0OUpWdO',
+    'CT2 System Administrator',
+    1
+)
+ON DUPLICATE KEY UPDATE
+    display_name = VALUES(display_name),
+    is_active = VALUES(is_active);
+
+INSERT INTO ct2_user_roles (ct2_user_id, ct2_role_id)
+SELECT u.ct2_user_id, r.ct2_role_id
+FROM ct2_users AS u
+INNER JOIN ct2_roles AS r ON r.role_key = 'system_admin'
+WHERE u.username = 'ct2admin'
+ON DUPLICATE KEY UPDATE assigned_at = CURRENT_TIMESTAMP;

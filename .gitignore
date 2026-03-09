@@ -1,0 +1,7 @@
+/.idea/
+/.vscode/
+/.DS_Store
+/ct2_back_office/config/ct2_local.php
+/ct2_back_office/storage/*
+!/ct2_back_office/storage/.gitkeep
+!/ct2_back_office/storage/sessions/.gitkeep

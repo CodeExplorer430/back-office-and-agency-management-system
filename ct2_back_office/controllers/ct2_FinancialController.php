@@ -197,7 +197,10 @@ final class CT2_FinancialController extends CT2_BaseController
                 'external_reference_id',
                 'notes',
                 'created_at',
-            ]
+            ],
+            ',',
+            '"',
+            '\\'
         );
 
         foreach ($ct2ExportRows as $ct2ExportRow) {
@@ -217,7 +220,10 @@ final class CT2_FinancialController extends CT2_BaseController
                     (string) ($ct2ExportRow['external_reference_id'] ?? ''),
                     (string) ($ct2ExportRow['notes'] ?? ''),
                     (string) ($ct2ExportRow['created_at'] ?? ''),
-                ]
+                ],
+                ',',
+                '"',
+                '\\'
             );
         }
 

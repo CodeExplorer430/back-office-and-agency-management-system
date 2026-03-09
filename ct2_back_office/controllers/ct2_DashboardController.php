@@ -13,6 +13,7 @@ final class CT2_DashboardController extends CT2_BaseController
         $ct2SupplierModel = new CT2_SupplierModel();
         $ct2ResourceModel = new CT2_ResourceModel();
         $ct2CampaignModel = new CT2_MarketingCampaignModel();
+        $ct2FinancialAnalyticsModel = new CT2_FinancialAnalyticsModel();
         $ct2VisaApplicationModel = new CT2_VisaApplicationModel();
         $ct2ApprovalModel = new CT2_ApprovalModel();
         $ct2AssignmentModel = new CT2_AssignmentModel();
@@ -27,6 +28,7 @@ final class CT2_DashboardController extends CT2_BaseController
                 'ct2SupplierSummary' => $ct2SupplierModel->getSummaryCounts(),
                 'ct2ResourceSummary' => $ct2ResourceModel->getSummaryCounts(),
                 'ct2CampaignSummary' => $ct2CampaignModel->getSummaryCounts(),
+                'ct2FinancialSummary' => $ct2FinancialAnalyticsModel->getSummary(),
                 'ct2VisaSummary' => $ct2VisaApplicationModel->getSummaryCounts(),
                 'ct2Approvals' => array_slice($ct2ApprovalModel->getAll(), 0, 5),
                 'ct2Assignments' => array_slice($ct2AssignmentModel->getAll(), 0, 5),

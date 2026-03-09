@@ -36,8 +36,8 @@ $ct2Modules = [
     [
         'module_key' => 'financial-reporting-analytics',
         'title' => 'Financial Reporting and Analytics',
-        'status' => 'scaffolded',
-        'routes' => [ct2_app_url(['module' => 'placeholders', 'action' => 'show', 'feature' => 'financial-reporting-analytics'])],
+        'status' => 'implemented',
+        'routes' => [ct2_app_url(['module' => 'financial', 'action' => 'index'])],
     ],
     [
         'module_key' => 'document-visa-assistance',

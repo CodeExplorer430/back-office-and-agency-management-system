@@ -42,6 +42,11 @@
             <strong><?= (int) ($ct2VisaSummary['total_applications'] ?? 0); ?></strong>
             <span>Review queue: <?= (int) ($ct2VisaSummary['review_queue'] ?? 0); ?></span>
         </article>
+        <article class="ct2-stat-card">
+            <h3>Financial Snapshots</h3>
+            <strong><?= (int) ($ct2FinancialSummary['snapshot_count'] ?? 0); ?></strong>
+            <span>Open flags: <?= (int) ($ct2FinancialSummary['open_flags'] ?? 0); ?></span>
+        </article>
     </div>
 </section>
 
@@ -130,7 +135,7 @@
     </article>
     <article class="ct2-placeholder-card">
         <h3>Financial Reporting and Analytics</h3>
-        <p>Financial reporting and analytics remains scaffolded while CT2 continues to consume finance-owned identifiers and outputs.</p>
-        <a class="ct2-link" href="<?= htmlspecialchars(ct2_url(['module' => 'placeholders', 'action' => 'show', 'feature' => 'financial-reporting-analytics']), ENT_QUOTES, 'UTF-8'); ?>">View placeholder</a>
+        <p>Operational report definitions, reconciliation flags, financial snapshots, and CSV exports are now available for CT2 users with finance permissions.</p>
+        <a class="ct2-link" href="<?= htmlspecialchars(ct2_url(['module' => 'financial', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Open module</a>
     </article>
 </section>

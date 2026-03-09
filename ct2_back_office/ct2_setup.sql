@@ -871,6 +871,102 @@ CREATE TABLE IF NOT EXISTS ct2_visa_notes (
         ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS ct2_financial_reports (
+    ct2_financial_report_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    report_code VARCHAR(80) NOT NULL UNIQUE,
+    report_name VARCHAR(190) NOT NULL,
+    report_scope ENUM('agents', 'suppliers', 'availability', 'marketing', 'visa', 'cross_module') NOT NULL DEFAULT 'cross_module',
+    report_status ENUM('draft', 'active', 'archived') NOT NULL DEFAULT 'active',
+    default_date_range ENUM('7d', '30d', '90d', 'custom') NOT NULL DEFAULT '30d',
+    definition_notes TEXT NULL,
+    created_by INT UNSIGNED NULL,
+    updated_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ct2_financial_reports_created_by
+        FOREIGN KEY (created_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_ct2_financial_reports_updated_by
+        FOREIGN KEY (updated_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_report_filters (
+    ct2_report_filter_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_financial_report_id INT UNSIGNED NOT NULL,
+    filter_key VARCHAR(120) NOT NULL,
+    filter_label VARCHAR(190) NOT NULL,
+    filter_type ENUM('date', 'select', 'text', 'status') NOT NULL DEFAULT 'text',
+    default_value VARCHAR(255) NULL,
+    sort_order INT UNSIGNED NOT NULL DEFAULT 1,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_ct2_report_filter (ct2_financial_report_id, filter_key),
+    CONSTRAINT fk_ct2_report_filters_report
+        FOREIGN KEY (ct2_financial_report_id) REFERENCES ct2_financial_reports (ct2_financial_report_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_report_runs (
+    ct2_report_run_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_financial_report_id INT UNSIGNED NOT NULL,
+    run_label VARCHAR(190) NOT NULL,
+    date_from DATE NOT NULL,
+    date_to DATE NOT NULL,
+    module_key VARCHAR(80) NOT NULL DEFAULT 'all',
+    source_system VARCHAR(80) NULL,
+    generated_by INT UNSIGNED NULL,
+    generated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_ct2_report_runs_report (ct2_financial_report_id, generated_at),
+    CONSTRAINT fk_ct2_report_runs_report
+        FOREIGN KEY (ct2_financial_report_id) REFERENCES ct2_financial_reports (ct2_financial_report_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ct2_report_runs_generated_by
+        FOREIGN KEY (generated_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_financial_snapshots (
+    ct2_financial_snapshot_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_report_run_id INT UNSIGNED NOT NULL,
+    snapshot_type VARCHAR(120) NOT NULL,
+    reference_code VARCHAR(120) NOT NULL,
+    source_module VARCHAR(80) NOT NULL,
+    source_record_id INT UNSIGNED NULL,
+    metric_label VARCHAR(120) NOT NULL,
+    metric_value DECIMAL(14,2) NOT NULL DEFAULT 0.00,
+    metric_count INT UNSIGNED NOT NULL DEFAULT 0,
+    status_flag ENUM('ok', 'warning', 'critical') NOT NULL DEFAULT 'ok',
+    external_reference_id VARCHAR(120) NULL,
+    notes TEXT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_ct2_financial_snapshots_run (ct2_report_run_id, source_module),
+    CONSTRAINT fk_ct2_financial_snapshots_run
+        FOREIGN KEY (ct2_report_run_id) REFERENCES ct2_report_runs (ct2_report_run_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS ct2_reconciliation_flags (
+    ct2_reconciliation_flag_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ct2_report_run_id INT UNSIGNED NOT NULL,
+    flag_type VARCHAR(120) NOT NULL,
+    source_module VARCHAR(80) NOT NULL,
+    source_record_id INT UNSIGNED NULL,
+    severity ENUM('low', 'medium', 'high') NOT NULL DEFAULT 'medium',
+    flag_status ENUM('open', 'acknowledged', 'resolved') NOT NULL DEFAULT 'open',
+    flag_summary VARCHAR(255) NOT NULL,
+    resolution_notes TEXT NULL,
+    resolved_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    resolved_at DATETIME NULL,
+    INDEX idx_ct2_reconciliation_flags_run (ct2_report_run_id, flag_status),
+    CONSTRAINT fk_ct2_reconciliation_flags_run
+        FOREIGN KEY (ct2_report_run_id) REFERENCES ct2_report_runs (ct2_report_run_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ct2_reconciliation_flags_resolved_by
+        FOREIGN KEY (resolved_by) REFERENCES ct2_users (ct2_user_id)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
 INSERT INTO ct2_roles (role_key, role_name, description)
 VALUES
     ('system_admin', 'System Admin', 'Full CT2 platform administration'),
@@ -903,6 +999,9 @@ FROM (
     UNION ALL SELECT 'system_admin', 'marketing.view'
     UNION ALL SELECT 'system_admin', 'marketing.manage'
     UNION ALL SELECT 'system_admin', 'marketing.approve'
+    UNION ALL SELECT 'system_admin', 'financial.view'
+    UNION ALL SELECT 'system_admin', 'financial.manage'
+    UNION ALL SELECT 'system_admin', 'financial.export'
     UNION ALL SELECT 'system_admin', 'visa.view'
     UNION ALL SELECT 'system_admin', 'visa.manage'
     UNION ALL SELECT 'system_admin', 'visa.approve'
@@ -925,6 +1024,9 @@ FROM (
     UNION ALL SELECT 'back_office_manager', 'marketing.view'
     UNION ALL SELECT 'back_office_manager', 'marketing.manage'
     UNION ALL SELECT 'back_office_manager', 'marketing.approve'
+    UNION ALL SELECT 'back_office_manager', 'financial.view'
+    UNION ALL SELECT 'back_office_manager', 'financial.manage'
+    UNION ALL SELECT 'back_office_manager', 'financial.export'
     UNION ALL SELECT 'back_office_manager', 'visa.view'
     UNION ALL SELECT 'back_office_manager', 'visa.manage'
     UNION ALL SELECT 'back_office_manager', 'visa.approve'
@@ -940,6 +1042,7 @@ FROM (
     UNION ALL SELECT 'team_lead', 'availability.manage'
     UNION ALL SELECT 'team_lead', 'marketing.view'
     UNION ALL SELECT 'team_lead', 'marketing.manage'
+    UNION ALL SELECT 'team_lead', 'financial.view'
     UNION ALL SELECT 'team_lead', 'visa.view'
     UNION ALL SELECT 'team_lead', 'visa.manage'
     UNION ALL SELECT 'front_desk_agent', 'dashboard.view'
@@ -954,6 +1057,9 @@ FROM (
     UNION ALL SELECT 'accounting_staff', 'approvals.view'
     UNION ALL SELECT 'accounting_staff', 'suppliers.view'
     UNION ALL SELECT 'accounting_staff', 'marketing.view'
+    UNION ALL SELECT 'accounting_staff', 'financial.view'
+    UNION ALL SELECT 'accounting_staff', 'financial.manage'
+    UNION ALL SELECT 'accounting_staff', 'financial.export'
     UNION ALL SELECT 'accounting_staff', 'visa.view'
     UNION ALL SELECT 'accounting_staff', 'api.access'
 ) AS permission_seed
@@ -978,3 +1084,51 @@ FROM ct2_users AS u
 INNER JOIN ct2_roles AS r ON r.role_key = 'system_admin'
 WHERE u.username = 'ct2admin'
 ON DUPLICATE KEY UPDATE assigned_at = CURRENT_TIMESTAMP;
+
+INSERT INTO ct2_financial_reports (
+    report_code, report_name, report_scope, report_status, default_date_range, definition_notes
+)
+VALUES
+    ('CT2-OPS-001', 'CT2 Operational Financial Snapshot', 'cross_module', 'active', '30d', 'Cross-module operational margin and reconciliation summary.'),
+    ('CT2-AGENT-001', 'Agent Commission Exposure', 'agents', 'active', '30d', 'Tracks approved agents, commission rates, and missing finance references.'),
+    ('CT2-SUP-001', 'Supplier Cost Exposure', 'suppliers', 'active', '30d', 'Tracks supplier-linked resource cost exposure and contract renewal risk.'),
+    ('CT2-AVL-001', 'Resource Margin Monitor', 'availability', 'active', '30d', 'Tracks package margin against current linked resource costs.'),
+    ('CT2-MKT-001', 'Marketing ROI Monitor', 'marketing', 'active', '30d', 'Tracks budget versus attributed revenue and unresolved redemption gaps.'),
+    ('CT2-VISA-001', 'Visa Payment Monitor', 'visa', 'active', '30d', 'Tracks visa fee coverage and open unpaid applications.')
+ON DUPLICATE KEY UPDATE
+    report_name = VALUES(report_name),
+    report_scope = VALUES(report_scope),
+    report_status = VALUES(report_status),
+    default_date_range = VALUES(default_date_range),
+    definition_notes = VALUES(definition_notes);
+
+INSERT INTO ct2_report_filters (
+    ct2_financial_report_id, filter_key, filter_label, filter_type, default_value, sort_order
+)
+SELECT fr.ct2_financial_report_id, fs.filter_key, fs.filter_label, fs.filter_type, fs.default_value, fs.sort_order
+FROM (
+    SELECT 'CT2-OPS-001' AS report_code, 'date_from' AS filter_key, 'Date From' AS filter_label, 'date' AS filter_type, NULL AS default_value, 1 AS sort_order
+    UNION ALL SELECT 'CT2-OPS-001', 'date_to', 'Date To', 'date', NULL, 2
+    UNION ALL SELECT 'CT2-OPS-001', 'module_key', 'Module Scope', 'select', 'all', 3
+    UNION ALL SELECT 'CT2-OPS-001', 'source_system', 'Source System', 'text', NULL, 4
+    UNION ALL SELECT 'CT2-AGENT-001', 'date_from', 'Date From', 'date', NULL, 1
+    UNION ALL SELECT 'CT2-AGENT-001', 'date_to', 'Date To', 'date', NULL, 2
+    UNION ALL SELECT 'CT2-AGENT-001', 'source_system', 'Source System', 'text', NULL, 3
+    UNION ALL SELECT 'CT2-SUP-001', 'date_from', 'Date From', 'date', NULL, 1
+    UNION ALL SELECT 'CT2-SUP-001', 'date_to', 'Date To', 'date', NULL, 2
+    UNION ALL SELECT 'CT2-SUP-001', 'source_system', 'Source System', 'text', NULL, 3
+    UNION ALL SELECT 'CT2-AVL-001', 'date_from', 'Date From', 'date', NULL, 1
+    UNION ALL SELECT 'CT2-AVL-001', 'date_to', 'Date To', 'date', NULL, 2
+    UNION ALL SELECT 'CT2-MKT-001', 'date_from', 'Date From', 'date', NULL, 1
+    UNION ALL SELECT 'CT2-MKT-001', 'date_to', 'Date To', 'date', NULL, 2
+    UNION ALL SELECT 'CT2-MKT-001', 'source_system', 'Source System', 'text', NULL, 3
+    UNION ALL SELECT 'CT2-VISA-001', 'date_from', 'Date From', 'date', NULL, 1
+    UNION ALL SELECT 'CT2-VISA-001', 'date_to', 'Date To', 'date', NULL, 2
+    UNION ALL SELECT 'CT2-VISA-001', 'payment_status', 'Payment Status', 'status', 'unpaid', 3
+) AS fs
+INNER JOIN ct2_financial_reports AS fr ON fr.report_code = fs.report_code
+ON DUPLICATE KEY UPDATE
+    filter_label = VALUES(filter_label),
+    filter_type = VALUES(filter_type),
+    default_value = VALUES(default_value),
+    sort_order = VALUES(sort_order);

@@ -14,6 +14,7 @@ $ct2ControllerMap = [
     'suppliers' => CT2_SupplierController::class,
     'availability' => CT2_AvailabilityController::class,
     'marketing' => CT2_MarketingController::class,
+    'financial' => CT2_FinancialController::class,
     'visa' => CT2_VisaController::class,
     'staff' => CT2_StaffController::class,
     'approvals' => CT2_ApprovalController::class,

@@ -17,8 +17,8 @@ final class CT2_PlaceholderController extends CT2_BaseController
             ],
             'financial-reporting-analytics' => [
                 'title' => 'Financial Reporting and Analytics',
-                'status' => 'Scaffolded',
-                'summary' => 'CT2 reporting endpoints will consume shared identifiers and external financial references instead of becoming system of record.',
+                'status' => 'Implemented',
+                'summary' => 'CT2 financial reporting now provides operational dashboards, reconciliation flags, snapshots, and CSV exports without taking ownership of core Financials records.',
             ],
             'document-visa-assistance' => [
                 'title' => 'Document and Visa Assistance Module',

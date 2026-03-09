@@ -51,12 +51,22 @@ This repository contains the `CORE TRANSACTION 2: Back-Office and Agency Managem
   `main` for releasable code, `develop` for integration.
 - Short-lived branches:
   `feature/ct2-*`, `fix/ct2-*`, `docs/ct2-*`.
+- `develop` is now the integrated CT2 baseline branch. Validate all new CT2 work there before promoting anything to `main`.
 - Commit format:
   `feat(ct2-auth): add login flow`
   `feat(ct2-agents): add approval queue`
   `fix(ct2-api): harden JSON validation`
   `docs(ct2): define repo standards`
   `chore(ct2-repo): add native lint scripts`
+
+## Local Runtime Validation
+- Copy `ct2_back_office/config/ct2_local.php.example` to `ct2_back_office/config/ct2_local.php` and set the local XAMPP MySQL credentials.
+- Import `ct2_back_office/ct2_setup.sql` into a clean `ct2_back_office` database before browser testing.
+- Use the seeded administrator account for first login:
+  `ct2admin` / `ChangeMe123!`
+- Validate the full route set on local PHP/XAMPP:
+  dashboard, agents, suppliers, availability, marketing, financial, visa, staff, approvals.
+- Validate representative JSON endpoints under `ct2_back_office/api/` and confirm JSON envelopes, HTTP status codes, and audit/API log creation remain correct.
 
 ## Review Focus
 - Security regressions first: authentication, authorization, CSRF, SQL safety, output escaping.

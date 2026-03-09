@@ -6,6 +6,7 @@ $ct2RequiredFiles = [
     __DIR__ . '/../ct2_index.php',
     __DIR__ . '/../config/ct2_bootstrap.php',
     __DIR__ . '/../config/ct2_database.php',
+    __DIR__ . '/ct2_db_smoke_check.php',
     __DIR__ . '/../assets/css/ct2_styles.css',
     __DIR__ . '/../api/ct2_agents.php',
     __DIR__ . '/../api/ct2_staff.php',

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 return [
+    // Keep TCP settings explicit so the same file works for Linux LAMP and Windows XAMPP.
     'host' => '127.0.0.1',
     'port' => '3306',
     'name' => 'ct2_back_office',

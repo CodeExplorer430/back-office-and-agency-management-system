@@ -36,6 +36,7 @@ This repository contains the `CORE TRANSACTION 2: Back-Office and Agency Managem
 ## Quality Gates
 - Run `bash ct2_back_office/scripts/ct2_lint.sh` before every commit.
 - Run `php ct2_back_office/scripts/ct2_smoke_check.php` before every commit.
+- Run `php ct2_back_office/scripts/ct2_db_smoke_check.php` whenever local DB-backed behavior, seeds, or schema compatibility are part of the work.
 - Import `ct2_back_office/ct2_setup.sql` into a clean MySQL database before claiming schema work is complete.
 - Do not merge code that emits PHP warnings, notices, or fatal errors under `E_ALL`.
 
@@ -60,11 +61,12 @@ This repository contains the `CORE TRANSACTION 2: Back-Office and Agency Managem
   `chore(ct2-repo): add native lint scripts`
 
 ## Local Runtime Validation
-- Copy `ct2_back_office/config/ct2_local.php.example` to `ct2_back_office/config/ct2_local.php` and set the local XAMPP MySQL credentials.
+- Copy `ct2_back_office/config/ct2_local.php.example` to `ct2_back_office/config/ct2_local.php` and set explicit TCP MySQL credentials for either LAMP or Windows XAMPP.
 - Import `ct2_back_office/ct2_setup.sql` into a clean `ct2_back_office` database before browser testing.
+- Run `php ct2_back_office/scripts/ct2_db_smoke_check.php` after import and before browser testing.
 - Use the seeded administrator account for first login:
   `ct2admin` / `ChangeMe123!`
-- Validate the full route set on local PHP/XAMPP:
+- Validate the full route set on local PHP/Apache:
   dashboard, agents, suppliers, availability, marketing, financial, visa, staff, approvals.
 - Validate representative JSON endpoints under `ct2_back_office/api/` and confirm JSON envelopes, HTTP status codes, and audit/API log creation remain correct.
 

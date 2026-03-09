@@ -6,12 +6,8 @@ final class CT2_Database
 {
     private static ?PDO $ct2Connection = null;
 
-    public static function getConnection(): PDO
+    public static function getConfig(): array
     {
-        if (self::$ct2Connection instanceof PDO) {
-            return self::$ct2Connection;
-        }
-
         $ct2Config = [
             'host' => getenv('CT2_DB_HOST') ?: '127.0.0.1',
             'port' => getenv('CT2_DB_PORT') ?: '3306',
@@ -28,6 +24,17 @@ final class CT2_Database
                 $ct2Config = array_merge($ct2Config, $ct2LocalConfig);
             }
         }
+
+        return $ct2Config;
+    }
+
+    public static function getConnection(): PDO
+    {
+        if (self::$ct2Connection instanceof PDO) {
+            return self::$ct2Connection;
+        }
+
+        $ct2Config = self::getConfig();
 
         $ct2Dsn = sprintf(
             'mysql:host=%s;port=%s;dbname=%s;charset=%s',

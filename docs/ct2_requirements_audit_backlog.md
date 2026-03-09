@@ -15,46 +15,48 @@ This backlog captures the open actions surfaced by `docs/ct2_requirements_tracea
   and every matrix row is updated from `Source Gap` or repo-derived wording to explicit upstream mapping.
 
 ## Priority 2
-### Expand non-functional validation evidence
+### Add formal performance and accessibility evidence
 - Type: Validation gap
-- Impact: Security, operational, and runtime quality claims are mostly supported, but performance, accessibility, and broad warning-free coverage are not directly evidenced in the repo.
+- Impact: Security, audit, and representative runtime hardening now have direct evidence, but performance and accessibility still rely on code inspection and manual usability impressions.
 - Expected work:
-  define concrete NFR checks for performance, accessibility/usability, and warning-free runtime expectations;
-  add lightweight reproducible validation steps or scripts where practical.
+  define lightweight but real accessibility checks such as keyboard navigation and heading/form-label review;
+  add a reproducible performance sanity check for the seeded local environment;
+  record those results in `docs/ct2_nfr_evidence.md`.
 - Acceptance criteria:
-  the audit matrix no longer marks performance/accessibility as `Unverified`,
+  the audit matrix can upgrade performance/accessibility from `Partially Implemented` to `Implemented`,
   and the repo contains a repeatable method to demonstrate those NFRs.
 
 ## Priority 3
 ### Broaden automated regression coverage beyond current smoke checks
 - Type: Validation gap
-- Impact: Current confidence depends heavily on manual QA plus targeted smoke scripts. That is acceptable for release history, but weak for ongoing change protection.
+- Impact: Current confidence is materially stronger after the runtime hardening script, but several lower-frequency mutation paths still depend more on manual QA than scripted protection.
 - Expected work:
-  extend the DB-backed smoke layer and/or add additional scripted HTTP checks for representative cross-module workflows and negative cases.
+  extend the DB-backed smoke layer and runtime hardening checks to cover more write paths, especially marketing mutations, availability creation flows, supplier contracts/KPIs/notes, and additional visa/financial auxiliary forms.
 - Acceptance criteria:
-  representative auth, approval, upload, export, and cross-module read paths are covered by repeatable scripted checks,
-  and the audit matrix can point to direct automated evidence for more rows currently marked `Partially Implemented`.
+  representative auth, approval, upload, export, and cross-module read/write paths are covered by repeatable scripted checks,
+  and fewer functional rows remain `Partially Implemented` only because of evidence gaps.
 
 ## Priority 4
-### Add direct audit-log verification to the QA contract
+### Add executed Windows XAMPP runtime evidence
 - Type: Validation gap
-- Impact: Audit logging is implemented, but current QA artifacts do not explicitly verify audit rows for each major state-changing path.
+- Impact: The CT2 runtime contract is cross-platform by design, but in-repo runtime proof is still strongest on the local Linux LAMP environment.
 - Expected work:
-  add audit-log assertions to the QA pack or a DB-backed validation script for representative agent, approval, supplier, visa, and financial actions.
+  execute the deployment guide, DB smoke, runtime hardening script, and a short browser/API pass on a Windows XAMPP setup;
+  record the result in the deployment or NFR docs.
 - Acceptance criteria:
-  the matrix can upgrade audit logging from `Partially Implemented` to `Implemented`,
-  and the QA docs/scripts name the expected audit evidence.
+  the repo contains explicit Windows XAMPP execution evidence,
+  and cross-platform compatibility is no longer only code-aligned and documented.
 
 ## Priority 5
-### Tighten negative-path coverage for browser security controls
+### Add a broader warning-free route sweep
 - Type: Validation gap
-- Impact: Positive CSRF/session/permission paths are exercised, but direct invalid-CSRF and stale-session posting evidence is still mostly procedural rather than recorded.
+- Impact: Normal validated flows are now proven clean, but the repo still lacks an automated sweep across all reachable CT2 routes and common filter combinations.
 - Expected work:
-  extend QA or scripted validation with invalid token and expired-session checks on representative state-changing routes.
+  add a lightweight route crawler or scripted route matrix that loads every module route, key filter variant, and a broader set of export/API entrypoints under `E_ALL`.
 - Acceptance criteria:
-  the matrix can point to direct negative-path evidence for CSRF/session controls,
-  and security controls remain proven after future changes.
+  warning-free runtime evidence extends beyond the current representative hardening flows,
+  and the route sweep becomes part of the repeatable local validation toolset.
 
 ## Current Recommendation
-- Treat CT2 as release-ready for the repo-defined scope.
-- Treat strict “all requirements from the original diagrams are implemented” as not yet fully provable until the missing upstream CT2 diagrams are added and mapped.
+- Treat CT2 as strongly hardened for the repo-defined scope.
+- Treat the remaining debt as traceability and validation-depth work, not obvious missing core module implementation.

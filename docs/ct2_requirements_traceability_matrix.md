@@ -12,6 +12,7 @@ This matrix traces the current `CORE TRANSACTION 2: Back-Office and Agency Manag
 - `docs/ct2_manual_qa_pack.md`
 - `docs/ct2_api_validation.md`
 - `docs/ct2_qa_execution_report.md`
+- `docs/ct2_nfr_evidence.md`
 - `docs/ct2_release_summary_2026-03-10.md`
 - `docs/ct2_deployment_guide.md`
 - `docs/ct2_operator_runbook.md`
@@ -45,13 +46,13 @@ This matrix traces the current `CORE TRANSACTION 2: Back-Office and Agency Manag
 | NFR-01 | Use Vanilla OOP PHP only; no frameworks, Composer, or NPM. | `AGENTS.md` | Repo structure and direct PHP implementation | Repository inspection | Implemented | No framework tooling is present. |
 | NFR-02 | Use PDO prepared statements with MySQL only. | `AGENTS.md` | `ct2_back_office/config/ct2_database.php`, model query patterns | Code inspection and runtime DB smoke | Implemented | Query style is consistently PDO-based. |
 | NFR-03 | Prefix CT2 artifacts with `ct2_`. | `AGENTS.md`, setup contract | Files, tables, APIs, classes, CSS, and routes are prefixed | Codebase inspection and smoke checks | Implemented | Minor non-prefixed PHP language constructs are outside CT2 naming scope. |
-| NFR-04 | Enforce CSRF and role checks on state-changing browser flows. | `AGENTS.md`, QA pack | `ct2_bootstrap.php`, controller assertions, permission checks | Manual QA guidance and execution report approval/upload flows | Partially Implemented | Positive-path evidence exists; systematic invalid-CSRF negative coverage is documented but not captured in the execution report. |
+| NFR-04 | Enforce CSRF and role checks on state-changing browser flows. | `AGENTS.md`, QA pack, NFR evidence | `ct2_bootstrap.php`, controller assertions, permission checks, `ct2_back_office/scripts/ct2_runtime_hardening_check.sh` | `docs/ct2_qa_execution_report.md`, `docs/ct2_nfr_evidence.md` | Implemented | Invalid-CSRF and stale-session negative checks now have direct scripted evidence on representative protected browser writes. |
 | NFR-05 | APIs return JSON with stable envelope and no HTML leakage. | `AGENTS.md`, API validation guide | `ct2_bootstrap.php`, API entrypoints, centralized API exception handler | API checks and post-fix rerun in `docs/ct2_qa_execution_report.md` | Implemented | Search-related HTML leakage was fixed before release. |
-| NFR-06 | Audit logging exists for state-changing back-office actions. | `AGENTS.md`, release summary | `ct2_back_office/models/ct2_AuditLogModel.php`, controller audit calls | QA evidence indirectly covers approval, upload, and update flows | Partially Implemented | Logging is implemented, but the current repo docs do not provide a dedicated audit-log verification step for every module. |
+| NFR-06 | Audit logging exists for state-changing back-office actions. | `AGENTS.md`, QA pack, NFR evidence | `ct2_back_office/models/ct2_AuditLogModel.php`, controller audit calls, `ct2_back_office/scripts/ct2_regression_probe.php`, `ct2_back_office/scripts/ct2_runtime_hardening_check.sh` | `docs/ct2_nfr_evidence.md`, updated QA pack audit assertions | Implemented | Representative audit assertions now directly prove both positive writes and rejected negative paths. |
 | NFR-07 | Runtime supports LAMP and Windows XAMPP through the same config contract. | Deployment guide, operator runbook | TCP-first DB config, local override template, upload/session paths | Local LAMP validation plus deployment docs | Implemented | Windows compatibility is documented rather than directly executed in the repo evidence. |
 | NFR-08 | Release and deployment process is documented and repeatable. | Release summary, deployment guide, operator runbook | Release tag, GitHub release, release docs, smoke scripts | Published GitHub release and local release verification | Implemented | Release state is now represented in repo docs and GitHub. |
-| NFR-09 | No warnings, notices, or fatal errors under normal validated flows. | `AGENTS.md`, QA expectations | Runtime hardening, recent CSV export fix, smoke scripts | QA execution report and release validation history | Partially Implemented | Validated for exercised flows, but not proven across every route/action combination. |
-| NFR-10 | Performance, accessibility, and load characteristics are explicitly evidenced. | Implied non-functional assurance need | No dedicated performance, accessibility, or load artifacts in repo | None | Unverified | This is a validation gap, not direct proof of failure. |
+| NFR-09 | No warnings, notices, or fatal errors under normal validated flows. | `AGENTS.md`, NFR evidence | Smoke scripts, runtime hardening script, recent CSV export fix | `docs/ct2_qa_execution_report.md`, `docs/ct2_nfr_evidence.md` | Implemented | Proved on the current validated browser, API, upload, approval, and export flows; not intended as exhaustive route fuzzing evidence. |
+| NFR-10 | Performance, accessibility, and load characteristics are explicitly evidenced. | NFR evidence need | `docs/ct2_nfr_evidence.md` documents current limits and lightweight runtime contract notes | `docs/ct2_nfr_evidence.md` | Partially Implemented | The repo now makes the evidence gap explicit, but it still lacks dedicated performance, accessibility, or load-test artifacts. |
 
 ## Feature And Source Coverage Notes
 | ID | Requirement | Source Artifact | Implementation Evidence | Validation Evidence | Status | Notes |
@@ -62,7 +63,7 @@ This matrix traces the current `CORE TRANSACTION 2: Back-Office and Agency Manag
 
 ## Overall Assessment
 - CT2 is strongly implemented and release-validated for the repo-defined scope.
-- The largest remaining gaps are evidence gaps, not obvious missing module implementations:
+- The largest remaining gaps are now concentrated in three areas:
   upstream diagram traceability,
-  performance/accessibility proof,
-  and broader negative/automated coverage for some non-functional behaviors.
+  formal performance/accessibility evidence,
+  and broader scripted coverage for less-exercised mutation paths such as marketing, availability creation, and some supplier auxiliary forms.

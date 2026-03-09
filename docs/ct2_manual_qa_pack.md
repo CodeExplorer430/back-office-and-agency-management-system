@@ -12,6 +12,7 @@ Read this after completing the install flow in `docs/ct2_deployment_guide.md`.
    `bash ct2_back_office/scripts/ct2_lint.sh`
    `php ct2_back_office/scripts/ct2_smoke_check.php`
    `php ct2_back_office/scripts/ct2_db_smoke_check.php`
+   `bash ct2_back_office/scripts/ct2_runtime_hardening_check.sh`
 4. Start the app and sign in through `ct2_back_office/ct2_index.php`.
 
 ## Seeded Accounts
@@ -101,6 +102,7 @@ All seeded users use the same initial password: `ChangeMe123!`
 ### CSRF and session coverage
 - Submit at least one state-changing form per module with a valid session.
 - Confirm logout works and that a stale session cannot continue posting changes.
+- Confirm invalid CSRF submissions are rejected for at least approvals, supplier onboarding, and visa checklist updates.
 
 ### Upload coverage
 - Upload one local sample file through the visa checklist flow.
@@ -111,3 +113,11 @@ All seeded users use the same initial password: `ChangeMe123!`
 - `ct2_report_runs` should include `QA Baseline Cross-Module Run`.
 - `ct2_visa_applications` should include `VISA-APP-001` and `VISA-APP-002`.
 - `ct2_campaigns` should include both an active and a pending-approval record.
+
+### Audit-log assertions
+- Agent save should create a new `ct2_audit_logs` row with `action_key = 'agents.update'`.
+- Supplier onboarding save should create a new `ct2_audit_logs` row with `action_key = 'suppliers.onboarding_update'`.
+- Approval decisions should create a new `ct2_audit_logs` row with `action_key = 'approvals.decide'`.
+- Visa checklist verification should create a new `ct2_audit_logs` row with `action_key = 'visa.document_checklist_update'`.
+- Financial reconciliation updates should create a new `ct2_audit_logs` row with `action_key = 'financial.flag_update'`.
+- Invalid-CSRF and stale-session write attempts must not create new audit rows for the protected action being tested.

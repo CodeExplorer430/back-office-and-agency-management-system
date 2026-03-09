@@ -1,0 +1,409 @@
+<?php
+
+declare(strict_types=1);
+
+require_once __DIR__ . '/../config/ct2_bootstrap.php';
+
+if (PHP_SAPI !== 'cli') {
+    fwrite(STDERR, "CT2 regression probe must be run from the CLI.\n");
+    exit(1);
+}
+
+$ct2Command = $argv[1] ?? '';
+if ($ct2Command === '') {
+    fwrite(STDERR, "Usage: php ct2_regression_probe.php <command> [arguments]\n");
+    exit(1);
+}
+
+$ct2Pdo = CT2_Database::getConnection();
+
+try {
+    switch ($ct2Command) {
+        case 'audit-count':
+            $ct2ActionKey = $argv[2] ?? '';
+            if ($ct2ActionKey === '') {
+                throw new InvalidArgumentException('audit-count requires an action key.');
+            }
+
+            $ct2Sql = 'SELECT COUNT(*) FROM ct2_audit_logs WHERE action_key = :action_key';
+            $ct2Params = ['action_key' => $ct2ActionKey];
+
+            if (($argv[3] ?? '') !== '') {
+                $ct2Sql .= ' AND entity_type = :entity_type';
+                $ct2Params['entity_type'] = $argv[3];
+            }
+
+            if (($argv[4] ?? '') !== '') {
+                $ct2Sql .= ' AND entity_id = :entity_id';
+                $ct2Params['entity_id'] = (int) $argv[4];
+            }
+
+            echo (string) ct2ProbeScalar($ct2Pdo, $ct2Sql, $ct2Params);
+            break;
+
+        case 'agent-id':
+            echo (string) ct2ProbeIdByCode($ct2Pdo, 'ct2_agents', 'ct2_agent_id', 'agent_code', $argv[2] ?? '', 'agent');
+            break;
+
+        case 'supplier-id':
+            echo (string) ct2ProbeIdByCode($ct2Pdo, 'ct2_suppliers', 'ct2_supplier_id', 'supplier_code', $argv[2] ?? '', 'supplier');
+            break;
+
+        case 'visa-application-id':
+            echo (string) ct2ProbeIdByCode(
+                $ct2Pdo,
+                'ct2_visa_applications',
+                'ct2_visa_application_id',
+                'application_reference',
+                $argv[2] ?? '',
+                'visa application'
+            );
+            break;
+
+        case 'report-run-id':
+            echo (string) ct2ProbeIdByCode(
+                $ct2Pdo,
+                'ct2_report_runs',
+                'ct2_report_run_id',
+                'run_label',
+                $argv[2] ?? '',
+                'report run'
+            );
+            break;
+
+        case 'approval-id':
+            $ct2SubjectType = $argv[2] ?? '';
+            $ct2ReferenceCode = $argv[3] ?? '';
+            echo (string) ct2ProbeApprovalField($ct2Pdo, $ct2SubjectType, $ct2ReferenceCode, 'ct2_approval_workflow_id');
+            break;
+
+        case 'approval-status':
+            $ct2SubjectType = $argv[2] ?? '';
+            $ct2ReferenceCode = $argv[3] ?? '';
+            echo (string) ct2ProbeApprovalField($ct2Pdo, $ct2SubjectType, $ct2ReferenceCode, 'approval_status');
+            break;
+
+        case 'checklist-id':
+            $ct2ApplicationReference = $argv[2] ?? '';
+            $ct2ItemName = $argv[3] ?? '';
+            echo (string) ct2ProbeChecklistField($ct2Pdo, $ct2ApplicationReference, $ct2ItemName, 'ct2_application_checklist_id');
+            break;
+
+        case 'checklist-status':
+            $ct2ApplicationReference = $argv[2] ?? '';
+            $ct2ItemName = $argv[3] ?? '';
+            echo (string) ct2ProbeChecklistField($ct2Pdo, $ct2ApplicationReference, $ct2ItemName, 'checklist_status');
+            break;
+
+        case 'latest-document-path':
+            $ct2ApplicationReference = $argv[2] ?? '';
+            echo (string) ct2ProbeLatestDocumentField($ct2Pdo, $ct2ApplicationReference, 'file_path');
+            break;
+
+        case 'latest-document-name':
+            $ct2ApplicationReference = $argv[2] ?? '';
+            echo (string) ct2ProbeLatestDocumentField($ct2Pdo, $ct2ApplicationReference, 'file_name');
+            break;
+
+        case 'supplier-onboarding-field':
+            $ct2SupplierCode = $argv[2] ?? '';
+            $ct2Field = $argv[3] ?? '';
+            echo (string) ct2ProbeSupplierOnboardingField($ct2Pdo, $ct2SupplierCode, $ct2Field);
+            break;
+
+        case 'flag-id':
+            $ct2SourceModule = $argv[2] ?? '';
+            $ct2ReferenceCode = $argv[3] ?? '';
+            echo (string) ct2ProbeFlagField($ct2Pdo, $ct2SourceModule, $ct2ReferenceCode, 'ct2_reconciliation_flag_id');
+            break;
+
+        case 'flag-field':
+            $ct2SourceModule = $argv[2] ?? '';
+            $ct2ReferenceCode = $argv[3] ?? '';
+            $ct2Field = $argv[4] ?? '';
+            echo (string) ct2ProbeFlagField($ct2Pdo, $ct2SourceModule, $ct2ReferenceCode, $ct2Field);
+            break;
+
+        default:
+            throw new InvalidArgumentException('Unknown CT2 regression probe command: ' . $ct2Command);
+    }
+} catch (Throwable $ct2Exception) {
+    fwrite(STDERR, $ct2Exception->getMessage() . "\n");
+    exit(1);
+}
+
+function ct2ProbeScalar(PDO $ct2Pdo, string $ct2Sql, array $ct2Params = []): string
+{
+    $ct2Statement = $ct2Pdo->prepare($ct2Sql);
+    $ct2Statement->execute($ct2Params);
+    $ct2Value = $ct2Statement->fetchColumn();
+
+    if ($ct2Value === false) {
+        throw new RuntimeException('CT2 regression probe query returned no result.');
+    }
+
+    return (string) $ct2Value;
+}
+
+function ct2ProbeIdByCode(
+    PDO $ct2Pdo,
+    string $ct2TableName,
+    string $ct2IdColumn,
+    string $ct2LookupColumn,
+    string $ct2LookupValue,
+    string $ct2Label
+): int {
+    if ($ct2LookupValue === '') {
+        throw new InvalidArgumentException('Missing lookup value for ' . $ct2Label . '.');
+    }
+
+    $ct2Statement = $ct2Pdo->prepare(
+        sprintf(
+            'SELECT %s FROM %s WHERE %s = :lookup_value LIMIT 1',
+            $ct2IdColumn,
+            $ct2TableName,
+            $ct2LookupColumn
+        )
+    );
+    $ct2Statement->execute(['lookup_value' => $ct2LookupValue]);
+    $ct2Id = $ct2Statement->fetchColumn();
+
+    if ($ct2Id === false) {
+        throw new RuntimeException('Unable to resolve seeded ' . $ct2Label . ': ' . $ct2LookupValue);
+    }
+
+    return (int) $ct2Id;
+}
+
+function ct2ProbeApprovalField(PDO $ct2Pdo, string $ct2SubjectType, string $ct2ReferenceCode, string $ct2Field): string
+{
+    $ct2AllowedFields = ['ct2_approval_workflow_id', 'approval_status'];
+    if (!in_array($ct2Field, $ct2AllowedFields, true)) {
+        throw new InvalidArgumentException('Unsupported approval field: ' . $ct2Field);
+    }
+
+    [$ct2JoinSql, $ct2ReferenceColumn] = ct2ProbeApprovalReferenceTarget($ct2SubjectType);
+    $ct2Statement = $ct2Pdo->prepare(
+        sprintf(
+            'SELECT aw.%s
+             FROM ct2_approval_workflows AS aw
+             %s
+             WHERE %s = :reference_code
+             LIMIT 1',
+            $ct2Field,
+            $ct2JoinSql,
+            $ct2ReferenceColumn
+        )
+    );
+    $ct2Statement->execute(['reference_code' => $ct2ReferenceCode]);
+    $ct2Value = $ct2Statement->fetchColumn();
+
+    if ($ct2Value === false) {
+        throw new RuntimeException('Unable to resolve approval workflow for ' . $ct2SubjectType . ' reference ' . $ct2ReferenceCode);
+    }
+
+    return (string) $ct2Value;
+}
+
+function ct2ProbeApprovalReferenceTarget(string $ct2SubjectType): array
+{
+    return match ($ct2SubjectType) {
+        'agent' => [
+            'INNER JOIN ct2_agents AS ref ON ref.ct2_agent_id = aw.subject_id AND aw.subject_type = "agent"',
+            'ref.agent_code',
+        ],
+        'supplier' => [
+            'INNER JOIN ct2_suppliers AS ref ON ref.ct2_supplier_id = aw.subject_id AND aw.subject_type = "supplier"',
+            'ref.supplier_code',
+        ],
+        'campaign' => [
+            'INNER JOIN ct2_campaigns AS ref ON ref.ct2_campaign_id = aw.subject_id AND aw.subject_type = "campaign"',
+            'ref.campaign_code',
+        ],
+        'promotion' => [
+            'INNER JOIN ct2_promotions AS ref ON ref.ct2_promotion_id = aw.subject_id AND aw.subject_type = "promotion"',
+            'ref.promotion_code',
+        ],
+        'visa_application' => [
+            'INNER JOIN ct2_visa_applications AS ref ON ref.ct2_visa_application_id = aw.subject_id AND aw.subject_type = "visa_application"',
+            'ref.application_reference',
+        ],
+        default => throw new InvalidArgumentException('Unsupported approval subject type: ' . $ct2SubjectType),
+    };
+}
+
+function ct2ProbeChecklistField(PDO $ct2Pdo, string $ct2ApplicationReference, string $ct2ItemName, string $ct2Field): string
+{
+    $ct2AllowedFields = ['ct2_application_checklist_id', 'checklist_status'];
+    if (!in_array($ct2Field, $ct2AllowedFields, true)) {
+        throw new InvalidArgumentException('Unsupported checklist field: ' . $ct2Field);
+    }
+
+    if ($ct2ApplicationReference === '' || $ct2ItemName === '') {
+        throw new InvalidArgumentException('checklist lookups require application reference and item name.');
+    }
+
+    $ct2Statement = $ct2Pdo->prepare(
+        sprintf(
+            'SELECT ac.%s
+             FROM ct2_application_checklist AS ac
+             INNER JOIN ct2_visa_applications AS va
+                ON va.ct2_visa_application_id = ac.ct2_visa_application_id
+             INNER JOIN ct2_visa_checklist_items AS ci
+                ON ci.ct2_visa_checklist_item_id = ac.ct2_visa_checklist_item_id
+             WHERE va.application_reference = :application_reference
+               AND ci.item_name = :item_name
+             LIMIT 1',
+            $ct2Field
+        )
+    );
+    $ct2Statement->execute(
+        [
+            'application_reference' => $ct2ApplicationReference,
+            'item_name' => $ct2ItemName,
+        ]
+    );
+    $ct2Value = $ct2Statement->fetchColumn();
+
+    if ($ct2Value === false) {
+        throw new RuntimeException('Unable to resolve checklist item ' . $ct2ItemName . ' for ' . $ct2ApplicationReference);
+    }
+
+    return (string) $ct2Value;
+}
+
+function ct2ProbeLatestDocumentField(PDO $ct2Pdo, string $ct2ApplicationReference, string $ct2Field): string
+{
+    $ct2AllowedFields = ['file_path', 'file_name'];
+    if (!in_array($ct2Field, $ct2AllowedFields, true)) {
+        throw new InvalidArgumentException('Unsupported document field: ' . $ct2Field);
+    }
+
+    if ($ct2ApplicationReference === '') {
+        throw new InvalidArgumentException('latest-document lookup requires an application reference.');
+    }
+
+    $ct2Statement = $ct2Pdo->prepare(
+        sprintf(
+            'SELECT d.%s
+             FROM ct2_documents AS d
+             INNER JOIN ct2_visa_applications AS va
+                ON va.ct2_visa_application_id = d.entity_id
+               AND d.entity_type = "visa_application"
+             WHERE va.application_reference = :application_reference
+             ORDER BY d.ct2_document_id DESC
+             LIMIT 1',
+            $ct2Field
+        )
+    );
+    $ct2Statement->execute(['application_reference' => $ct2ApplicationReference]);
+    $ct2Value = $ct2Statement->fetchColumn();
+
+    if ($ct2Value === false) {
+        throw new RuntimeException('Unable to resolve the latest CT2 document for ' . $ct2ApplicationReference);
+    }
+
+    return (string) $ct2Value;
+}
+
+function ct2ProbeSupplierOnboardingField(PDO $ct2Pdo, string $ct2SupplierCode, string $ct2Field): string
+{
+    $ct2AllowedFields = [
+        'checklist_status',
+        'documents_status',
+        'compliance_status',
+        'review_notes',
+        'blocked_reason',
+        'target_go_live_date',
+    ];
+    if (!in_array($ct2Field, $ct2AllowedFields, true)) {
+        throw new InvalidArgumentException('Unsupported supplier onboarding field: ' . $ct2Field);
+    }
+
+    if ($ct2SupplierCode === '') {
+        throw new InvalidArgumentException('supplier-onboarding-field requires a supplier code.');
+    }
+
+    $ct2Statement = $ct2Pdo->prepare(
+        sprintf(
+            'SELECT so.%s
+             FROM ct2_supplier_onboarding AS so
+             INNER JOIN ct2_suppliers AS s ON s.ct2_supplier_id = so.ct2_supplier_id
+             WHERE s.supplier_code = :supplier_code
+             LIMIT 1',
+            $ct2Field
+        )
+    );
+    $ct2Statement->execute(['supplier_code' => $ct2SupplierCode]);
+    $ct2Value = $ct2Statement->fetchColumn();
+
+    if ($ct2Value === false) {
+        throw new RuntimeException('Unable to resolve supplier onboarding row for ' . $ct2SupplierCode);
+    }
+
+    return (string) $ct2Value;
+}
+
+function ct2ProbeFlagField(PDO $ct2Pdo, string $ct2SourceModule, string $ct2ReferenceCode, string $ct2Field): string
+{
+    $ct2AllowedFields = ['ct2_reconciliation_flag_id', 'flag_status', 'resolution_notes'];
+    if (!in_array($ct2Field, $ct2AllowedFields, true)) {
+        throw new InvalidArgumentException('Unsupported reconciliation flag field: ' . $ct2Field);
+    }
+
+    if ($ct2SourceModule === '' || $ct2ReferenceCode === '') {
+        throw new InvalidArgumentException('flag lookups require source module and reference code.');
+    }
+
+    [$ct2JoinSql, $ct2ReferenceColumn] = ct2ProbeFlagReferenceTarget($ct2SourceModule);
+    $ct2Statement = $ct2Pdo->prepare(
+        sprintf(
+            'SELECT rf.%s
+             FROM ct2_reconciliation_flags AS rf
+             %s
+             WHERE rf.source_module = :source_module
+               AND %s = :reference_code
+             ORDER BY rf.ct2_reconciliation_flag_id DESC
+             LIMIT 1',
+            $ct2Field,
+            $ct2JoinSql,
+            $ct2ReferenceColumn
+        )
+    );
+    $ct2Statement->execute(
+        [
+            'source_module' => $ct2SourceModule,
+            'reference_code' => $ct2ReferenceCode,
+        ]
+    );
+    $ct2Value = $ct2Statement->fetchColumn();
+
+    if ($ct2Value === false) {
+        throw new RuntimeException('Unable to resolve reconciliation flag for ' . $ct2SourceModule . ' / ' . $ct2ReferenceCode);
+    }
+
+    return (string) $ct2Value;
+}
+
+function ct2ProbeFlagReferenceTarget(string $ct2SourceModule): array
+{
+    return match ($ct2SourceModule) {
+        'agents' => [
+            'INNER JOIN ct2_agents AS ref ON ref.ct2_agent_id = rf.source_record_id',
+            'ref.agent_code',
+        ],
+        'suppliers' => [
+            'INNER JOIN ct2_suppliers AS ref ON ref.ct2_supplier_id = rf.source_record_id',
+            'ref.supplier_code',
+        ],
+        'marketing' => [
+            'INNER JOIN ct2_campaigns AS ref ON ref.ct2_campaign_id = rf.source_record_id',
+            'ref.campaign_code',
+        ],
+        'visa' => [
+            'INNER JOIN ct2_visa_applications AS ref ON ref.ct2_visa_application_id = rf.source_record_id',
+            'ref.application_reference',
+        ],
+        default => throw new InvalidArgumentException('Unsupported reconciliation flag source module: ' . $ct2SourceModule),
+    };
+}

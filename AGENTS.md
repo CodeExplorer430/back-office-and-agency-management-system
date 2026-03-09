@@ -38,10 +38,12 @@ This repository contains the `CORE TRANSACTION 2: Back-Office and Agency Managem
 - Run `bash ct2_back_office/scripts/ct2_lint.sh` before every commit.
 - Run `php ct2_back_office/scripts/ct2_smoke_check.php` before every commit.
 - Run `php ct2_back_office/scripts/ct2_db_smoke_check.php` whenever local DB-backed behavior, seeds, or schema compatibility are part of the work.
+- Run `bash ct2_back_office/scripts/ct2_runtime_hardening_check.sh` whenever auth, CSRF, session, upload, approval, audit-log, or financial export behavior changes.
 - Import `ct2_back_office/ct2_setup.sql` into a clean MySQL database before claiming schema work is complete.
 - Keep `docs/ct2_manual_qa_pack.md` and `docs/ct2_api_validation.md` in sync with seeded roles, demo records, and validation flows whenever QA behavior changes.
 - Keep `docs/ct2_qa_execution_report.md` and `docs/ct2_qa_fix_queue.md` updated after live QA passes so validated behavior and open defects stay explicit.
 - Keep `docs/ct2_requirements_traceability_matrix.md` and `docs/ct2_requirements_audit_backlog.md` updated whenever CT2 scope, validation evidence, or source-of-truth assumptions change.
+- Keep `docs/ct2_nfr_evidence.md` aligned with the current hardening scripts and the non-functional claims used in release or audit documents.
 - Keep `docs/ct2_deployment_guide.md` and `docs/ct2_operator_runbook.md` aligned with the active `develop` release process and supported LAMP/XAMPP runtime expectations.
 - Do not merge code that emits PHP warnings, notices, or fatal errors under `E_ALL`.
 

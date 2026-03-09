@@ -99,3 +99,29 @@ This report records the first live execution of the CT2 manual QA pack against t
 ## Current Recommendation
 - The search/filter blocker is resolved on `develop`.
 - The current local QA evidence supports moving to broader release signoff or final promotion review, assuming no additional issues are introduced outside this rerun scope.
+
+## Internal Hardening Validation Rerun
+- Date: March 10, 2026
+- Branch: `develop`
+- Validation entrypoint: `bash ct2_back_office/scripts/ct2_runtime_hardening_check.sh`
+- Scope: representative positive and negative browser/API security checks plus direct audit-log assertions
+
+### Hardening scenario results
+| Scenario | Actor | Result | Evidence |
+| --- | --- | --- | --- |
+| Dashboard and availability read path | `ct2admin` | Pass | Dashboard loaded; availability search rendered `Skyline Coaster 18-Seater`, `CT1-BKG-1001`, and `NAA-4581`. |
+| Agent update audit assertion | `ct2admin` | Pass | `agents.update` audit count incremented after a seeded agent save. |
+| Supplier onboarding invalid CSRF rejection | `ct2admin` | Pass | Invalid token redirected back with flash error; onboarding state and audit count did not change. |
+| Supplier onboarding positive audit assertion | `ct2admin` | Pass | `suppliers.onboarding_update` audit count incremented and updated review notes persisted. |
+| Approval invalid CSRF rejection | `ct2admin` | Pass | Invalid token redirected back with approval error flash; workflow status and audit count did not change. |
+| Approval decision positive audit assertion | `ct2admin` | Pass | `approvals.decide` audit count incremented and the seeded supplier workflow moved to `approved`. |
+| Visa checklist invalid CSRF rejection | `ct2admin` | Pass | Invalid token redirected back with error flash; checklist status and audit count did not change. |
+| Visa upload positive audit assertion | `ct2admin` | Pass | PNG upload succeeded, checklist status moved to `verified`, stored file path existed, and `visa.document_checklist_update` audit count incremented. |
+| Financial reconciliation positive audit assertion | `ct2admin` | Pass | Reconciliation flag updated to `resolved` and `financial.flag_update` audit count incremented. |
+| Financial CSV export | `ct2admin` | Pass | Export returned `Content-Type: text/csv` and included the seeded supplier reconciliation data. |
+| Stale-session browser write rejection | anonymous after logout | Pass | Protected agent save returned `302` to the login route and did not create an audit row. |
+| Protected API JSON negative paths | anonymous | Pass | `GET /api/ct2_agents.php` returned JSON `403`; `GET /api/ct2_auth_login.php` returned JSON `405`; neither leaked HTML. |
+
+### Hardening conclusion
+- No new blocker was found during the internal hardening rerun.
+- The repo now has direct repeatable evidence for representative CSRF rejection, stale-session rejection, protected API JSON behavior, and audit-log creation across major CT2 write paths.

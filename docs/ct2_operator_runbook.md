@@ -7,6 +7,7 @@ This runbook is for the technical deployment or support team responsible for ope
 - `develop` is the current integrated CT2 branch.
 - `main` is the release branch.
 - The current approved CT2 release is tracked in `docs/ct2_release_summary_2026-03-10.md`.
+- `develop` currently contains post-release validation hardening beyond `ct2-release-2026-03-10`; do not promote that delta to `main` until the Windows XAMPP evidence packet has been executed and any resulting findings are cleared.
 - Do not deploy directly from unreviewed feature branches.
 - Promotion flow:
   validate on `develop`,

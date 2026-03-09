@@ -2,6 +2,7 @@
 
 ## Purpose
 Use this packet to collect the missing Windows XAMPP runtime evidence for CT2 without introducing a separate Windows-only code path. The application contract stays the same as LAMP: TCP MySQL, local `ct2_local.php`, seeded SQL import, native scripts, and browser/API verification.
+The next promotion from `develop` to `main` is gated on this packet being executed and the evidence being copied back into the repo docs.
 
 ## Target Environment
 - Windows machine with XAMPP installed

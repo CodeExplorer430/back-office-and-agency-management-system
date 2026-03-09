@@ -39,6 +39,7 @@ This repository contains the `CORE TRANSACTION 2: Back-Office and Agency Managem
 - Run `php ct2_back_office/scripts/ct2_smoke_check.php` before every commit.
 - Run `php ct2_back_office/scripts/ct2_db_smoke_check.php` whenever local DB-backed behavior, seeds, or schema compatibility are part of the work.
 - Run `bash ct2_back_office/scripts/ct2_runtime_hardening_check.sh` whenever auth, CSRF, session, upload, approval, audit-log, or financial export behavior changes.
+- Run `bash ct2_back_office/scripts/ct2_route_matrix_check.sh` whenever route rendering, filter behavior, representative JSON GET coverage, or export breadth changes.
 - Import `ct2_back_office/ct2_setup.sql` into a clean MySQL database before claiming schema work is complete.
 - Keep `docs/ct2_manual_qa_pack.md` and `docs/ct2_api_validation.md` in sync with seeded roles, demo records, and validation flows whenever QA behavior changes.
 - Keep `docs/ct2_qa_execution_report.md` and `docs/ct2_qa_fix_queue.md` updated after live QA passes so validated behavior and open defects stay explicit.
@@ -77,6 +78,7 @@ This repository contains the `CORE TRANSACTION 2: Back-Office and Agency Managem
 - Validate the full route set on local PHP/Apache:
   dashboard, agents, suppliers, availability, marketing, financial, visa, staff, approvals.
 - Validate representative JSON endpoints under `ct2_back_office/api/` and confirm JSON envelopes, HTTP status codes, and audit/API log creation remain correct.
+- Run `bash ct2_back_office/scripts/ct2_route_matrix_check.sh` after major UI or filter changes so all module index/filter/export routes stay warning-free under the seeded environment.
 
 ## Review Focus
 - Security regressions first: authentication, authorization, CSRF, SQL safety, output escaping.

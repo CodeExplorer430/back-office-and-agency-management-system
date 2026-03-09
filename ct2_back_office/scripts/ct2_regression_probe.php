@@ -49,6 +49,37 @@ try {
             echo (string) ct2ProbeIdByCode($ct2Pdo, 'ct2_suppliers', 'ct2_supplier_id', 'supplier_code', $argv[2] ?? '', 'supplier');
             break;
 
+        case 'campaign-id':
+            echo (string) ct2ProbeIdByCode($ct2Pdo, 'ct2_campaigns', 'ct2_campaign_id', 'campaign_code', $argv[2] ?? '', 'campaign');
+            break;
+
+        case 'promotion-id':
+            echo (string) ct2ProbeIdByCode($ct2Pdo, 'ct2_promotions', 'ct2_promotion_id', 'promotion_code', $argv[2] ?? '', 'promotion');
+            break;
+
+        case 'voucher-id':
+            echo (string) ct2ProbeIdByCode($ct2Pdo, 'ct2_vouchers', 'ct2_voucher_id', 'voucher_code', $argv[2] ?? '', 'voucher');
+            break;
+
+        case 'affiliate-id':
+            echo (string) ct2ProbeIdByCode($ct2Pdo, 'ct2_affiliates', 'ct2_affiliate_id', 'affiliate_code', $argv[2] ?? '', 'affiliate');
+            break;
+
+        case 'resource-id':
+            echo (string) ct2ProbeIdByCode(
+                $ct2Pdo,
+                'ct2_inventory_resources',
+                'ct2_resource_id',
+                'resource_name',
+                $argv[2] ?? '',
+                'resource'
+            );
+            break;
+
+        case 'package-id':
+            echo (string) ct2ProbeIdByCode($ct2Pdo, 'ct2_tour_packages', 'ct2_package_id', 'package_name', $argv[2] ?? '', 'package');
+            break;
+
         case 'visa-application-id':
             echo (string) ct2ProbeIdByCode(
                 $ct2Pdo,
@@ -57,6 +88,29 @@ try {
                 'application_reference',
                 $argv[2] ?? '',
                 'visa application'
+            );
+            break;
+
+        case 'visa-type-id':
+            echo (string) ct2ProbeIdByCode($ct2Pdo, 'ct2_visa_types', 'ct2_visa_type_id', 'visa_code', $argv[2] ?? '', 'visa type');
+            break;
+
+        case 'vehicle-id':
+            echo (string) ct2ProbeIdByCode($ct2Pdo, 'ct2_dispatch_vehicles', 'ct2_vehicle_id', 'plate_number', $argv[2] ?? '', 'dispatch vehicle');
+            break;
+
+        case 'driver-id':
+            echo (string) ct2ProbeIdByCode($ct2Pdo, 'ct2_dispatch_drivers', 'ct2_driver_id', 'full_name', $argv[2] ?? '', 'dispatch driver');
+            break;
+
+        case 'financial-report-id':
+            echo (string) ct2ProbeIdByCode(
+                $ct2Pdo,
+                'ct2_financial_reports',
+                'ct2_financial_report_id',
+                'report_code',
+                $argv[2] ?? '',
+                'financial report'
             );
             break;
 

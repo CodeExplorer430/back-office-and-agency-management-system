@@ -125,3 +125,32 @@ This report records the first live execution of the CT2 manual QA pack against t
 ### Hardening conclusion
 - No new blocker was found during the internal hardening rerun.
 - The repo now has direct repeatable evidence for representative CSRF rejection, stale-session rejection, protected API JSON behavior, and audit-log creation across major CT2 write paths.
+
+## CT2-Wide Regression Expansion Rerun
+- Date: March 10, 2026
+- Branch: `develop`
+- Validation entrypoints:
+  - `bash ct2_back_office/scripts/ct2_runtime_hardening_check.sh`
+  - `bash ct2_back_office/scripts/ct2_route_matrix_check.sh`
+- Scope: broader scripted create/update coverage plus route/filter/export breadth checks under the seeded local environment
+
+### Expanded mutation coverage
+| Scenario Family | Actor | Result | Evidence |
+| --- | --- | --- | --- |
+| Supplier auxiliary writes | `ct2admin` | Pass | Contract, KPI, and relationship-note submissions completed successfully and each incremented the matching audit action: `suppliers.contract_create`, `suppliers.kpi_create`, and `suppliers.note_create`. |
+| Availability creation flows | `ct2admin` | Pass | Resource, package, allocation, seasonal block, vehicle, driver, dispatch, and maintenance saves completed successfully; `availability.resource_create` through `availability.maintenance_create` audit rows incremented as expected. |
+| Marketing mutation flows | `ct2admin` | Pass | Campaign invalid-CSRF rejection worked; campaign, promotion, voucher, affiliate, referral, redemption, metric, and marketing-note submissions all completed successfully with matching audit increments. |
+| Visa auxiliary writes | `ct2admin` | Pass | Payment, notification, and visa-note submissions completed successfully and incremented `visa.payment_create`, `visa.notification_create`, and `visa.note_create`. |
+| Financial filter/run flows | `ct2admin` | Pass | Invalid-CSRF report generation was rejected without persistence; valid filter creation and report generation succeeded with `financial.filter_create` and `financial.run_generate` audit increments. |
+| Stale-session non-agent write rejection | anonymous after logout | Pass | Post-logout `financial.saveFilter` redirected to login and did not create a `financial.filter_create` audit entry. |
+
+### Route and filter breadth coverage
+| Scenario Family | Actor | Result | Evidence |
+| --- | --- | --- | --- |
+| HTML module route matrix | `ct2admin` | Pass | Dashboard, agents, staff, suppliers, availability, marketing, financial, visa, and approvals all returned `200` on seeded index/filter variants with no `CT2 application error`, `Warning`, `Notice`, or `Deprecated` output. |
+| Representative JSON GET matrix | `ct2admin` | Pass | Module status, agents, staff, suppliers, resources, marketing campaigns, affiliates, visa applications, and financial reports all returned `200` with `Content-Type: application/json` and clean success envelopes. |
+| Financial CSV breadth check | `ct2admin` | Pass | Export route returned `Content-Type: text/csv` and clean CSV headers for the seeded financial run during the route matrix pass. |
+
+### Expanded rerun conclusion
+- No new blocker or regression was found during the CT2-wide scripted coverage expansion.
+- The remaining validation debt is now concentrated in performance/accessibility evidence, executed Windows XAMPP runtime evidence, and a small set of less-used manual/API mutation paths rather than the core CT2 browser workflows.

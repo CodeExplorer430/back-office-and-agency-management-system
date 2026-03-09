@@ -10,6 +10,7 @@ $ct2RequiredFiles = [
     __DIR__ . '/ct2_db_smoke_check.php',
     __DIR__ . '/ct2_regression_probe.php',
     __DIR__ . '/ct2_runtime_hardening_check.sh',
+    __DIR__ . '/ct2_route_matrix_check.sh',
     __DIR__ . '/../assets/css/ct2_styles.css',
     __DIR__ . '/../api/ct2_agents.php',
     __DIR__ . '/../api/ct2_staff.php',

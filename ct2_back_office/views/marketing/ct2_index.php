@@ -6,7 +6,7 @@ $ct2AffiliateForm = $ct2AffiliateForEdit ?? null;
 <section class="ct2-section">
     <div class="ct2-section-header">
         <div>
-            <p class="ct2-eyebrow">Fourth Vertical Slice</p>
+            <p class="ct2-eyebrow">Demand Generation</p>
             <h2>Marketing and Promotions Management</h2>
         </div>
         <form method="get" action="<?= htmlspecialchars(ct2_url(), ENT_QUOTES, 'UTF-8'); ?>" class="ct2-inline-form">

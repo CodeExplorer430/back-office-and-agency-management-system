@@ -5,8 +5,8 @@ $ct2ApplicationForm = $ct2ApplicationForEdit ?? null;
 <section class="ct2-section">
     <div class="ct2-section-header">
         <div>
-            <p class="ct2-eyebrow">Fifth Vertical Slice</p>
-            <h2>Document and Visa Assistance Module</h2>
+            <p class="ct2-eyebrow">Travel Documentation</p>
+            <h2>Document and Visa Assistance</h2>
         </div>
         <form method="get" action="<?= htmlspecialchars(ct2_url(), ENT_QUOTES, 'UTF-8'); ?>" class="ct2-inline-form">
             <input type="hidden" name="module" value="visa">

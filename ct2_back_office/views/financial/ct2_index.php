@@ -4,7 +4,7 @@ $ct2ReportForm = $ct2ReportForEdit ?? null;
 <section class="ct2-section">
     <div class="ct2-section-header">
         <div>
-            <p class="ct2-eyebrow">Final Vertical Slice</p>
+            <p class="ct2-eyebrow">Operational Finance</p>
             <h2>Financial Reporting and Analytics</h2>
         </div>
         <form method="get" action="<?= htmlspecialchars(ct2_url(), ENT_QUOTES, 'UTF-8'); ?>" class="ct2-inline-form">

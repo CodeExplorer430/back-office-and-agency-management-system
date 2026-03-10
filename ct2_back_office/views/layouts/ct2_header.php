@@ -5,6 +5,7 @@ declare(strict_types=1);
 $ct2CurrentUser = ct2_current_user();
 $ct2SuccessMessage = ct2_flash('success');
 $ct2ErrorMessage = ct2_flash('error');
+$ct2CurrentModule = (string) ($_GET['module'] ?? 'dashboard');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -33,16 +34,28 @@ $ct2ErrorMessage = ct2_flash('error');
     </header>
 
     <?php if ($ct2CurrentUser !== null): ?>
-        <nav class="ct2-nav">
-            <a href="<?= htmlspecialchars(ct2_url(['module' => 'dashboard', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Dashboard</a>
-            <a href="<?= htmlspecialchars(ct2_url(['module' => 'agents', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Agents</a>
-            <a href="<?= htmlspecialchars(ct2_url(['module' => 'suppliers', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Suppliers</a>
-            <a href="<?= htmlspecialchars(ct2_url(['module' => 'availability', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Availability</a>
-            <a href="<?= htmlspecialchars(ct2_url(['module' => 'marketing', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Marketing</a>
-            <a href="<?= htmlspecialchars(ct2_url(['module' => 'financial', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Financial</a>
-            <a href="<?= htmlspecialchars(ct2_url(['module' => 'visa', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Visa</a>
-            <a href="<?= htmlspecialchars(ct2_url(['module' => 'staff', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Staff</a>
-            <a href="<?= htmlspecialchars(ct2_url(['module' => 'approvals', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Approvals</a>
+        <nav class="ct2-nav" aria-label="Primary">
+            <?php
+            $ct2NavItems = [
+                'dashboard' => 'Dashboard',
+                'agents' => 'Agents',
+                'suppliers' => 'Suppliers',
+                'availability' => 'Availability',
+                'marketing' => 'Marketing',
+                'financial' => 'Financial',
+                'visa' => 'Visa',
+                'staff' => 'Staff',
+                'approvals' => 'Approvals',
+            ];
+            ?>
+            <?php foreach ($ct2NavItems as $ct2ModuleKey => $ct2Label): ?>
+                <?php $ct2NavClass = 'ct2-nav-link' . ($ct2CurrentModule === $ct2ModuleKey ? ' ct2-nav-link-active' : ''); ?>
+                <a
+                    class="<?= htmlspecialchars($ct2NavClass, ENT_QUOTES, 'UTF-8'); ?>"
+                    href="<?= htmlspecialchars(ct2_url(['module' => $ct2ModuleKey, 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>"
+                    <?= $ct2CurrentModule === $ct2ModuleKey ? 'aria-current="page"' : ''; ?>
+                ><?= htmlspecialchars($ct2Label, ENT_QUOTES, 'UTF-8'); ?></a>
+            <?php endforeach; ?>
         </nav>
     <?php endif; ?>
 

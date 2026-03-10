@@ -1,7 +1,7 @@
 <section class="ct2-section">
     <div class="ct2-section-header">
         <div>
-            <p class="ct2-eyebrow">Third Vertical Slice</p>
+            <p class="ct2-eyebrow">Resource Control</p>
             <h2>Tour Availability and Resource Planning</h2>
         </div>
         <form method="get" action="<?= htmlspecialchars(ct2_url(), ENT_QUOTES, 'UTF-8'); ?>" class="ct2-inline-form">

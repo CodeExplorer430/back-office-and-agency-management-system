@@ -6,6 +6,7 @@ $ct2ReportForm = $ct2ReportForEdit ?? null;
         <div>
             <p class="ct2-eyebrow">Operational Finance</p>
             <h2>Financial Reporting and Analytics</h2>
+            <p class="ct2-section-copy">Review report definitions, snapshots, reconciliation flags, and export-ready runs across CT2 operational data.</p>
         </div>
         <form method="get" action="<?= htmlspecialchars(ct2_url(), ENT_QUOTES, 'UTF-8'); ?>" class="ct2-inline-form">
             <input type="hidden" name="module" value="financial">

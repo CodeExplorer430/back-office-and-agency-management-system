@@ -4,6 +4,7 @@
         <div>
             <p class="ct2-eyebrow">Partner Network</p>
             <h2>Supplier and Partner Management</h2>
+            <p class="ct2-section-copy">Run supplier onboarding, contracts, KPI reviews, and relationship tracking with clearer operational context and handoff visibility.</p>
         </div>
         <form method="get" action="<?= htmlspecialchars(ct2_url(), ENT_QUOTES, 'UTF-8'); ?>" class="ct2-inline-form">
             <input type="hidden" name="module" value="suppliers">

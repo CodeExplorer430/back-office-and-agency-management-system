@@ -7,6 +7,7 @@ $ct2ApplicationForm = $ct2ApplicationForEdit ?? null;
         <div>
             <p class="ct2-eyebrow">Travel Documentation</p>
             <h2>Document and Visa Assistance</h2>
+            <p class="ct2-section-copy">Oversee intake, checklist review, uploaded files, appointments, and release status for active visa cases.</p>
         </div>
         <form method="get" action="<?= htmlspecialchars(ct2_url(), ENT_QUOTES, 'UTF-8'); ?>" class="ct2-inline-form">
             <input type="hidden" name="module" value="visa">

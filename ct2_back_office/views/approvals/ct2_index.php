@@ -3,6 +3,7 @@
         <div>
             <p class="ct2-eyebrow">Operational Governance</p>
             <h2>Approval Queue</h2>
+            <p class="ct2-section-copy">Review queued operational decisions, confirm approvals, and keep cross-module change control moving without breaking audit continuity.</p>
         </div>
     </div>
 </section>

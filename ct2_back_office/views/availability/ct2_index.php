@@ -3,6 +3,7 @@
         <div>
             <p class="ct2-eyebrow">Resource Control</p>
             <h2>Tour Availability and Resource Planning</h2>
+            <p class="ct2-section-copy">Coordinate resource supply, package planning, allocation conflicts, and dispatch execution from one planning console.</p>
         </div>
         <form method="get" action="<?= htmlspecialchars(ct2_url(), ENT_QUOTES, 'UTF-8'); ?>" class="ct2-inline-form">
             <input type="hidden" name="module" value="availability">

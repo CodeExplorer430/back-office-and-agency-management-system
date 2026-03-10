@@ -8,6 +8,7 @@ $ct2AffiliateForm = $ct2AffiliateForEdit ?? null;
         <div>
             <p class="ct2-eyebrow">Demand Generation</p>
             <h2>Marketing and Promotions Management</h2>
+            <p class="ct2-section-copy">Manage campaigns, promotions, affiliate activity, and attribution reporting with direct visibility into operational impact.</p>
         </div>
         <form method="get" action="<?= htmlspecialchars(ct2_url(), ENT_QUOTES, 'UTF-8'); ?>" class="ct2-inline-form">
             <input type="hidden" name="module" value="marketing">

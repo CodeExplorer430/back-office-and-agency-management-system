@@ -3,6 +3,7 @@
         <div>
             <p class="ct2-eyebrow">Operational Overview</p>
             <h2>Back-Office Dashboard</h2>
+            <p class="ct2-section-copy">Track approvals, dispatch activity, financial posture, and cross-module workload from one CT2 command surface.</p>
         </div>
     </div>
 
@@ -55,6 +56,7 @@
         <div>
             <p class="ct2-eyebrow">Workspace Launcher</p>
             <h2>Core Transaction 2 Workspaces</h2>
+            <p class="ct2-section-copy">Move between agency, supplier, availability, marketing, visa, financial, and governance workflows without leaving the operational dashboard.</p>
         </div>
     </div>
 </section>

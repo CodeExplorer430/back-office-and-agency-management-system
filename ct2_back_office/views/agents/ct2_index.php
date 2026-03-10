@@ -4,6 +4,7 @@
         <div>
             <p class="ct2-eyebrow">Partner Coverage</p>
             <h2>Travel Agent and Staff Management</h2>
+            <p class="ct2-section-copy">Maintain agency records, staff assignments, approval state, and customer-facing coverage from one operational workspace.</p>
         </div>
         <form method="get" action="<?= htmlspecialchars(ct2_url(), ENT_QUOTES, 'UTF-8'); ?>" class="ct2-inline-form">
             <input type="hidden" name="module" value="agents">

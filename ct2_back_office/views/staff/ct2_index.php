@@ -4,6 +4,7 @@
         <div>
             <p class="ct2-eyebrow">Internal Workforce</p>
             <h2>Staff Management</h2>
+            <p class="ct2-section-copy">Keep the CT2 roster, team ownership, and availability records aligned before staff are assigned into live agency operations.</p>
         </div>
         <form method="get" action="<?= htmlspecialchars(ct2_url(), ENT_QUOTES, 'UTF-8'); ?>" class="ct2-inline-form">
             <input type="hidden" name="module" value="staff">

@@ -685,23 +685,31 @@ body.ct2-body {
     }
 
     .ct2-topbar {
+        display: grid;
+        grid-template-columns: 1fr;
         align-items: stretch;
         gap: 14px;
-        padding: 14px 14px 12px;
+        padding: 12px 12px 10px;
         border-radius: 18px;
     }
 
+    .ct2-topbar-brand {
+        width: 100%;
+    }
+
     .ct2-topbar-brand .ct2-eyebrow {
-        margin-bottom: 6px;
+        margin-bottom: 4px;
         font-size: 0.68rem;
         letter-spacing: 0.14em;
     }
 
     .ct2-title {
-        max-width: 11ch;
-        font-size: 1.42rem;
-        line-height: 1.08;
-        letter-spacing: 0.01em;
+        max-width: none;
+        font-size: 1.34rem;
+        line-height: 1.12;
+        letter-spacing: 0;
+        word-break: normal;
+        overflow-wrap: normal;
     }
 
     .ct2-userbar {
@@ -709,6 +717,7 @@ body.ct2-body {
         grid-template-columns: 1fr;
         gap: 8px;
         width: 100%;
+        justify-content: stretch;
     }
 
     .ct2-userbar-status,

@@ -110,7 +110,7 @@ All seeded users use the same initial password: `ChangeMe123!`
 - `ct2_role_uat_check.sh` now covers seeded manager, front-desk, and accounting browser-role expectations, including approval access, visa access, financial denial, and CSV export.
 - `ct2_route_matrix_check.sh` now covers breadth for the main module routes, seeded filter variants, representative JSON GET endpoints, and financial CSV export.
 - `ct2_runtime_hardening_check.sh` now covers representative positive and negative writes across agents, suppliers, approvals, availability, marketing, visa, and financial workflows with direct audit-log assertions.
-- On Windows, use the matching PowerShell entrypoints and `ct2_validation_suite.ps1` where possible, then record any remaining Bash-backed dependencies in the Windows result template.
+- On Windows, use the matching PowerShell entrypoints and `ct2_validation_suite.ps1`, then record the actual XAMPP results in the Windows result template.
 - Manual QA should now focus on operator judgment, end-to-end sequencing, and Windows-target confirmation rather than re-proving baseline route health, keyboard reachability, or representative persistence.
 
 ### Route coverage

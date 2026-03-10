@@ -10,12 +10,6 @@ This register captures repo-owned CT2 debt that is still relevant after the curr
 - Current state: `docs/ct2_windows_xampp_validation_pack.md` and `docs/ct2_windows_xampp_result_template.md` are ready for operator execution.
 - Exit criteria: Execute the Windows run, import the results into the NFR and QA docs, and update the audit backlog.
 
-### PowerShell parity is incomplete for advanced checks
-- Type: Tooling debt
-- Impact: Windows users can launch the validation flow from PowerShell, but several advanced `.ps1` entrypoints still delegate to the existing Bash scripts when `bash` is present.
-- Current state: `ct2_lint.ps1`, `ct2_format_check.ps1`, `ct2_smoke_check.ps1`, and `ct2_db_smoke_check.ps1` run natively; broader runtime/API/accessibility/load/UAT scripts still depend on `bash`.
-- Exit criteria: Replace Bash delegation with fully native PowerShell implementations or explicitly retire Windows-native parity as a product requirement.
-
 ### Traceability to upstream module diagrams is blocked by missing source material
 - Type: Source-of-truth debt
 - Impact: The repo cannot prove strict CT2 module conformance against external process diagrams because `docs/diagrams/` currently contains only the organizational chart image.

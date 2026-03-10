@@ -44,7 +44,7 @@ This runbook is for the technical deployment or support team responsible for ope
 7. Re-run the route/API validation steps most affected by the change.
 8. If the target is Windows XAMPP, update the evidence table in `docs/ct2_windows_xampp_validation_pack.md`.
 9. If the target is Windows XAMPP, return the completed `docs/ct2_windows_xampp_result_template.md` so the repo evidence can be updated without interpretation drift.
-10. If the target is Windows XAMPP, prefer the `.ps1` validation entrypoints and `ct2_validation_suite.ps1` from PowerShell; note in the evidence template if any advanced check still required Bash-backed execution.
+10. If the target is Windows XAMPP, prefer the `.ps1` validation entrypoints and `ct2_validation_suite.ps1` from PowerShell, then return the completed evidence template for repo ingestion.
 
 ## Configuration Rules
 - Prefer explicit TCP MySQL values in `ct2_local.php`.

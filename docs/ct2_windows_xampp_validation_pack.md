@@ -10,7 +10,7 @@ Use `docs/ct2_windows_xampp_result_template.md` as the required return format fo
 - Apache and MySQL running
 - PHP with `pdo_mysql` enabled
 - Windows PowerShell
-- Git for Windows Bash if you need to execute the current Bash-backed advanced validation wrappers
+- PowerShell for the native CT2 validation entrypoints
 
 ## Configuration Steps
 1. Check out the validated CT2 branch you intend to verify.
@@ -46,7 +46,6 @@ powershell -ExecutionPolicy Bypass -File .\ct2_back_office\scripts\ct2_validatio
 ```
 
 If Chrome automation is not available on the Windows host, execute the keyboard walkthrough manually and record the result in the evidence table instead of skipping the evidence.
-If `bash` is not available, the PHP-based checks still run natively, but the current advanced PowerShell wrappers will fail until the Bash dependency is removed from the repo.
 
 ## Browser And Operator Checks
 - Sign in as `ct2admin` / `ChangeMe123!`
@@ -64,7 +63,7 @@ If `bash` is not available, the PHP-based checks still run natively, but the cur
 
 ## Windows-Specific Watch Items
 - PowerShell is the primary operator shell.
-- Some advanced `.ps1` entrypoints still delegate to `bash`; install Git for Windows if you need those checks today.
+- PowerShell is sufficient for the full scripted validation path.
 - Apache/PHP file permissions must still allow writes under `storage/`.
 - Use TCP MySQL values such as `127.0.0.1` and `3306`; do not switch CT2 to a socket-only config path.
 - If upload paths fail, confirm the Apache user can write to `ct2_back_office/storage/uploads/`.

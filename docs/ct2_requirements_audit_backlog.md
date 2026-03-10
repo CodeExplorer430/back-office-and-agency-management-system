@@ -15,13 +15,12 @@ This backlog captures the remaining repo-owned actions surfaced by `docs/ct2_req
   and cross-platform compatibility is no longer only code-aligned and documented.
 
 ### Remove Bash delegation from advanced PowerShell validation entrypoints
-- Type: Tooling debt
-- Impact: Windows operators can launch validation from PowerShell, but full native parity is not complete because several advanced `.ps1` scripts still call the Bash implementations.
+- Type: Validation gap
+- Impact: Windows validation is now script-complete from PowerShell, but the repo still lacks executed XAMPP evidence to prove the full suite on the target platform.
 - Expected work:
-  port route-matrix, runtime-hardening, API-post, accessibility, load, NFR sanity, and role-UAT logic to native PowerShell or retire the Bash-free parity expectation explicitly.
+  execute `docs/ct2_windows_xampp_validation_pack.md`, return `docs/ct2_windows_xampp_result_template.md`, and ingest the evidence into the QA and NFR docs.
 - Acceptance criteria:
-  Windows validation can run from PowerShell without requiring Bash for the advanced checks,
-  or the project scope explicitly removes that requirement from the repo contract.
+  the Windows run is executed, the results are copied back into the repo, and any Windows-specific defect is either fixed or tracked explicitly.
 
 ## Resolved In Repo
 - Broaden automated regression coverage beyond the earlier representative smoke checks.
@@ -37,4 +36,4 @@ This backlog captures the remaining repo-owned actions surfaced by `docs/ct2_req
 
 ## Current Recommendation
 - Treat CT2 as strongly hardened for the repo-defined scope.
-- Treat the remaining repo-owned debt as executed Windows XAMPP evidence plus full native PowerShell parity rather than missing core module implementation or major Linux-side validation depth.
+- Treat the remaining repo-owned debt as executed Windows XAMPP evidence rather than missing core module implementation or major Linux-side validation depth.

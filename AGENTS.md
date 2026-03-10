@@ -96,7 +96,7 @@ This repository contains the `CORE TRANSACTION 2: Back-Office and Agency Managem
 - Run `bash ct2_back_office/scripts/ct2_route_matrix_check.sh` after major UI or filter changes so all module index/filter/export routes stay warning-free under the seeded environment.
 - Run `bash ct2_back_office/scripts/ct2_role_uat_check.sh` after role/permission changes so manager, front desk, and accounting seeded walkthroughs remain directly evidenced.
 - Use `docs/ct2_windows_xampp_validation_pack.md` as the handoff packet for Windows evidence collection rather than maintaining a separate Windows-only runtime path in code.
-- Current Windows note: PHP-based checks are native through PowerShell, but several advanced `.ps1` entrypoints still delegate to the existing Bash scripts when `bash` is available. Treat full Bash-free PowerShell parity as active technical debt until it is removed from `docs/ct2_technical_debt_register.md`.
+- Current Windows note: the CT2 validation surface now has native PowerShell entrypoints across format, lint, smoke, DB smoke, route matrix, runtime hardening, API POST regression, NFR sanity, load profile, role UAT, and browser accessibility. The remaining Windows gap is executed XAMPP evidence, not Bash dependency.
 
 ## Review Focus
 - Security regressions first: authentication, authorization, CSRF, SQL safety, output escaping.

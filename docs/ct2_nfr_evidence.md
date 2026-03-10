@@ -118,6 +118,7 @@ This document records the direct non-functional evidence that currently exists i
 - Session and upload storage remain relative to `ct2_back_office/storage/`, which keeps the runtime contract portable between Linux and Windows file layouts.
 - The repo now includes a Windows XAMPP validation pack that mirrors the native Linux validation flow without introducing Windows-specific code behavior.
 - The repo now includes PowerShell entrypoints for the major validation surface so Windows operators can launch CT2 validation from native PowerShell instead of starting from Bash commands.
+- Route matrix, NFR sanity, load profile, role UAT, and browser accessibility now run through shared PHP or JS validators that are invoked from both Bash and PowerShell.
 
 ## Partially Proven
 ### Warning-free runtime scope
@@ -126,7 +127,7 @@ This document records the direct non-functional evidence that currently exists i
 
 ### Cross-platform execution breadth
 - The Linux-side runtime, keyboard/focus, repeated load, and role/UAT evidence is now directly captured in-repo.
-- The remaining cross-platform gaps are the executed Windows XAMPP run and the removal of Bash delegation from several advanced PowerShell validation entrypoints.
+- The remaining cross-platform gaps are the executed Windows XAMPP run and the removal of Bash delegation from `ct2_runtime_hardening_check.ps1` and `ct2_api_post_regression_check.ps1`.
 
 ## Remaining Gaps
 - Cross-platform compatibility is documented and code-aligned, but runtime evidence in-repo is still strongest on the local Linux LAMP environment rather than an executed Windows XAMPP run.
@@ -134,4 +135,4 @@ This document records the direct non-functional evidence that currently exists i
 
 ## Current Recommendation
 - Treat CT2 security, audit, API write coverage, route breadth, keyboard/focus reachability, repeated load sanity, and role/UAT evidence as materially stronger than the earlier release-only state.
-- Treat the executed Windows XAMPP run and the remaining Bash-backed PowerShell wrappers as the main repo-owned non-functional validation debt.
+- Treat the executed Windows XAMPP run as the main remaining repo-owned non-functional validation debt.

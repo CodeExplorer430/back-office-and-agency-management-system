@@ -18,13 +18,13 @@ $ct2CurrentModule = (string) ($_GET['module'] ?? 'dashboard');
 <body class="ct2-body">
 <div id="ct2-app">
     <header class="ct2-topbar">
-        <div>
+        <div class="ct2-topbar-brand">
             <p class="ct2-eyebrow">Travel and Tours ERP</p>
             <h1 class="ct2-title">CORE TRANSACTION 2</h1>
         </div>
         <?php if ($ct2CurrentUser !== null): ?>
             <div class="ct2-userbar">
-                <span><?= htmlspecialchars((string) $ct2CurrentUser['display_name'], ENT_QUOTES, 'UTF-8'); ?></span>
+                <span class="ct2-userbar-status"><?= htmlspecialchars((string) $ct2CurrentUser['display_name'], ENT_QUOTES, 'UTF-8'); ?></span>
                 <form method="post" action="<?= htmlspecialchars(ct2_url(['module' => 'auth', 'action' => 'logout']), ENT_QUOTES, 'UTF-8'); ?>">
                     <input type="hidden" name="ct2_csrf_token" value="<?= htmlspecialchars(ct2_csrf_token(), ENT_QUOTES, 'UTF-8'); ?>">
                     <button class="ct2-btn ct2-btn-secondary" type="submit">Sign Out</button>

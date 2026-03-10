@@ -66,7 +66,7 @@
             <a class="ct2-link" href="<?= htmlspecialchars(ct2_url(['module' => 'approvals', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Review approvals</a>
         </div>
         <div class="ct2-table-wrap">
-            <table class="ct2-table">
+            <table class="ct2-table ct2-table-mobile-cards">
                 <thead>
                 <tr>
                     <th>Subject</th>
@@ -77,9 +77,9 @@
                 <tbody>
                 <?php foreach ($ct2Approvals as $ct2Approval): ?>
                     <tr>
-                        <td><?= htmlspecialchars((string) $ct2Approval['subject_type'], ENT_QUOTES, 'UTF-8'); ?> #<?= (int) $ct2Approval['subject_id']; ?></td>
-                        <td><?= htmlspecialchars((string) $ct2Approval['approval_status'], ENT_QUOTES, 'UTF-8'); ?></td>
-                        <td><?= htmlspecialchars((string) ($ct2Approval['requested_by_name'] ?? 'System'), ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td data-label="Subject"><?= htmlspecialchars((string) $ct2Approval['subject_type'], ENT_QUOTES, 'UTF-8'); ?> #<?= (int) $ct2Approval['subject_id']; ?></td>
+                        <td data-label="Status"><?= htmlspecialchars((string) $ct2Approval['approval_status'], ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td data-label="Requested By"><?= htmlspecialchars((string) ($ct2Approval['requested_by_name'] ?? 'System'), ENT_QUOTES, 'UTF-8'); ?></td>
                     </tr>
                 <?php endforeach; ?>
                 <?php if ($ct2Approvals === []): ?>
@@ -96,7 +96,7 @@
             <a class="ct2-link" href="<?= htmlspecialchars(ct2_url(['module' => 'availability', 'action' => 'index']), ENT_QUOTES, 'UTF-8'); ?>">Review dispatch planning</a>
         </div>
         <div class="ct2-table-wrap">
-            <table class="ct2-table">
+            <table class="ct2-table ct2-table-mobile-cards">
                 <thead>
                 <tr>
                     <th>Booking</th>
@@ -107,9 +107,9 @@
                 <tbody>
                 <?php foreach ($ct2DispatchOrders as $ct2DispatchOrder): ?>
                     <tr>
-                        <td><?= htmlspecialchars((string) ($ct2DispatchOrder['external_booking_id'] ?? 'Manual'), ENT_QUOTES, 'UTF-8'); ?></td>
-                        <td><?= htmlspecialchars((string) $ct2DispatchOrder['plate_number'], ENT_QUOTES, 'UTF-8'); ?></td>
-                        <td><?= htmlspecialchars((string) $ct2DispatchOrder['dispatch_status'], ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td data-label="Booking"><?= htmlspecialchars((string) ($ct2DispatchOrder['external_booking_id'] ?? 'Manual'), ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td data-label="Vehicle"><?= htmlspecialchars((string) $ct2DispatchOrder['plate_number'], ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td data-label="Status"><?= htmlspecialchars((string) $ct2DispatchOrder['dispatch_status'], ENT_QUOTES, 'UTF-8'); ?></td>
                     </tr>
                 <?php endforeach; ?>
                 <?php if ($ct2DispatchOrders === []): ?>

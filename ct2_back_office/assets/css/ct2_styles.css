@@ -66,6 +66,10 @@ body.ct2-body {
     border-radius: calc(var(--ct2-radius) + 6px);
 }
 
+.ct2-topbar-brand {
+    min-width: 0;
+}
+
 .ct2-title,
 .ct2-section h2,
 .ct2-panel h3,
@@ -122,6 +126,7 @@ body.ct2-body {
     border-radius: 22px;
     overflow-x: auto;
     overflow-y: hidden;
+    scroll-padding-inline: 10px;
     scrollbar-width: thin;
     scrollbar-color: rgba(127, 42, 13, 0.4) rgba(216, 213, 202, 0.4);
 }
@@ -482,6 +487,10 @@ body.ct2-body {
     background: rgba(184, 92, 56, 0.04);
 }
 
+.ct2-table-mobile-cards td::before {
+    content: none;
+}
+
 .ct2-checklist {
     margin: 12px 0 0;
     padding-left: 18px;
@@ -661,5 +670,182 @@ body.ct2-body {
 
     .ct2-table {
         min-width: 500px;
+    }
+}
+
+@media (max-width: 420px) {
+    #ct2-app {
+        width: min(100%, calc(100% - 12px));
+        padding-top: 12px;
+        padding-bottom: 28px;
+    }
+
+    .ct2-main {
+        gap: 16px;
+    }
+
+    .ct2-topbar {
+        align-items: stretch;
+        gap: 14px;
+        padding: 14px 14px 12px;
+        border-radius: 18px;
+    }
+
+    .ct2-topbar-brand .ct2-eyebrow {
+        margin-bottom: 6px;
+        font-size: 0.68rem;
+        letter-spacing: 0.14em;
+    }
+
+    .ct2-title {
+        max-width: 11ch;
+        font-size: 1.42rem;
+        line-height: 1.08;
+        letter-spacing: 0.01em;
+    }
+
+    .ct2-userbar {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .ct2-userbar-status,
+    .ct2-userbar form,
+    .ct2-userbar form .ct2-btn {
+        width: 100%;
+    }
+
+    .ct2-userbar-status {
+        padding: 8px 12px;
+        font-size: 0.86rem;
+    }
+
+    .ct2-nav {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        margin: 12px 0 16px;
+        padding: 8px;
+        overflow: visible;
+    }
+
+    .ct2-nav-link {
+        min-height: 54px;
+        padding: 10px 8px;
+        line-height: 1.18;
+        text-align: center;
+        white-space: normal;
+    }
+
+    .ct2-section {
+        gap: 8px;
+    }
+
+    .ct2-section h2 {
+        font-size: 1.35rem;
+    }
+
+    .ct2-stat-grid,
+    .ct2-grid-3 {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .ct2-stat-card,
+    .ct2-module-card,
+    .ct2-panel {
+        padding: 16px 14px;
+        border-radius: 16px;
+    }
+
+    .ct2-stat-card strong {
+        margin-top: 10px;
+        font-size: 1.75rem;
+    }
+
+    .ct2-inline-form,
+    .ct2-inline-form .ct2-input,
+    .ct2-inline-form .ct2-select,
+    .ct2-inline-form .ct2-btn {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .ct2-inline-form .ct2-input,
+    .ct2-inline-form .ct2-select,
+    .ct2-inline-form .ct2-btn {
+        flex-basis: 100%;
+    }
+
+    .ct2-table-mobile-cards {
+        min-width: 0;
+    }
+
+    .ct2-table-mobile-cards thead {
+        display: none;
+    }
+
+    .ct2-table-mobile-cards,
+    .ct2-table-mobile-cards tbody,
+    .ct2-table-mobile-cards tr,
+    .ct2-table-mobile-cards td {
+        display: block;
+        width: 100%;
+    }
+
+    .ct2-table-mobile-cards tbody {
+        display: grid;
+        gap: 12px;
+        padding: 12px;
+    }
+
+    .ct2-table-mobile-cards tbody tr {
+        display: grid;
+        gap: 8px;
+        padding: 14px 12px;
+        border: 1px solid rgba(216, 213, 202, 0.84);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.9);
+    }
+
+    .ct2-table-mobile-cards tbody tr:hover {
+        background: rgba(255, 255, 255, 0.95);
+    }
+
+    .ct2-table-mobile-cards td {
+        display: grid;
+        grid-template-columns: minmax(88px, 0.78fr) minmax(0, 1fr);
+        gap: 10px;
+        padding: 0;
+        border: 0;
+    }
+
+    .ct2-table-mobile-cards td::before {
+        content: attr(data-label);
+        color: var(--ct2-accent-dark);
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .ct2-table-mobile-cards td[data-label="Decision"] {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding-top: 4px;
+    }
+
+    .ct2-table-mobile-cards td[data-label="Decision"] .ct2-approval-form {
+        width: 100%;
+    }
+
+    .ct2-table-mobile-cards td[colspan] {
+        grid-template-columns: 1fr;
+    }
+
+    .ct2-table-mobile-cards td[colspan]::before {
+        content: none;
     }
 }

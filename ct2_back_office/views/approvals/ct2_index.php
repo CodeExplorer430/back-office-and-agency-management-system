@@ -9,7 +9,7 @@
 
 <section class="ct2-panel">
     <div class="ct2-table-wrap">
-        <table class="ct2-table">
+        <table class="ct2-table ct2-table-mobile-cards">
             <thead>
             <tr>
                 <th>Subject</th>
@@ -22,11 +22,11 @@
             <tbody>
             <?php foreach ($ct2Approvals as $ct2Approval): ?>
                 <tr>
-                    <td><?= htmlspecialchars((string) $ct2Approval['subject_type'], ENT_QUOTES, 'UTF-8'); ?> #<?= (int) $ct2Approval['subject_id']; ?></td>
-                    <td><?= htmlspecialchars((string) $ct2Approval['approval_status'], ENT_QUOTES, 'UTF-8'); ?></td>
-                    <td><?= htmlspecialchars((string) ($ct2Approval['requested_by_name'] ?? 'System'), ENT_QUOTES, 'UTF-8'); ?></td>
-                    <td><?= htmlspecialchars((string) $ct2Approval['requested_at'], ENT_QUOTES, 'UTF-8'); ?></td>
-                    <td>
+                    <td data-label="Subject"><?= htmlspecialchars((string) $ct2Approval['subject_type'], ENT_QUOTES, 'UTF-8'); ?> #<?= (int) $ct2Approval['subject_id']; ?></td>
+                    <td data-label="Status"><?= htmlspecialchars((string) $ct2Approval['approval_status'], ENT_QUOTES, 'UTF-8'); ?></td>
+                    <td data-label="Requested By"><?= htmlspecialchars((string) ($ct2Approval['requested_by_name'] ?? 'System'), ENT_QUOTES, 'UTF-8'); ?></td>
+                    <td data-label="Requested At"><?= htmlspecialchars((string) $ct2Approval['requested_at'], ENT_QUOTES, 'UTF-8'); ?></td>
+                    <td data-label="Decision">
                         <?php if (ct2_has_permission('approvals.decide')): ?>
                             <form method="post" action="<?= htmlspecialchars(ct2_url(['module' => 'approvals', 'action' => 'decide']), ENT_QUOTES, 'UTF-8'); ?>" class="ct2-approval-form">
                                 <input type="hidden" name="ct2_csrf_token" value="<?= htmlspecialchars(ct2_csrf_token(), ENT_QUOTES, 'UTF-8'); ?>">

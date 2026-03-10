@@ -8,7 +8,7 @@ This guide is the client-facing handoff for deploying `CORE TRANSACTION 2: Back-
 - Entry point: `ct2_back_office/ct2_index.php`
 - Database schema and seed data: `ct2_back_office/ct2_setup.sql`
 - Runtime config template: `ct2_back_office/config/ct2_local.php.example`
-- Approved release summary: `docs/ct2_release_summary_2026-03-10.md`
+- Approved release summary: `docs/ct2_release_summary_2026-03-10-r2.md`
 - Post-install validation: `docs/ct2_manual_qa_pack.md`, `docs/ct2_api_validation.md`, and `docs/ct2_windows_xampp_validation_pack.md`
 
 ## Supported Runtime
@@ -108,4 +108,4 @@ Run the acceptance flow in this order:
 ## Release Baseline
 - `develop` remains the integration baseline for ongoing CT2 work.
 - `main` is the approved release branch.
-- The current validated CT2 release is summarized in `docs/ct2_release_summary_2026-03-10.md`.
+- The current validated CT2 release is summarized in `docs/ct2_release_summary_2026-03-10-r2.md`.

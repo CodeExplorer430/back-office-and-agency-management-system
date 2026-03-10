@@ -13,6 +13,8 @@ This backlog captures the remaining repo-owned actions surfaced by `docs/ct2_req
 - Acceptance criteria:
   the repo contains explicit Windows XAMPP execution evidence,
   and cross-platform compatibility is no longer only code-aligned and documented.
+- Release impact:
+  deferred follow-up after the current approved `main` promotion, not a blocker for the active release baseline.
 
 ## Resolved In Repo
 - Broaden automated regression coverage beyond the earlier representative smoke checks.
@@ -29,3 +31,4 @@ This backlog captures the remaining repo-owned actions surfaced by `docs/ct2_req
 ## Current Recommendation
 - Treat CT2 as strongly hardened for the repo-defined scope.
 - Treat the remaining repo-owned debt as executed Windows XAMPP evidence rather than missing core module implementation or major Linux-side validation depth.
+- Treat Windows runtime proof as post-promotion validation debt, not as a reason to hold the current `main` release state.

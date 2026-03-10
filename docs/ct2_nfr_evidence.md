@@ -136,3 +136,4 @@ This document records the direct non-functional evidence that currently exists i
 ## Current Recommendation
 - Treat CT2 security, audit, API write coverage, route breadth, keyboard/focus reachability, repeated load sanity, and role/UAT evidence as materially stronger than the earlier release-only state.
 - Treat the executed Windows XAMPP run as the main remaining repo-owned non-functional validation debt.
+- Treat that Windows evidence gap as deferred cross-platform follow-up rather than a blocker for the current approved `main` release baseline.

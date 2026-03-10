@@ -9,18 +9,10 @@ This backlog captures the remaining repo-owned actions surfaced by `docs/ct2_req
 - Impact: The CT2 runtime contract is cross-platform by design, but in-repo runtime proof is still strongest on the local Linux LAMP environment.
 - Expected work:
   execute the deployment guide, DB smoke, runtime hardening script, and a short browser/API pass on a Windows XAMPP setup;
-  record the result in the deployment or NFR docs.
+  record the result in the Windows result template and copy the evidence back into the QA and NFR docs.
 - Acceptance criteria:
   the repo contains explicit Windows XAMPP execution evidence,
   and cross-platform compatibility is no longer only code-aligned and documented.
-
-### Remove Bash delegation from advanced PowerShell validation entrypoints
-- Type: Validation gap
-- Impact: Windows validation is now script-complete from PowerShell, but the repo still lacks executed XAMPP evidence to prove the full suite on the target platform.
-- Expected work:
-  execute `docs/ct2_windows_xampp_validation_pack.md`, return `docs/ct2_windows_xampp_result_template.md`, and ingest the evidence into the QA and NFR docs.
-- Acceptance criteria:
-  the Windows run is executed, the results are copied back into the repo, and any Windows-specific defect is either fixed or tracked explicitly.
 
 ## Resolved In Repo
 - Broaden automated regression coverage beyond the earlier representative smoke checks.
@@ -32,7 +24,7 @@ This backlog captures the remaining repo-owned actions surfaced by `docs/ct2_req
 - Add seeded role-specific UAT evidence for manager, front desk, and accounting workflows.
 
 ## External Dependency Note
-- Upstream CT2 module diagrams and requirements packs are still absent from `docs/diagrams/`, which currently contains only the organizational chart image. That source-of-truth gap is owned by the documentation teams rather than this CT2 implementation workstream.
+- Upstream CT2 module workflow diagrams and requirements packs are still absent from `docs/diagrams/`. The organizational chart is intentionally separate actor/context material and does not replace the missing workflow diagrams. That source-of-truth gap is owned by the documentation teams rather than this CT2 implementation workstream.
 
 ## Current Recommendation
 - Treat CT2 as strongly hardened for the repo-defined scope.

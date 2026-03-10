@@ -12,8 +12,8 @@ This register captures repo-owned CT2 debt that is still relevant after the curr
 
 ### Traceability to upstream module diagrams is blocked by missing source material
 - Type: Source-of-truth debt
-- Impact: The repo cannot prove strict CT2 module conformance against external process diagrams because `docs/diagrams/` currently contains only the organizational chart image.
-- Current state: The requirements matrix correctly treats this as a source gap, not as a hidden implementation claim.
+- Impact: The repo cannot prove strict CT2 module conformance against external process diagrams because `docs/diagrams/` currently contains the intentionally separated organizational chart, but not the module workflow diagrams.
+- Current state: The requirements matrix correctly treats the organizational chart as actor/context material and the missing workflow diagrams as the actual source gap.
 - Exit criteria: The external documentation team adds the actual CT2 module diagrams to the repo, then CT2 refreshes the traceability matrix and validation mapping.
 
 ## Accepted Limitations

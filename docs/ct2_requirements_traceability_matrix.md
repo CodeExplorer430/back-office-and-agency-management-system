@@ -1,7 +1,7 @@
 # CT2 Requirements Traceability Matrix
 
 ## Purpose
-This matrix traces the current `CORE TRANSACTION 2: Back-Office and Agency Management System` implementation against the source of truth that actually exists in this repository today. It does not claim strict conformance to a module-level CT2 diagram pack, because `docs/diagrams/` currently contains only the organizational chart image and no module workflow or requirements diagrams.
+This matrix traces the current `CORE TRANSACTION 2: Back-Office and Agency Management System` implementation against the source of truth that actually exists in this repository today. It does not claim strict conformance to a module-level CT2 diagram pack, because `docs/diagrams/` currently contains the intentionally separated organizational chart but not the CT2 workflow or requirements diagrams.
 
 ## Source Of Truth Used For This Matrix
 - `ct2_back_office/ct2_setup.sql`
@@ -61,7 +61,7 @@ This matrix traces the current `CORE TRANSACTION 2: Back-Office and Agency Manag
 | --- | --- | --- | --- | --- | --- | --- |
 | FT-01 | Seeded demo data supports cross-module UAT and technical validation. | QA pack, setup SQL | `ct2_back_office/ct2_setup.sql`, DB smoke checks | QA pack and DB smoke | Implemented | Seed coverage spans all six modules plus approvals. |
 | FT-02 | Shared browser upload flow exists for CT2 documents. | Release summary, QA pack | `ct2_back_office/config/ct2_UploadService.php`, visa controller and view | Upload path verified in QA execution report and release smoke | Implemented | Shared upload transport is only adopted by visa in current release. |
-| FT-03 | Strict traceability to a CT2 module diagram pack can be proven. | `docs/diagrams/` | Only organizational chart image present | Repo inspection | Source Gap | Upstream CT2 module process/requirements diagrams are not present in the repo. |
+| FT-03 | Strict traceability to a CT2 module diagram pack can be proven. | `docs/diagrams/` | Organizational chart present; workflow diagrams absent | Repo inspection | Source Gap | The organizational chart is valid actor/context documentation, but the CT2 module process/requirements diagrams are not present in the repo. |
 | FT-04 | Windows operators can launch the validation suite from native PowerShell. | Windows validation pack, operator runbook | `ct2_back_office/scripts/*.ps1`, `ct2_back_office/scripts/ct2_validation_suite.ps1`, shared PHP and JS validators for route, runtime, API, NFR, load, role, and browser checks | Linux `pwsh` execution plus repo smoke checks | Implemented | Native PowerShell entrypoints now exist across the full CT2 validation surface. Executed Windows XAMPP evidence is tracked separately as runtime proof, not as an implementation gap. |
 
 ## Overall Assessment

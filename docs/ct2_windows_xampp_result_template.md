@@ -13,7 +13,7 @@ Use this template to return the executed Windows XAMPP evidence in a form that c
 - MySQL version:
 - Browser used:
 - Chrome automation script executed directly: `yes / no`
-- Git Bash used: `yes / no`
+- Additional shell used beyond PowerShell, if any:
 
 ## Native Validation Results
 | Check | Result | Notes |
@@ -40,7 +40,7 @@ Use this template to return the executed Windows XAMPP evidence in a form that c
 | Warnings/notices in Apache or PHP output | `none / present` |  |
 
 ## Timing Summary
-- Include the repeated-load summary from `ct2_load_profile_check.sh` here:
+- Include the repeated-load summary from `ct2_load_profile_check.ps1` or `ct2_validation_suite.ps1` here:
 
 ```text
 paste the timing summary output

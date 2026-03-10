@@ -5,6 +5,7 @@ Use this checklist after importing the seeded CT2 database to verify representat
 
 ## Preconditions
 - Import `ct2_back_office/ct2_setup.sql`.
+- Run `bash ct2_back_office/scripts/ct2_format_check.sh`.
 - Run `php ct2_back_office/scripts/ct2_db_smoke_check.php`.
 - Run `bash ct2_back_office/scripts/ct2_api_post_regression_check.sh` for the scripted POST regression pass.
 - Run `bash ct2_back_office/scripts/ct2_role_uat_check.sh` when permission-boundary behavior is part of the validation pass.

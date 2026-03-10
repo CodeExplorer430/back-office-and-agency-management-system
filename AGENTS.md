@@ -36,6 +36,7 @@ This repository contains the `CORE TRANSACTION 2: Back-Office and Agency Managem
 
 ## Quality Gates
 - Run `bash ct2_back_office/scripts/ct2_lint.sh` before every commit.
+- Run `bash ct2_back_office/scripts/ct2_format_check.sh` before every commit.
 - Run `php ct2_back_office/scripts/ct2_smoke_check.php` before every commit.
 - Run `php ct2_back_office/scripts/ct2_db_smoke_check.php` whenever local DB-backed behavior, seeds, or schema compatibility are part of the work.
 - Run `bash ct2_back_office/scripts/ct2_api_post_regression_check.sh` whenever JSON API write contracts, validation, or permission boundaries change.
@@ -49,14 +50,17 @@ This repository contains the `CORE TRANSACTION 2: Back-Office and Agency Managem
 - Keep `docs/ct2_manual_qa_pack.md` and `docs/ct2_api_validation.md` in sync with seeded roles, demo records, and validation flows whenever QA behavior changes.
 - Keep `docs/ct2_qa_execution_report.md` and `docs/ct2_qa_fix_queue.md` updated after live QA passes so validated behavior and open defects stay explicit.
 - Keep `docs/ct2_requirements_traceability_matrix.md` and `docs/ct2_requirements_audit_backlog.md` updated whenever CT2 scope, validation evidence, or source-of-truth assumptions change.
+- Keep `docs/ct2_technical_debt_register.md` updated whenever repo-owned debt, accepted limitations, or enhancement opportunities change.
 - Keep `docs/ct2_nfr_evidence.md` aligned with the current hardening scripts and the non-functional claims used in release or audit documents.
 - Keep `docs/ct2_performance_accessibility_evidence.md` and `docs/ct2_windows_xampp_validation_pack.md` aligned with the active seeded validation workflow and the supported runtime contract.
 - Keep `docs/ct2_windows_xampp_result_template.md` aligned with the Windows evidence-ingestion workflow so operators return executable results in one canonical format.
 - Keep `docs/ct2_deployment_guide.md` and `docs/ct2_operator_runbook.md` aligned with the active `develop` release process and supported LAMP/XAMPP runtime expectations.
 - Do not merge code that emits PHP warnings, notices, or fatal errors under `E_ALL`.
+- Do not merge code that fails the formatting gate for PHP, CSS, Markdown, SQL, shell, or PowerShell files.
 
 ## Definition Of Done
 - Routes render without PHP warnings or notices.
+- Formatting checks pass with no trailing whitespace, no BOM, and a trailing newline at EOF for tracked CT2 text artifacts.
 - New or changed APIs return valid JSON envelopes and appropriate HTTP status codes.
 - Database changes are reflected in `ct2_setup.sql`.
 - Navigation, permissions, and CSRF behavior are covered by manual smoke testing.
@@ -80,6 +84,7 @@ This repository contains the `CORE TRANSACTION 2: Back-Office and Agency Managem
 - Environment variables must override `ct2_local.php` when both are present.
 - Import `ct2_back_office/ct2_setup.sql` into a clean `ct2_back_office` database before browser testing.
 - Run `php ct2_back_office/scripts/ct2_db_smoke_check.php` after import and before browser testing.
+- On Windows, prefer the matching PowerShell entrypoints under `ct2_back_office/scripts/*.ps1` and the aggregate `ct2_validation_suite.ps1`.
 - Use the seeded administrator account for first login:
   `ct2admin` / `ChangeMe123!`
 - Validate the full route set on local PHP/Apache:
@@ -91,6 +96,7 @@ This repository contains the `CORE TRANSACTION 2: Back-Office and Agency Managem
 - Run `bash ct2_back_office/scripts/ct2_route_matrix_check.sh` after major UI or filter changes so all module index/filter/export routes stay warning-free under the seeded environment.
 - Run `bash ct2_back_office/scripts/ct2_role_uat_check.sh` after role/permission changes so manager, front desk, and accounting seeded walkthroughs remain directly evidenced.
 - Use `docs/ct2_windows_xampp_validation_pack.md` as the handoff packet for Windows evidence collection rather than maintaining a separate Windows-only runtime path in code.
+- Current Windows note: PHP-based checks are native through PowerShell, but several advanced `.ps1` entrypoints still delegate to the existing Bash scripts when `bash` is available. Treat full Bash-free PowerShell parity as active technical debt until it is removed from `docs/ct2_technical_debt_register.md`.
 
 ## Review Focus
 - Security regressions first: authentication, authorization, CSRF, SQL safety, output escaping.

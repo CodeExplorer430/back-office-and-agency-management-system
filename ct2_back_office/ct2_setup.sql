@@ -2104,7 +2104,7 @@ FROM (
     FROM ct2_agents AS a
     WHERE a.agent_code = 'AGT-CT2-001'
     UNION ALL
-    SELECT 'supplier_exposure', 'SUP-CT2-002', 'suppliers', s.ct2_supplier_id, 'Contract Exposure', 4800.00, 1, 'warning', s.external_supplier_id, 'Pending supplier approval keeps onboarding in review.' 
+    SELECT 'supplier_exposure', 'SUP-CT2-002', 'suppliers', s.ct2_supplier_id, 'Contract Exposure', 4800.00, 1, 'warning', s.external_supplier_id, 'Pending supplier approval keeps onboarding in review.'
     FROM ct2_suppliers AS s
     WHERE s.supplier_code = 'SUP-CT2-002'
     UNION ALL

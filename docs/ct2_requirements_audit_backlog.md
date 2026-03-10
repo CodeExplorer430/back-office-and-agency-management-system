@@ -14,6 +14,15 @@ This backlog captures the remaining repo-owned actions surfaced by `docs/ct2_req
   the repo contains explicit Windows XAMPP execution evidence,
   and cross-platform compatibility is no longer only code-aligned and documented.
 
+### Remove Bash delegation from advanced PowerShell validation entrypoints
+- Type: Tooling debt
+- Impact: Windows operators can launch validation from PowerShell, but full native parity is not complete because several advanced `.ps1` scripts still call the Bash implementations.
+- Expected work:
+  port route-matrix, runtime-hardening, API-post, accessibility, load, NFR sanity, and role-UAT logic to native PowerShell or retire the Bash-free parity expectation explicitly.
+- Acceptance criteria:
+  Windows validation can run from PowerShell without requiring Bash for the advanced checks,
+  or the project scope explicitly removes that requirement from the repo contract.
+
 ## Resolved In Repo
 - Broaden automated regression coverage beyond the earlier representative smoke checks.
 - Add a broader warning-free route sweep for major module routes, seeded filters, representative JSON GET endpoints, and financial export breadth.
@@ -24,8 +33,8 @@ This backlog captures the remaining repo-owned actions surfaced by `docs/ct2_req
 - Add seeded role-specific UAT evidence for manager, front desk, and accounting workflows.
 
 ## External Dependency Note
-- Upstream CT2 diagrams and requirements packs are still absent from `docs/diagrams/`, but that source-of-truth gap is owned by the documentation teams rather than this CT2 implementation workstream.
+- Upstream CT2 module diagrams and requirements packs are still absent from `docs/diagrams/`, which currently contains only the organizational chart image. That source-of-truth gap is owned by the documentation teams rather than this CT2 implementation workstream.
 
 ## Current Recommendation
 - Treat CT2 as strongly hardened for the repo-defined scope.
-- Treat the remaining debt as executed Windows XAMPP evidence rather than missing core module implementation or major Linux-side validation depth.
+- Treat the remaining repo-owned debt as executed Windows XAMPP evidence plus full native PowerShell parity rather than missing core module implementation or major Linux-side validation depth.

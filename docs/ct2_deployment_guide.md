@@ -48,6 +48,8 @@ Run these commands from the repo root:
 
 `bash ct2_back_office/scripts/ct2_lint.sh`
 
+`bash ct2_back_office/scripts/ct2_format_check.sh`
+
 `php ct2_back_office/scripts/ct2_smoke_check.php`
 
 `php ct2_back_office/scripts/ct2_db_smoke_check.php`
@@ -83,7 +85,7 @@ Run these commands from the repo root:
 - Confirm `php_pdo_mysql` is enabled in the active XAMPP `php.ini`.
 - Keep upload and session folders writable by the Apache service account.
 - Use the same `ct2_local.php` contract as LAMP; no Windows-specific code path is required.
-- Use `docs/ct2_windows_xampp_validation_pack.md` as the execution and evidence template for Windows validation.
+- Use the PowerShell entrypoints under `ct2_back_office/scripts/*.ps1` and `docs/ct2_windows_xampp_validation_pack.md` as the execution and evidence template for Windows validation.
 
 ## Post-Install Acceptance
 Run the acceptance flow in this order:

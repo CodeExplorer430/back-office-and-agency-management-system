@@ -9,6 +9,7 @@ Read this after completing the install flow in `docs/ct2_deployment_guide.md`.
 1. Copy `ct2_back_office/config/ct2_local.php.example` to `ct2_back_office/config/ct2_local.php` and set TCP MySQL credentials.
 2. Import `ct2_back_office/ct2_setup.sql` into a clean `ct2_back_office` database.
 3. Run:
+   `bash ct2_back_office/scripts/ct2_format_check.sh`
    `bash ct2_back_office/scripts/ct2_lint.sh`
    `php ct2_back_office/scripts/ct2_smoke_check.php`
    `php ct2_back_office/scripts/ct2_db_smoke_check.php`
@@ -109,6 +110,7 @@ All seeded users use the same initial password: `ChangeMe123!`
 - `ct2_role_uat_check.sh` now covers seeded manager, front-desk, and accounting browser-role expectations, including approval access, visa access, financial denial, and CSV export.
 - `ct2_route_matrix_check.sh` now covers breadth for the main module routes, seeded filter variants, representative JSON GET endpoints, and financial CSV export.
 - `ct2_runtime_hardening_check.sh` now covers representative positive and negative writes across agents, suppliers, approvals, availability, marketing, visa, and financial workflows with direct audit-log assertions.
+- On Windows, use the matching PowerShell entrypoints and `ct2_validation_suite.ps1` where possible, then record any remaining Bash-backed dependencies in the Windows result template.
 - Manual QA should now focus on operator judgment, end-to-end sequencing, and Windows-target confirmation rather than re-proving baseline route health, keyboard reachability, or representative persistence.
 
 ### Route coverage

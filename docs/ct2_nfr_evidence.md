@@ -4,6 +4,7 @@
 This document records the direct non-functional evidence that currently exists in the repository for the integrated `CORE TRANSACTION 2: Back-Office and Agency Management System`. It is intentionally narrower than a formal certification pack: it captures what CT2 can actually prove today, the repeatable checks that produce that evidence, and the remaining gaps that are still technical debt rather than hidden assumptions.
 
 ## Evidence Sources
+- `bash ct2_back_office/scripts/ct2_format_check.sh`
 - `bash ct2_back_office/scripts/ct2_lint.sh`
 - `php ct2_back_office/scripts/ct2_smoke_check.php`
 - `php ct2_back_office/scripts/ct2_db_smoke_check.php`
@@ -116,6 +117,7 @@ This document records the direct non-functional evidence that currently exists i
   `host`, `port`, `name`, `username`, `password`, `charset`.
 - Session and upload storage remain relative to `ct2_back_office/storage/`, which keeps the runtime contract portable between Linux and Windows file layouts.
 - The repo now includes a Windows XAMPP validation pack that mirrors the native Linux validation flow without introducing Windows-specific code behavior.
+- The repo now includes PowerShell entrypoints for the major validation surface so Windows operators can launch CT2 validation from native PowerShell instead of starting from Bash commands.
 
 ## Partially Proven
 ### Warning-free runtime scope
@@ -124,11 +126,12 @@ This document records the direct non-functional evidence that currently exists i
 
 ### Cross-platform execution breadth
 - The Linux-side runtime, keyboard/focus, repeated load, and role/UAT evidence is now directly captured in-repo.
-- The remaining cross-platform gap is the executed Windows XAMPP run, which still relies on the prepared validation packet rather than a completed in-repo evidence import.
+- The remaining cross-platform gaps are the executed Windows XAMPP run and the removal of Bash delegation from several advanced PowerShell validation entrypoints.
 
 ## Remaining Gaps
 - Cross-platform compatibility is documented and code-aligned, but runtime evidence in-repo is still strongest on the local Linux LAMP environment rather than an executed Windows XAMPP run.
+- Formatting checks now exist repo-wide, but they must still be kept in the active validation workflow whenever docs, scripts, SQL, or CSS are touched.
 
 ## Current Recommendation
 - Treat CT2 security, audit, API write coverage, route breadth, keyboard/focus reachability, repeated load sanity, and role/UAT evidence as materially stronger than the earlier release-only state.
-- Treat the executed Windows XAMPP run as the main remaining repo-owned non-functional validation debt.
+- Treat the executed Windows XAMPP run and the remaining Bash-backed PowerShell wrappers as the main repo-owned non-functional validation debt.

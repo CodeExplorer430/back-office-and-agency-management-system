@@ -9,7 +9,8 @@ Use `docs/ct2_windows_xampp_result_template.md` as the required return format fo
 - Windows machine with XAMPP installed
 - Apache and MySQL running
 - PHP with `pdo_mysql` enabled
-- Git Bash recommended for the repo shell scripts
+- Windows PowerShell
+- Git for Windows Bash if you need to execute the current Bash-backed advanced validation wrappers
 
 ## Configuration Steps
 1. Check out the validated CT2 branch you intend to verify.
@@ -22,22 +23,30 @@ Use `docs/ct2_windows_xampp_result_template.md` as the required return format fo
    `ct2_back_office/storage/uploads/`
 
 ## Native Validation Sequence
-Run these from Git Bash in the repo root:
+Run these from Windows PowerShell in the repo root:
 
-```bash
-bash ct2_back_office/scripts/ct2_lint.sh
-php ct2_back_office/scripts/ct2_smoke_check.php
-php ct2_back_office/scripts/ct2_db_smoke_check.php
-bash ct2_back_office/scripts/ct2_browser_accessibility_check.sh
-bash ct2_back_office/scripts/ct2_load_profile_check.sh
-bash ct2_back_office/scripts/ct2_route_matrix_check.sh
-bash ct2_back_office/scripts/ct2_runtime_hardening_check.sh
-bash ct2_back_office/scripts/ct2_api_post_regression_check.sh
-bash ct2_back_office/scripts/ct2_nfr_sanity_check.sh
-bash ct2_back_office/scripts/ct2_role_uat_check.sh
+```powershell
+powershell -ExecutionPolicy Bypass -File .\ct2_back_office\scripts\ct2_format_check.ps1
+powershell -ExecutionPolicy Bypass -File .\ct2_back_office\scripts\ct2_lint.ps1
+powershell -ExecutionPolicy Bypass -File .\ct2_back_office\scripts\ct2_smoke_check.ps1
+powershell -ExecutionPolicy Bypass -File .\ct2_back_office\scripts\ct2_db_smoke_check.ps1
+powershell -ExecutionPolicy Bypass -File .\ct2_back_office\scripts\ct2_browser_accessibility_check.ps1
+powershell -ExecutionPolicy Bypass -File .\ct2_back_office\scripts\ct2_load_profile_check.ps1
+powershell -ExecutionPolicy Bypass -File .\ct2_back_office\scripts\ct2_route_matrix_check.ps1
+powershell -ExecutionPolicy Bypass -File .\ct2_back_office\scripts\ct2_runtime_hardening_check.ps1
+powershell -ExecutionPolicy Bypass -File .\ct2_back_office\scripts\ct2_api_post_regression_check.ps1
+powershell -ExecutionPolicy Bypass -File .\ct2_back_office\scripts\ct2_nfr_sanity_check.ps1
+powershell -ExecutionPolicy Bypass -File .\ct2_back_office\scripts\ct2_role_uat_check.ps1
+```
+
+You can also run the aggregate suite:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\ct2_back_office\scripts\ct2_validation_suite.ps1
 ```
 
 If Chrome automation is not available on the Windows host, execute the keyboard walkthrough manually and record the result in the evidence table instead of skipping the evidence.
+If `bash` is not available, the PHP-based checks still run natively, but the current advanced PowerShell wrappers will fail until the Bash dependency is removed from the repo.
 
 ## Browser And Operator Checks
 - Sign in as `ct2admin` / `ChangeMe123!`
@@ -54,7 +63,8 @@ If Chrome automation is not available on the Windows host, execute the keyboard 
 - Copy the finished template back into the repo docs listed in its `Repo Copy-Back Targets` section.
 
 ## Windows-Specific Watch Items
-- Git Bash is needed for the `bash` scripts unless you translate them manually.
+- PowerShell is the primary operator shell.
+- Some advanced `.ps1` entrypoints still delegate to `bash`; install Git for Windows if you need those checks today.
 - Apache/PHP file permissions must still allow writes under `storage/`.
 - Use TCP MySQL values such as `127.0.0.1` and `3306`; do not switch CT2 to a socket-only config path.
 - If upload paths fail, confirm the Apache user can write to `ct2_back_office/storage/uploads/`.

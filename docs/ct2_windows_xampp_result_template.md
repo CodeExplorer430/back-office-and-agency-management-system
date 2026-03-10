@@ -18,16 +18,17 @@ Use this template to return the executed Windows XAMPP evidence in a form that c
 ## Native Validation Results
 | Check | Result | Notes |
 | --- | --- | --- |
-| `ct2_lint.sh` | `pass / fail` |  |
-| `ct2_smoke_check.php` | `pass / fail` |  |
-| `ct2_db_smoke_check.php` | `pass / fail` |  |
-| `ct2_browser_accessibility_check.sh` or manual keyboard walkthrough | `pass / fail` |  |
-| `ct2_load_profile_check.sh` | `pass / fail` |  |
-| `ct2_route_matrix_check.sh` | `pass / fail` |  |
-| `ct2_runtime_hardening_check.sh` | `pass / fail` |  |
-| `ct2_api_post_regression_check.sh` | `pass / fail` |  |
-| `ct2_nfr_sanity_check.sh` | `pass / fail` |  |
-| `ct2_role_uat_check.sh` | `pass / fail` |  |
+| `ct2_format_check.ps1` | `pass / fail` |  |
+| `ct2_lint.ps1` | `pass / fail` |  |
+| `ct2_smoke_check.ps1` | `pass / fail` |  |
+| `ct2_db_smoke_check.ps1` | `pass / fail` |  |
+| `ct2_browser_accessibility_check.ps1` or manual keyboard walkthrough | `pass / fail` |  |
+| `ct2_load_profile_check.ps1` | `pass / fail` |  |
+| `ct2_route_matrix_check.ps1` | `pass / fail` |  |
+| `ct2_runtime_hardening_check.ps1` | `pass / fail` |  |
+| `ct2_api_post_regression_check.ps1` | `pass / fail` |  |
+| `ct2_nfr_sanity_check.ps1` | `pass / fail` |  |
+| `ct2_role_uat_check.ps1` | `pass / fail` |  |
 
 ## Browser And Operator Results
 | Check | Result | Notes |

@@ -9,3 +9,11 @@
 !/ct2_back_office/storage/uploads/.gitkeep
 /ct2_back_office/storage/uploads/*
 !/ct2_back_office/storage/uploads/.gitkeep
+
+# Local AI agent instruction files
+/AGENTS.md
+/CLAUDE.md
+/GEMINI.md
+/COPILOT.md
+/CURSOR.md
+/BOLT.md

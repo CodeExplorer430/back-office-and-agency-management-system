@@ -13,6 +13,13 @@ $ct2CurrentModule = (string) ($_GET['module'] ?? 'dashboard');
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= htmlspecialchars(CT2_APP_NAME, ENT_QUOTES, 'UTF-8'); ?></title>
+    <meta name="theme-color" content="#12263a">
+    <link rel="icon" type="image/svg+xml" href="<?= htmlspecialchars(ct2_asset_url('icons/ct2-favicon.svg'), ENT_QUOTES, 'UTF-8'); ?>">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?= htmlspecialchars(ct2_asset_url('icons/favicon-32x32.png'), ENT_QUOTES, 'UTF-8'); ?>">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?= htmlspecialchars(ct2_asset_url('icons/favicon-16x16.png'), ENT_QUOTES, 'UTF-8'); ?>">
+    <link rel="shortcut icon" href="<?= htmlspecialchars(ct2_asset_url('icons/favicon.ico'), ENT_QUOTES, 'UTF-8'); ?>">
+    <link rel="apple-touch-icon" sizes="180x180" href="<?= htmlspecialchars(ct2_asset_url('icons/apple-touch-icon.png'), ENT_QUOTES, 'UTF-8'); ?>">
+    <link rel="manifest" href="<?= htmlspecialchars(ct2_asset_url('icons/site.webmanifest'), ENT_QUOTES, 'UTF-8'); ?>">
     <link rel="stylesheet" href="<?= htmlspecialchars(ct2_asset_url('css/ct2_styles.css'), ENT_QUOTES, 'UTF-8'); ?>">
 </head>
 <body class="ct2-body">

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="ct2Title ct2Desc">
+  <title id="ct2Title">CT2 favicon</title>
+  <desc id="ct2Desc">CORE TRANSACTION 2 monogram badge for the CT2 back-office application.</desc>
+  <defs>
+    <linearGradient id="ct2Accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c96f47" />
+      <stop offset="100%" stop-color="#7f2a0d" />
+    </linearGradient>
+    <filter id="ct2Shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#12263a" flood-opacity="0.12" />
+    </filter>
+  </defs>
+
+  <rect width="512" height="512" rx="112" fill="#f7f7f3" />
+  <rect x="32" y="32" width="448" height="448" rx="96" fill="#fbf7ef" stroke="#d9d4c7" stroke-width="10" filter="url(#ct2Shadow)" />
+  <rect x="64" y="64" width="384" height="42" rx="21" fill="url(#ct2Accent)" />
+
+  <text
+    x="144"
+    y="302"
+    fill="#12263a"
+    font-family="'DejaVu Sans', 'Segoe UI', Arial, sans-serif"
+    font-size="176"
+    font-weight="700"
+    letter-spacing="-10"
+  >CT</text>
+
+  <circle cx="382" cy="350" r="76" fill="url(#ct2Accent)" />
+  <text
+    x="382"
+    y="382"
+    text-anchor="middle"
+    fill="#f7f7f3"
+    font-family="'DejaVu Sans', 'Segoe UI', Arial, sans-serif"
+    font-size="116"
+    font-weight="800"
+  >2</text>
+</svg>

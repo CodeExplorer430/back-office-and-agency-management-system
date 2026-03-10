@@ -1,0 +1,19 @@
+{
+  "name": "CORE TRANSACTION 2",
+  "short_name": "CT2",
+  "icons": [
+    {
+      "src": "android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#12263a",
+  "background_color": "#f7f7f3",
+  "display": "standalone"
+}

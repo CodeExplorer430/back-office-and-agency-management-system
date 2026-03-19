@@ -6,6 +6,12 @@ $ct2CurrentUser = ct2_current_user();
 $ct2SuccessMessage = ct2_flash('success');
 $ct2ErrorMessage = ct2_flash('error');
 $ct2CurrentModule = (string) ($_GET['module'] ?? 'dashboard');
+$ct2CurrentAction = (string) ($_GET['action'] ?? ($ct2CurrentModule === 'auth' ? 'landing' : 'index'));
+$ct2BodyClass = 'ct2-body';
+
+if ($ct2CurrentUser === null && $ct2CurrentModule === 'auth') {
+    $ct2BodyClass .= ' ct2-body-guest';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -22,7 +28,7 @@ $ct2CurrentModule = (string) ($_GET['module'] ?? 'dashboard');
     <link rel="manifest" href="<?= htmlspecialchars(ct2_asset_url('icons/site.webmanifest'), ENT_QUOTES, 'UTF-8'); ?>">
     <link rel="stylesheet" href="<?= htmlspecialchars(ct2_asset_url('css/ct2_styles.css'), ENT_QUOTES, 'UTF-8'); ?>">
 </head>
-<body class="ct2-body">
+<body class="<?= htmlspecialchars($ct2BodyClass, ENT_QUOTES, 'UTF-8'); ?>">
 <div id="ct2-app">
     <header class="ct2-topbar">
         <div class="ct2-topbar-brand">
@@ -36,6 +42,10 @@ $ct2CurrentModule = (string) ($_GET['module'] ?? 'dashboard');
                     <input type="hidden" name="ct2_csrf_token" value="<?= htmlspecialchars(ct2_csrf_token(), ENT_QUOTES, 'UTF-8'); ?>">
                     <button class="ct2-btn ct2-btn-secondary" type="submit">Sign Out</button>
                 </form>
+            </div>
+        <?php elseif ($ct2CurrentModule === 'auth' && in_array($ct2CurrentAction, ['landing', 'login'], true)): ?>
+            <div class="ct2-userbar ct2-userbar-guest">
+                <span class="ct2-userbar-status">Unified operations access for CT2 staff.</span>
             </div>
         <?php endif; ?>
     </header>
@@ -73,4 +83,4 @@ $ct2CurrentModule = (string) ($_GET['module'] ?? 'dashboard');
         <div class="ct2-alert ct2-alert-danger"><?= htmlspecialchars($ct2ErrorMessage, ENT_QUOTES, 'UTF-8'); ?></div>
     <?php endif; ?>
 
-    <main class="ct2-main">
+    <main class="ct2-main<?= $ct2CurrentUser === null && $ct2CurrentModule === 'auth' ? ' ct2-main-guest' : ''; ?>">

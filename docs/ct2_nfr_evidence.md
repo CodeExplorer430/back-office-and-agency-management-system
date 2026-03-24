@@ -3,13 +3,19 @@
 ## Purpose
 This document records the direct non-functional evidence that currently exists in the repository for the integrated `CORE TRANSACTION 2: Back-Office and Agency Management System`. It is intentionally narrower than a formal certification pack: it captures what CT2 can actually prove today, the repeatable checks that produce that evidence, and the remaining gaps that are still technical debt rather than hidden assumptions.
 
+## Current Quality Gate
+- The mandatory enforcement point for this evidence is `docs/ct2_quality_gate.md`.
+- NFR evidence is only current when the strict full suite passes with zero tolerated warnings, notices, deprecations, or validator failures.
+
 ## Evidence Sources
+- `bash ct2_back_office/scripts/ct2_validation_suite.sh`
 - `bash ct2_back_office/scripts/ct2_format_check.sh`
 - `bash ct2_back_office/scripts/ct2_lint.sh`
 - `php ct2_back_office/scripts/ct2_smoke_check.php`
 - `php ct2_back_office/scripts/ct2_db_smoke_check.php`
 - `bash ct2_back_office/scripts/ct2_api_post_regression_check.sh`
 - `bash ct2_back_office/scripts/ct2_browser_accessibility_check.sh`
+- `bash ct2_back_office/scripts/ct2_ui_regression_check.sh`
 - `bash ct2_back_office/scripts/ct2_load_profile_check.sh`
 - `bash ct2_back_office/scripts/ct2_nfr_sanity_check.sh`
 - `bash ct2_back_office/scripts/ct2_role_uat_check.sh`
@@ -22,6 +28,7 @@ This document records the direct non-functional evidence that currently exists i
 - `docs/ct2_qa_execution_report.md`
 - `docs/ct2_deployment_guide.md`
 - `docs/ct2_operator_runbook.md`
+- `docs/ct2_quality_gate.md`
 
 ## Directly Proven
 ### Security controls
@@ -79,6 +86,15 @@ This document records the direct non-functional evidence that currently exists i
 
 ### Runtime quality on exercised flows
 - The current lint, structural smoke, DB smoke, API POST regression, route matrix, NFR sanity, and runtime hardening checks run without PHP warnings, notices, or fatal errors on the exercised CT2 paths.
+- The UI regression script now directly proves the shared UI contract for:
+  expanded and collapsed sidebar geometry,
+  collapsed logo and active-state alignment,
+  modal top-level mounting,
+  centered and clickable modal dialogs,
+  long-form modal footer safety,
+  tab and pagination query-state preservation,
+  toast-versus-modal stack order,
+  and split date/time modal controls on visa and availability flows.
 - The API POST regression script now covers:
   auth login,
   anonymous denial,
@@ -118,7 +134,7 @@ This document records the direct non-functional evidence that currently exists i
 - Session and upload storage remain relative to `ct2_back_office/storage/`, which keeps the runtime contract portable between Linux and Windows file layouts.
 - The repo now includes a Windows XAMPP validation pack that mirrors the native Linux validation flow without introducing Windows-specific code behavior.
 - The repo now includes PowerShell entrypoints for the major validation surface so Windows operators can launch CT2 validation from native PowerShell instead of starting from Bash commands.
-- Route matrix, NFR sanity, load profile, role UAT, and browser accessibility now run through shared PHP or JS validators that are invoked from both Bash and PowerShell.
+- Route matrix, UI regression, NFR sanity, load profile, role UAT, and browser accessibility now run through shared PHP or JS validators that are invoked from both Bash and PowerShell.
 
 ## Partially Proven
 ### Warning-free runtime scope

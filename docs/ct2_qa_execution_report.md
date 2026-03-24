@@ -1,5 +1,9 @@
 # CT2 QA Execution Report
 
+## Historical Snapshot
+- This report is historical evidence from the March 10, 2026 validation cycle.
+- The current mandatory gate for new work is `docs/ct2_quality_gate.md`, not the narrower baseline described in the original execution chronology below.
+
 ## Scope
 This report records the first live execution of the CT2 manual QA pack against the integrated `develop` branch after local MySQL import and seeded demo data setup.
 
@@ -13,6 +17,7 @@ This report records the first live execution of the CT2 manual QA pack against t
   - `ct2desk`
 
 ## Baseline Checks
+- Historical baseline at the time of this run. Current repo policy now requires the full strict suite.
 - `bash ct2_back_office/scripts/ct2_lint.sh`: pass
 - `php ct2_back_office/scripts/ct2_smoke_check.php`: pass
 - `php ct2_back_office/scripts/ct2_db_smoke_check.php`: pass

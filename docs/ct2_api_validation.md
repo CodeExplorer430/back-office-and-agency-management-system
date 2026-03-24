@@ -3,12 +3,14 @@
 ## Purpose
 Use this checklist after importing the seeded CT2 database to verify representative JSON API behavior for each implemented module family.
 
+## Current Quality Gate
+- The API checklist supplements the mandatory strict suite in `docs/ct2_quality_gate.md`; it does not replace it.
+- API validation is not complete if the full suite has not already passed without warnings, notices, deprecations, HTML leakage, or validator failures.
+- Use `docs/ct2_integration_guide.md` for source-of-truth rules and external-system integration boundaries before interpreting API results.
+
 ## Preconditions
 - Import `ct2_back_office/ct2_setup.sql`.
-- Run `bash ct2_back_office/scripts/ct2_format_check.sh`.
-- Run `php ct2_back_office/scripts/ct2_db_smoke_check.php`.
-- Run `bash ct2_back_office/scripts/ct2_api_post_regression_check.sh` for the scripted POST regression pass.
-- Run `bash ct2_back_office/scripts/ct2_role_uat_check.sh` when permission-boundary behavior is part of the validation pass.
+- Run `bash ct2_back_office/scripts/ct2_validation_suite.sh`.
 - Authenticate with a seeded account that has `api.access`, or use the browser session after logging in with `ct2admin`.
 
 ## Core API Expectations
@@ -81,6 +83,7 @@ Use this checklist after importing the seeded CT2 database to verify representat
 - Send malformed payload data to one write endpoint and confirm JSON error handling, not HTML failure output.
 
 ## Scripted Baseline
+- The strict suite is the blocking baseline; use this API checklist after the full suite passes.
 - `ct2_api_post_regression_check.sh` now covers representative success, malformed-payload, and permission-boundary checks for the stable CT2 POST endpoints.
 - `ct2_role_uat_check.sh` complements the API pass by proving the seeded browser-side permission boundaries for manager, front desk, and accounting roles.
 - Manual API validation should focus on endpoint families not yet included in the scripted regression pass or on business-intent interpretation beyond raw contract safety.

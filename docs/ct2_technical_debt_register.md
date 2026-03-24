@@ -3,6 +3,10 @@
 ## Purpose
 This register captures repo-owned CT2 debt that is still relevant after the current release and hardening work. It separates actionable debt from accepted architecture boundaries and from future enhancement ideas.
 
+## Current Quality Gate
+- The active repo policy is `docs/ct2_quality_gate.md`.
+- Debt tracking does not weaken the zero-warning, zero-skipped-gate requirement for current work.
+
 ## Active Technical Debt
 ### Windows validation execution still pending
 - Type: Validation debt
@@ -37,3 +41,4 @@ This register captures repo-owned CT2 debt that is still relevant after the curr
 
 ### Remove duplicated validation configuration between Bash and PowerShell entrypoints
 - Candidate areas: shared parameter loading, shared host/port handling, and a common validation manifest.
+- Current mitigation: keep both `ct2_validation_suite.sh` and `ct2_validation_suite.ps1` aligned to `docs/ct2_quality_gate.md`.

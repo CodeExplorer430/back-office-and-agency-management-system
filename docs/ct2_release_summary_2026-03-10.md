@@ -1,5 +1,9 @@
 # CT2 Release Summary - March 10, 2026
 
+## Historical Snapshot
+- This summary captures the original March 10, 2026 promoted state.
+- The current repo-wide quality policy is defined in `docs/ct2_quality_gate.md` and is stricter than the release-era baseline below.
+
 ## Release Marker
 - Branch: `main`
 - Tag: `ct2-release-2026-03-10`
@@ -24,10 +28,7 @@
   - financial CSV export
 
 ## Release Validation
-- Native checks:
-  - `bash ct2_back_office/scripts/ct2_lint.sh`
-  - `php ct2_back_office/scripts/ct2_smoke_check.php`
-  - `php ct2_back_office/scripts/ct2_db_smoke_check.php`
+- Native checks at the time of the release snapshot included lint, smoke, and DB smoke.
 - Live validation completed against local MySQL and PHP runtime
 - Search/filter blocker resolved and rerun verified in `docs/ct2_qa_execution_report.md`
 - No open blocker remains in `docs/ct2_qa_fix_queue.md`

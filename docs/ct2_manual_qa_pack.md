@@ -5,21 +5,14 @@ Use this guide to validate the integrated `CORE TRANSACTION 2: Back-Office and A
 
 Read this after completing the install flow in `docs/ct2_deployment_guide.md`.
 
+## Current Quality Gate
+- Manual QA is layered on top of the mandatory strict suite in `docs/ct2_quality_gate.md`.
+- Do not start the browser walkthrough if the full suite is red or if any warning, notice, or deprecation is still open.
+
 ## Environment Setup
 1. Copy `ct2_back_office/config/ct2_local.php.example` to `ct2_back_office/config/ct2_local.php` and set TCP MySQL credentials.
 2. Import `ct2_back_office/ct2_setup.sql` into a clean `ct2_back_office` database.
-3. Run:
-   `bash ct2_back_office/scripts/ct2_format_check.sh`
-   `bash ct2_back_office/scripts/ct2_lint.sh`
-   `php ct2_back_office/scripts/ct2_smoke_check.php`
-   `php ct2_back_office/scripts/ct2_db_smoke_check.php`
-   `bash ct2_back_office/scripts/ct2_api_post_regression_check.sh`
-   `bash ct2_back_office/scripts/ct2_browser_accessibility_check.sh`
-   `bash ct2_back_office/scripts/ct2_load_profile_check.sh`
-   `bash ct2_back_office/scripts/ct2_nfr_sanity_check.sh`
-   `bash ct2_back_office/scripts/ct2_role_uat_check.sh`
-   `bash ct2_back_office/scripts/ct2_route_matrix_check.sh`
-   `bash ct2_back_office/scripts/ct2_runtime_hardening_check.sh`
+3. Run `bash ct2_back_office/scripts/ct2_validation_suite.sh`.
 4. Start the app and sign in through `ct2_back_office/ct2_index.php`.
 
 ## Seeded Accounts
@@ -103,8 +96,10 @@ All seeded users use the same initial password: `ChangeMe123!`
 
 ## Technical Validation Appendix
 ### Scripted baseline
+- The strict suite is the required first pass. The checks below describe what that suite already proves and what manual QA should extend.
 - `ct2_api_post_regression_check.sh` now covers the stable JSON write endpoints for auth, agents, staff, suppliers, approvals, availability, marketing, visa, and financial flows.
 - `ct2_browser_accessibility_check.sh` now covers real keyboard tab order and focus visibility for login, dashboard navigation, agents, approvals, visa upload, and the financial export trigger.
+- `ct2_ui_regression_check.sh` now covers the shared shell and modal UI contract, including sidebar geometry, collapsed alignment, modal stacking and footer behavior, tab preservation, pagination state, toast layering, and split date/time controls.
 - `ct2_load_profile_check.sh` now covers repeated seeded timing samples for login, dashboard, filtered agents, module status, and financial export metadata.
 - `ct2_nfr_sanity_check.sh` now covers structural heading/label checks plus seeded local timing samples for login, dashboard, filtered agent search, and the module-status API.
 - `ct2_role_uat_check.sh` now covers seeded manager, front-desk, and accounting browser-role expectations, including approval access, visa access, financial denial, and CSV export.

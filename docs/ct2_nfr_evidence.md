@@ -143,7 +143,7 @@ This document records the direct non-functional evidence that currently exists i
 
 ### Cross-platform execution breadth
 - The Linux-side runtime, keyboard/focus, repeated load, and role/UAT evidence is now directly captured in-repo.
-- The remaining cross-platform gaps are the executed Windows XAMPP run and the removal of Bash delegation from `ct2_runtime_hardening_check.ps1` and `ct2_api_post_regression_check.ps1`.
+- The remaining cross-platform gap is the executed Windows XAMPP run that imports real target-environment evidence back into the repo.
 
 ## Remaining Gaps
 - Cross-platform compatibility is documented and code-aligned, but runtime evidence in-repo is still strongest on the local Linux LAMP environment rather than an executed Windows XAMPP run.

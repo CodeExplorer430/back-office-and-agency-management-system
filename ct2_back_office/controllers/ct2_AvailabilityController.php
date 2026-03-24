@@ -28,18 +28,37 @@ final class CT2_AvailabilityController extends CT2_BaseController
         ct2_require_permission('availability.view');
 
         $ct2Search = trim((string) ($_GET['search'] ?? ''));
+        $ct2Resources = $this->ct2ResourceModel->getAll($ct2Search !== '' ? $ct2Search : null);
+        $ct2Packages = $this->ct2TourPackageModel->getAll();
+        $ct2Allocations = $this->ct2ResourceAllocationModel->getAll();
+        $ct2Blocks = $this->ct2SeasonalBlockModel->getAll();
+        $ct2Vehicles = $this->ct2DispatchModel->getVehicles();
+        $ct2Drivers = $this->ct2DispatchModel->getDrivers();
+        $ct2DispatchOrders = $this->ct2DispatchModel->getDispatchOrders();
+        $ct2MaintenanceLogs = $this->ct2DispatchModel->getMaintenanceLogs();
+        $ct2ActiveTab = $this->ct2ResolveTab(['resources', 'planning', 'operations'], 'resources');
+
         $this->ct2Render(
             'availability/ct2_index',
             [
                 'ct2Suppliers' => $this->ct2SupplierModel->getAllForSelection(),
-                'ct2Resources' => $this->ct2ResourceModel->getAll($ct2Search !== '' ? $ct2Search : null),
-                'ct2Packages' => $this->ct2TourPackageModel->getAll(),
-                'ct2Allocations' => $this->ct2ResourceAllocationModel->getAll(),
-                'ct2Blocks' => $this->ct2SeasonalBlockModel->getAll(),
-                'ct2Vehicles' => $this->ct2DispatchModel->getVehicles(),
-                'ct2Drivers' => $this->ct2DispatchModel->getDrivers(),
-                'ct2DispatchOrders' => $this->ct2DispatchModel->getDispatchOrders(),
-                'ct2MaintenanceLogs' => $this->ct2DispatchModel->getMaintenanceLogs(),
+                'ct2Resources' => $ct2Resources,
+                'ct2Packages' => $ct2Packages,
+                'ct2Allocations' => $ct2Allocations,
+                'ct2Blocks' => $ct2Blocks,
+                'ct2Vehicles' => $ct2Vehicles,
+                'ct2Drivers' => $ct2Drivers,
+                'ct2DispatchOrders' => $ct2DispatchOrders,
+                'ct2MaintenanceLogs' => $ct2MaintenanceLogs,
+                'ct2VehiclePages' => $this->ct2PaginateArray($ct2Vehicles, 'vehicles_page'),
+                'ct2DriverPages' => $this->ct2PaginateArray($ct2Drivers, 'drivers_page'),
+                'ct2ResourcePages' => $this->ct2PaginateArray($ct2Resources, 'resources_page'),
+                'ct2PackagePages' => $this->ct2PaginateArray($ct2Packages, 'packages_page'),
+                'ct2AllocationPages' => $this->ct2PaginateArray($ct2Allocations, 'allocations_page'),
+                'ct2BlockPages' => $this->ct2PaginateArray($ct2Blocks, 'blocks_page'),
+                'ct2DispatchPages' => $this->ct2PaginateArray($ct2DispatchOrders, 'dispatch_page'),
+                'ct2MaintenancePages' => $this->ct2PaginateArray($ct2MaintenanceLogs, 'maintenance_page'),
+                'ct2ActiveTab' => $ct2ActiveTab,
                 'ct2ResourceSelection' => $this->ct2ResourceModel->getAllForSelection(),
                 'ct2PackageSelection' => $this->ct2TourPackageModel->getAllForSelection(),
                 'ct2AllocationSelection' => $this->ct2ResourceAllocationModel->getAllForSelection(),
@@ -71,7 +90,7 @@ final class CT2_AvailabilityController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit((int) ct2_current_user_id(), 'resource', $ct2ResourceId, 'availability.resource_create', $ct2Payload);
 
         ct2_flash('success', 'Inventory resource saved.');
-        $this->ct2Redirect(['module' => 'availability', 'action' => 'index']);
+        $this->ct2Redirect(['module' => 'availability', 'action' => 'index', 'tab' => 'resources']);
     }
 
     public function savePackage(): void
@@ -96,7 +115,7 @@ final class CT2_AvailabilityController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit((int) ct2_current_user_id(), 'tour_package', $ct2PackageId, 'availability.package_create', $ct2Payload);
 
         ct2_flash('success', 'Tour package saved.');
-        $this->ct2Redirect(['module' => 'availability', 'action' => 'index']);
+        $this->ct2Redirect(['module' => 'availability', 'action' => 'index', 'tab' => 'resources']);
     }
 
     public function saveAllocation(): void
@@ -127,7 +146,7 @@ final class CT2_AvailabilityController extends CT2_BaseController
             ct2_flash('success', 'Allocation reserved successfully.');
         }
 
-        $this->ct2Redirect(['module' => 'availability', 'action' => 'index']);
+        $this->ct2Redirect(['module' => 'availability', 'action' => 'index', 'tab' => 'planning']);
     }
 
     public function saveBlock(): void
@@ -151,7 +170,7 @@ final class CT2_AvailabilityController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit((int) ct2_current_user_id(), 'seasonal_block', $ct2BlockId, 'availability.block_create', $ct2Payload);
 
         ct2_flash('success', 'Seasonal block created.');
-        $this->ct2Redirect(['module' => 'availability', 'action' => 'index']);
+        $this->ct2Redirect(['module' => 'availability', 'action' => 'index', 'tab' => 'planning']);
     }
 
     public function saveVehicle(): void
@@ -175,7 +194,7 @@ final class CT2_AvailabilityController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit((int) ct2_current_user_id(), 'dispatch_vehicle', $ct2VehicleId, 'availability.vehicle_create', $ct2Payload);
 
         ct2_flash('success', 'Dispatch vehicle saved.');
-        $this->ct2Redirect(['module' => 'availability', 'action' => 'index']);
+        $this->ct2Redirect(['module' => 'availability', 'action' => 'index', 'tab' => 'operations']);
     }
 
     public function saveDriver(): void
@@ -197,7 +216,7 @@ final class CT2_AvailabilityController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit((int) ct2_current_user_id(), 'dispatch_driver', $ct2DriverId, 'availability.driver_create', $ct2Payload);
 
         ct2_flash('success', 'Dispatch driver saved.');
-        $this->ct2Redirect(['module' => 'availability', 'action' => 'index']);
+        $this->ct2Redirect(['module' => 'availability', 'action' => 'index', 'tab' => 'operations']);
     }
 
     public function saveDispatch(): void
@@ -205,13 +224,26 @@ final class CT2_AvailabilityController extends CT2_BaseController
         ct2_require_permission('availability.dispatch');
         $this->assertPostWithCsrf();
 
+        $ct2DispatchTimeRaw = trim((string) ($_POST['dispatch_time'] ?? ''));
+        $ct2ReturnDateRaw = trim((string) ($_POST['return_date'] ?? ''));
+        $ct2ReturnTimeRaw = trim((string) ($_POST['return_time'] ?? ''));
+        $ct2DispatchTime = (strpos($ct2DispatchTimeRaw, 'T') !== false || strpos($ct2DispatchTimeRaw, ' ') !== false)
+            ? $this->ct2ResolveDateTimeInput(['dispatch_time' => $ct2DispatchTimeRaw], 'dispatch_time')
+            : $this->ct2CombineDateAndTime((string) ($_POST['dispatch_date'] ?? ''), $ct2DispatchTimeRaw);
+        $ct2ReturnTime = '';
+        if ($ct2ReturnTimeRaw !== '') {
+            $ct2ReturnTime = ($ct2ReturnDateRaw !== '' || preg_match('/^\d{2}:\d{2}$/', $ct2ReturnTimeRaw) === 1)
+                ? $this->ct2CombineDateAndTime($ct2ReturnDateRaw, $ct2ReturnTimeRaw)
+                : $this->ct2ResolveDateTimeInput(['return_time' => $ct2ReturnTimeRaw], 'return_time');
+        }
+
         $ct2Payload = [
             'ct2_allocation_id' => (int) ($_POST['ct2_allocation_id'] ?? 0),
             'ct2_vehicle_id' => (int) ($_POST['ct2_vehicle_id'] ?? 0),
             'ct2_driver_id' => (int) ($_POST['ct2_driver_id'] ?? 0),
             'dispatch_date' => (string) ($_POST['dispatch_date'] ?? ''),
-            'dispatch_time' => (string) ($_POST['dispatch_time'] ?? ''),
-            'return_time' => trim((string) ($_POST['return_time'] ?? '')),
+            'dispatch_time' => $ct2DispatchTime,
+            'return_time' => $ct2ReturnTime,
             'start_mileage' => max(0, (int) ($_POST['start_mileage'] ?? 0)),
             'end_mileage' => max(0, (int) ($_POST['end_mileage'] ?? 0)),
             'dispatch_status' => (string) ($_POST['dispatch_status'] ?? 'scheduled'),
@@ -225,7 +257,7 @@ final class CT2_AvailabilityController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit((int) ct2_current_user_id(), 'dispatch_order', $ct2DispatchId, 'availability.dispatch_create', $ct2Payload);
 
         ct2_flash('success', 'Dispatch order saved.');
-        $this->ct2Redirect(['module' => 'availability', 'action' => 'index']);
+        $this->ct2Redirect(['module' => 'availability', 'action' => 'index', 'tab' => 'operations']);
     }
 
     public function saveMaintenance(): void
@@ -249,7 +281,7 @@ final class CT2_AvailabilityController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit((int) ct2_current_user_id(), 'maintenance_log', $ct2MaintenanceId, 'availability.maintenance_create', $ct2Payload);
 
         ct2_flash('success', 'Maintenance log saved.');
-        $this->ct2Redirect(['module' => 'availability', 'action' => 'index']);
+        $this->ct2Redirect(['module' => 'availability', 'action' => 'index', 'tab' => 'operations']);
     }
 
     private function assertPostWithCsrf(): void

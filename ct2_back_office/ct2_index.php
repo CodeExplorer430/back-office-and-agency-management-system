@@ -5,7 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/config/ct2_bootstrap.php';
 
 $ct2Module = (string) ($_GET['module'] ?? (ct2_current_user() === null ? 'auth' : 'dashboard'));
-$ct2Action = (string) ($_GET['action'] ?? ($ct2Module === 'auth' ? 'landing' : 'index'));
+$ct2Action = (string) ($_GET['action'] ?? ($ct2Module === 'auth' ? 'login' : 'index'));
 
 $ct2ControllerMap = [
     'auth' => CT2_AuthController::class,

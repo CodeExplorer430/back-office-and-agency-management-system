@@ -1,0 +1,149 @@
+name: CT2 Quality Gate
+
+on:
+  workflow_call:
+  pull_request:
+    branches:
+      - develop
+      - main
+  push:
+    branches:
+      - develop
+      - main
+  workflow_dispatch:
+
+jobs:
+  strict-suite-linux:
+    name: Strict Suite (Linux)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: ct2_back_office
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=30
+    env:
+      CT2_DB_HOST: 127.0.0.1
+      CT2_DB_PORT: 3306
+      CT2_DB_NAME: ct2_back_office
+      CT2_DB_USER: root
+      CT2_DB_PASS: root
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo_mysql
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set up Chrome
+        id: chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Install MySQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y default-mysql-client
+
+      - name: Wait for MySQL
+        run: |
+          for attempt in $(seq 1 30); do
+            if mysqladmin ping -h 127.0.0.1 -uroot -proot --silent; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "MySQL did not become healthy in time." >&2
+          exit 1
+
+      - name: Import CT2 schema
+        run: mysql -h 127.0.0.1 -uroot -proot ct2_back_office < ct2_back_office/ct2_setup.sql
+
+      - name: Run strict validation suite
+        env:
+          CHROME_BIN: ${{ steps.chrome.outputs.chrome-path }}
+        run: bash ct2_back_office/scripts/ct2_validation_suite.sh
+
+  strict-suite-powershell:
+    name: Strict Suite (PowerShell)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs:
+      - strict-suite-linux
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: ct2_back_office
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=30
+    env:
+      CT2_DB_HOST: 127.0.0.1
+      CT2_DB_PORT: 3306
+      CT2_DB_NAME: ct2_back_office
+      CT2_DB_USER: root
+      CT2_DB_PASS: root
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo_mysql
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set up Chrome
+        id: chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Install MySQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y default-mysql-client
+
+      - name: Wait for MySQL
+        run: |
+          for attempt in $(seq 1 30); do
+            if mysqladmin ping -h 127.0.0.1 -uroot -proot --silent; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "MySQL did not become healthy in time." >&2
+          exit 1
+
+      - name: Import CT2 schema
+        run: mysql -h 127.0.0.1 -uroot -proot ct2_back_office < ct2_back_office/ct2_setup.sql
+
+      - name: Run PowerShell strict validation suite
+        shell: pwsh
+        env:
+          CHROME_BIN: ${{ steps.chrome.outputs.chrome-path }}
+        run: .\ct2_back_office\scripts\ct2_validation_suite.ps1

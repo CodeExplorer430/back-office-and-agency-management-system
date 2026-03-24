@@ -23,7 +23,7 @@ This guide is the client-facing handoff for deploying `CORE TRANSACTION 2: Back-
 - Release artifact builder: `ct2_back_office/scripts/ct2_release_artifact.sh`
 - cPanel deployment automation: `ct2_back_office/scripts/ct2_cpanel_deploy.sh`
 - cPanel post-deploy verification: `ct2_back_office/scripts/ct2_cpanel_post_deploy_check.sh`
-- Approved release summary: `docs/ct2_release_summary_2026-03-24-r1.md`
+- Approved release summary: `docs/ct2_release_summary_2026-03-25-r1.md`
 - Post-install validation: `docs/ct2_manual_qa_pack.md`, `docs/ct2_api_validation.md`, and `docs/ct2_windows_xampp_validation_pack.md`
 
 ## Supported Runtime
@@ -118,5 +118,5 @@ Run the acceptance flow in this order:
 ## Release Baseline
 - `develop` remains the integration baseline for ongoing CT2 work.
 - `main` is the approved release branch.
-- The current validated CT2 release is summarized in `docs/ct2_release_summary_2026-03-24-r1.md`.
+- The current validated CT2 release is summarized in `docs/ct2_release_summary_2026-03-25-r1.md`.
 - For cPanel, deploy the artifact built from the approved release state rather than pulling a branch directly on the server.

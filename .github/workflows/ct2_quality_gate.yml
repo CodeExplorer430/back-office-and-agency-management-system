@@ -1,5 +1,12 @@
 name: CT2 Quality Gate
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ct2-quality-gate-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 on:
   workflow_call:
   pull_request:
@@ -39,7 +46,8 @@ jobs:
       NODE_OPTIONS: --experimental-websocket
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        # actions/checkout@v6.0.1
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -48,13 +56,15 @@ jobs:
           extensions: pdo_mysql
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        # actions/setup-node@v6.3.0
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version: '24'
 
       - name: Set up Chrome
         id: chrome
-        uses: browser-actions/setup-chrome@v1
+        # browser-actions/setup-chrome@v2.1.1
+        uses: browser-actions/setup-chrome@3ba2f2bc81ddf8088ecbacdea69d476631049f8b
 
       - name: Install MySQL client
         run: |
@@ -108,7 +118,8 @@ jobs:
       NODE_OPTIONS: --experimental-websocket
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        # actions/checkout@v6.0.1
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -117,13 +128,15 @@ jobs:
           extensions: pdo_mysql
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        # actions/setup-node@v6.3.0
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version: '24'
 
       - name: Set up Chrome
         id: chrome
-        uses: browser-actions/setup-chrome@v1
+        # browser-actions/setup-chrome@v2.1.1
+        uses: browser-actions/setup-chrome@3ba2f2bc81ddf8088ecbacdea69d476631049f8b
 
       - name: Install MySQL client
         run: |

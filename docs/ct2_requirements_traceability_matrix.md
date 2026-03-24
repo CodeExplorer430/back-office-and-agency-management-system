@@ -4,6 +4,8 @@
 This matrix traces the current `CORE TRANSACTION 2: Back-Office and Agency Management System` implementation against the source of truth that actually exists in this repository today. It does not claim strict conformance to a module-level CT2 diagram pack, because `docs/diagrams/` currently contains the intentionally separated organizational chart but not the CT2 workflow or requirements diagrams.
 
 ## Source Of Truth Used For This Matrix
+- `docs/ct2_quality_gate.md`
+- `ct2_back_office/scripts/ct2_validation_suite.sh`
 - `ct2_back_office/ct2_setup.sql`
 - `ct2_back_office/controllers/*`
 - `ct2_back_office/models/*`
@@ -51,9 +53,9 @@ This matrix traces the current `CORE TRANSACTION 2: Back-Office and Agency Manag
 | NFR-06 | Audit logging exists for state-changing back-office actions. | QA pack, NFR evidence | `ct2_back_office/models/ct2_AuditLogModel.php`, controller audit calls, `ct2_back_office/scripts/ct2_regression_probe.php`, `ct2_back_office/scripts/ct2_runtime_hardening_check.sh` | `docs/ct2_nfr_evidence.md`, updated QA pack audit assertions | Implemented | Representative audit assertions now directly prove both positive writes and rejected negative paths. |
 | NFR-07 | Runtime supports LAMP and Windows XAMPP through the same config contract. | Deployment guide, operator runbook | TCP-first DB config, local override template, upload/session paths, PowerShell validation entrypoints | Local LAMP validation plus deployment docs | Partially Implemented | Windows compatibility is code-aligned and PowerShell-launchable, but executed Windows evidence is still pending. |
 | NFR-08 | Release and deployment process is documented and repeatable. | Release summary, deployment guide, operator runbook | Release tag, GitHub release, release docs, smoke scripts | Published GitHub release and local release verification | Implemented | Release state is now represented in repo docs and GitHub. |
-| NFR-09 | No warnings, notices, or fatal errors under normal validated flows. | NFR evidence | Smoke scripts, route matrix script, runtime hardening script, recent CSV export fix | `docs/ct2_qa_execution_report.md`, `docs/ct2_nfr_evidence.md` | Implemented | Proved on major module routes, seeded filters, representative JSON GET endpoints, upload, approval, and export flows; not intended as exhaustive fuzzing evidence. |
+| NFR-09 | No warnings, notices, or fatal errors under normal validated flows. | NFR evidence and quality gate | Smoke scripts, route matrix script, runtime hardening script, strict validation suite, recent CSV export fix | `docs/ct2_qa_execution_report.md`, `docs/ct2_nfr_evidence.md`, `docs/ct2_quality_gate.md` | Implemented | Proved on major module routes, seeded filters, representative JSON GET endpoints, upload, approval, and export flows; current repo policy treats any new warning-like output as a blocker. |
 | NFR-10 | Performance, accessibility, and load characteristics are explicitly evidenced. | NFR evidence need | `ct2_back_office/scripts/ct2_nfr_sanity_check.sh`, `ct2_back_office/scripts/ct2_browser_accessibility_check.sh`, `ct2_back_office/scripts/ct2_load_profile_check.sh`, `docs/ct2_performance_accessibility_evidence.md`, `docs/ct2_nfr_evidence.md` | NFR sanity, browser accessibility, and repeated load sections in `docs/ct2_qa_execution_report.md` | Implemented | Evidence is explicit for the supported local runtime; this is still not a formal certification claim or large-scale performance benchmark. |
-| NFR-11 | Formatting checks cover repo text artifacts with zero warnings or drift. | Deployment and QA docs | `ct2_back_office/scripts/ct2_format_check.php`, `ct2_back_office/scripts/ct2_format_check.sh`, `ct2_back_office/scripts/ct2_format_check.ps1` | Repo-native format check output | Implemented | Covers PHP, CSS, Markdown, SQL, shell, and PowerShell text artifacts for BOM, trailing whitespace, and EOF newline hygiene. |
+| NFR-11 | Formatting checks cover repo text artifacts with zero warnings or drift. | Deployment, QA docs, and quality gate | `ct2_back_office/scripts/ct2_format_check.php`, `ct2_back_office/scripts/ct2_format_check.sh`, `ct2_back_office/scripts/ct2_format_check.ps1`, `ct2_back_office/scripts/ct2_validation_suite.sh` | Repo-native format check output and strict suite enforcement | Implemented | Covers PHP, CSS, Markdown, SQL, shell, and PowerShell text artifacts for BOM, trailing whitespace, and EOF newline hygiene. |
 
 ## Feature And Source Coverage Notes
 | ID | Requirement | Source Artifact | Implementation Evidence | Validation Evidence | Status | Notes |
@@ -65,5 +67,6 @@ This matrix traces the current `CORE TRANSACTION 2: Back-Office and Agency Manag
 
 ## Overall Assessment
 - CT2 is strongly implemented and release-validated for the repo-defined scope.
+- The current repo policy requires the strict validation suite for every new change before release or deployment.
 - The main remaining repo-owned gap is executed Windows XAMPP runtime evidence.
 - Upstream diagram traceability remains an external dependency rather than an active CT2 implementation gap in this repository.

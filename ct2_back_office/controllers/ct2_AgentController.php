@@ -25,13 +25,19 @@ final class CT2_AgentController extends CT2_BaseController
 
         $ct2Search = trim((string) ($_GET['search'] ?? ''));
         $ct2EditId = isset($_GET['edit_id']) ? (int) $_GET['edit_id'] : null;
+        $ct2Agents = $this->ct2AgentModel->getAll($ct2Search !== '' ? $ct2Search : null);
+        $ct2Assignments = $this->ct2AssignmentModel->getAll();
+        $ct2ActiveTab = $this->ct2ResolveTab(['agents', 'assignments'], 'agents');
 
         $this->ct2Render(
             'agents/ct2_index',
             [
-                'ct2Agents' => $this->ct2AgentModel->getAll($ct2Search !== '' ? $ct2Search : null),
+                'ct2Agents' => $ct2Agents,
                 'ct2AgentForEdit' => $ct2EditId !== null ? $this->ct2AgentModel->findById($ct2EditId) : null,
-                'ct2Assignments' => $this->ct2AssignmentModel->getAll(),
+                'ct2Assignments' => $ct2Assignments,
+                'ct2AgentPages' => $this->ct2PaginateArray($ct2Agents, 'agents_page'),
+                'ct2AssignmentPages' => $this->ct2PaginateArray($ct2Assignments, 'assignments_page'),
+                'ct2ActiveTab' => $ct2ActiveTab,
                 'ct2StaffOptions' => $this->ct2StaffModel->getAllForAssignments(),
                 'ct2Search' => $ct2Search,
             ]
@@ -63,7 +69,7 @@ final class CT2_AgentController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit($ct2UserId, 'agent', $ct2AgentId, $ct2Action, $ct2Payload);
 
         ct2_flash('success', 'Agent profile saved successfully.');
-        $this->ct2Redirect(['module' => 'agents', 'action' => 'index']);
+        $this->ct2Redirect(['module' => 'agents', 'action' => 'index', 'tab' => 'agents']);
     }
 
     public function assign(): void
@@ -100,7 +106,7 @@ final class CT2_AgentController extends CT2_BaseController
         );
 
         ct2_flash('success', 'Agent assignment saved successfully.');
-        $this->ct2Redirect(['module' => 'agents', 'action' => 'index']);
+        $this->ct2Redirect(['module' => 'agents', 'action' => 'index', 'tab' => 'assignments']);
     }
 
     private function ct2ValidatePayload(array $ct2Input): array

@@ -10,7 +10,7 @@ final class CT2_SupplierContractModel extends CT2_BaseModel
             'SELECT c.*, s.supplier_name, s.supplier_code
              FROM ct2_supplier_contracts AS c
              INNER JOIN ct2_suppliers AS s ON s.ct2_supplier_id = c.ct2_supplier_id
-             ORDER BY c.expiry_date ASC, c.created_at DESC'
+             ORDER BY c.created_at DESC, c.ct2_supplier_contract_id DESC'
         );
 
         return $ct2Statement->fetchAll();

@@ -1,0 +1,106 @@
+name: CT2 cPanel Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: Release version label. Leave blank to derive from the commit.
+        required: false
+        type: string
+      deploy_to_cpanel:
+        description: Deploy the validated artifact to cPanel after packaging.
+        required: true
+        default: false
+        type: boolean
+  push:
+    tags:
+      - 'ct2-v*'
+
+jobs:
+  validate-linux:
+    name: Validate (Linux)
+    uses: ./.github/workflows/ct2_quality_gate.yml
+    secrets: inherit
+
+  package-artifact:
+    name: Package Release Artifact
+    runs-on: ubuntu-latest
+    needs:
+      - validate-linux
+    outputs:
+      artifact_name: ${{ steps.package.outputs.artifact_name }}
+      artifact_path: ${{ steps.package.outputs.artifact_path }}
+      release_version: ${{ steps.package.outputs.release_version }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Package validated release artifact
+        id: package
+        run: |
+          OUTPUT_DIR="$RUNNER_TEMP/ct2-release"
+          VERSION_INPUT="${{ github.event.inputs.release_version }}"
+          if [ -n "$VERSION_INPUT" ]; then
+            bash ct2_back_office/scripts/ct2_release_artifact.sh --output-dir "$OUTPUT_DIR" --version "$VERSION_INPUT"
+            RELEASE_VERSION="$VERSION_INPUT"
+          elif [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            RELEASE_VERSION="${GITHUB_REF_NAME}"
+            bash ct2_back_office/scripts/ct2_release_artifact.sh --output-dir "$OUTPUT_DIR" --version "$RELEASE_VERSION"
+          else
+            bash ct2_back_office/scripts/ct2_release_artifact.sh --output-dir "$OUTPUT_DIR"
+            RELEASE_VERSION="$(basename "$(find "$OUTPUT_DIR" -maxdepth 1 -type f -name 'ct2-*.tar.gz' | head -n 1)" .tar.gz)"
+          fi
+          ARTIFACT_PATH="$(find "$OUTPUT_DIR" -maxdepth 1 -type f -name 'ct2-*.tar.gz' | head -n 1)"
+          if [ -z "$ARTIFACT_PATH" ]; then
+            echo "Release artifact was not created." >&2
+            exit 1
+          fi
+          echo "artifact_name=$(basename "$ARTIFACT_PATH")" >> "$GITHUB_OUTPUT"
+          echo "artifact_path=$ARTIFACT_PATH" >> "$GITHUB_OUTPUT"
+          echo "release_version=$RELEASE_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.package.outputs.artifact_name }}
+          path: |
+            ${{ steps.package.outputs.artifact_path }}
+            ${{ steps.package.outputs.artifact_path }}.sha256
+          if-no-files-found: error
+
+  deploy-cpanel:
+    name: Deploy To cPanel
+    runs-on: ubuntu-latest
+    needs:
+      - package-artifact
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_to_cpanel == 'true'
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Download validated release artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.package-artifact.outputs.artifact_name }}
+          path: ${{ runner.temp }}/ct2-release-download
+
+      - name: Install SSH key
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' '${{ secrets.CT2_CPANEL_SSH_KEY }}' > ~/.ssh/ct2_cpanel_key
+          chmod 600 ~/.ssh/ct2_cpanel_key
+
+      - name: Deploy validated release to cPanel
+        env:
+          CT2_ARTIFACT_PATH: ${{ runner.temp }}/ct2-release-download/${{ needs.package-artifact.outputs.artifact_name }}
+          CT2_RELEASE_NAME: ${{ needs.package-artifact.outputs.release_version }}
+          CT2_DEPLOY_HOST: ${{ secrets.CT2_CPANEL_HOST }}
+          CT2_DEPLOY_PORT: ${{ secrets.CT2_CPANEL_PORT }}
+          CT2_DEPLOY_USER: ${{ secrets.CT2_CPANEL_USER }}
+          CT2_DEPLOY_PATH: ${{ secrets.CT2_CPANEL_DEPLOY_PATH }}
+          CT2_SSH_KEY_PATH: ~/.ssh/ct2_cpanel_key
+          CT2_BASE_URL: ${{ secrets.CT2_CPANEL_BASE_URL }}
+          CT2_HEALTHCHECK_USERNAME: ${{ secrets.CT2_CPANEL_HEALTHCHECK_USERNAME }}
+          CT2_HEALTHCHECK_PASSWORD: ${{ secrets.CT2_CPANEL_HEALTHCHECK_PASSWORD }}
+        run: bash ct2_back_office/scripts/ct2_cpanel_deploy.sh

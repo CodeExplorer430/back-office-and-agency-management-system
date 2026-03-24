@@ -29,26 +29,38 @@ final class CT2_FinancialController extends CT2_BaseController
         if ($ct2SelectedReportId < 1 && $ct2ReportSelection !== []) {
             $ct2SelectedReportId = (int) $ct2ReportSelection[0]['ct2_financial_report_id'];
         }
+        $ct2FinancialReports = $this->ct2FinancialReportModel->getAll();
+        $ct2FinancialRuns = $this->ct2FinancialAnalyticsModel->getRuns();
+        $ct2FinancialSnapshots = $this->ct2FinancialAnalyticsModel->getSnapshots(
+            $ct2ReportRunId > 0 ? $ct2ReportRunId : null,
+            $ct2SourceModule !== '' ? $ct2SourceModule : null
+        );
+        $ct2ReconciliationFlags = $this->ct2FinancialAnalyticsModel->getFlags(
+            $ct2ReportRunId > 0 ? $ct2ReportRunId : null,
+            $ct2FlagStatus !== '' ? $ct2FlagStatus : null,
+            $ct2SourceModule !== '' ? $ct2SourceModule : null
+        );
+        $ct2SelectedReportFilters = $ct2SelectedReportId > 0
+            ? $this->ct2FinancialReportModel->getFilters($ct2SelectedReportId)
+            : [];
+        $ct2ActiveTab = $this->ct2ResolveTab(['runs', 'reports', 'analytics'], 'runs');
 
         $this->ct2Render(
             'financial/ct2_index',
             [
-                'ct2FinancialReports' => $this->ct2FinancialReportModel->getAll(),
-                'ct2FinancialRuns' => $this->ct2FinancialAnalyticsModel->getRuns(),
-                'ct2FinancialSnapshots' => $this->ct2FinancialAnalyticsModel->getSnapshots(
-                    $ct2ReportRunId > 0 ? $ct2ReportRunId : null,
-                    $ct2SourceModule !== '' ? $ct2SourceModule : null
-                ),
-                'ct2ReconciliationFlags' => $this->ct2FinancialAnalyticsModel->getFlags(
-                    $ct2ReportRunId > 0 ? $ct2ReportRunId : null,
-                    $ct2FlagStatus !== '' ? $ct2FlagStatus : null,
-                    $ct2SourceModule !== '' ? $ct2SourceModule : null
-                ),
+                'ct2FinancialReports' => $ct2FinancialReports,
+                'ct2FinancialRuns' => $ct2FinancialRuns,
+                'ct2FinancialSnapshots' => $ct2FinancialSnapshots,
+                'ct2ReconciliationFlags' => $ct2ReconciliationFlags,
+                'ct2FinancialRunPages' => $this->ct2PaginateArray($ct2FinancialRuns, 'runs_page'),
+                'ct2FinancialReportPages' => $this->ct2PaginateArray($ct2FinancialReports, 'reports_page'),
+                'ct2SelectedReportFilterPages' => $this->ct2PaginateArray($ct2SelectedReportFilters, 'filters_page'),
+                'ct2FinancialSnapshotPages' => $this->ct2PaginateArray($ct2FinancialSnapshots, 'snapshots_page'),
+                'ct2ReconciliationFlagPages' => $this->ct2PaginateArray($ct2ReconciliationFlags, 'flags_page'),
+                'ct2ActiveTab' => $ct2ActiveTab,
                 'ct2FinancialSummary' => $this->ct2FinancialAnalyticsModel->getSummary(),
                 'ct2ReportSelection' => $ct2ReportSelection,
-                'ct2SelectedReportFilters' => $ct2SelectedReportId > 0
-                    ? $this->ct2FinancialReportModel->getFilters($ct2SelectedReportId)
-                    : [],
+                'ct2SelectedReportFilters' => $ct2SelectedReportFilters,
                 'ct2ReportForEdit' => $ct2ReportEditId > 0 ? $this->ct2FinancialReportModel->findById($ct2ReportEditId) : null,
                 'ct2SelectedReportId' => $ct2SelectedReportId,
                 'ct2ReportRunId' => $ct2ReportRunId,
@@ -77,7 +89,7 @@ final class CT2_FinancialController extends CT2_BaseController
 
         $this->ct2AuditLogModel->recordAudit($ct2UserId, 'financial_report', $ct2FinancialReportId, $ct2Action, $ct2Payload);
         ct2_flash('success', 'Financial report definition saved successfully.');
-        $this->ct2Redirect(['module' => 'financial', 'action' => 'index', 'report_edit_id' => $ct2FinancialReportId, 'ct2_financial_report_id' => $ct2FinancialReportId]);
+        $this->ct2Redirect(['module' => 'financial', 'action' => 'index', 'tab' => 'reports', 'report_edit_id' => $ct2FinancialReportId, 'ct2_financial_report_id' => $ct2FinancialReportId]);
     }
 
     public function saveFilter(): void
@@ -87,10 +99,20 @@ final class CT2_FinancialController extends CT2_BaseController
 
         $ct2Payload = $this->ct2ValidateFilterPayload($_POST);
         $ct2FilterId = $this->ct2FinancialReportModel->createFilter($ct2Payload);
+        $ct2FilterPage = $this->ct2FinancialReportModel->getFilterPageForId(
+            (int) $ct2Payload['ct2_financial_report_id'],
+            $ct2FilterId
+        );
         $this->ct2AuditLogModel->recordAudit((int) ct2_current_user_id(), 'financial_report_filter', $ct2FilterId, 'financial.filter_create', $ct2Payload);
 
         ct2_flash('success', 'Report filter saved successfully.');
-        $this->ct2Redirect(['module' => 'financial', 'action' => 'index', 'ct2_financial_report_id' => (int) $ct2Payload['ct2_financial_report_id']]);
+        $this->ct2Redirect([
+            'module' => 'financial',
+            'action' => 'index',
+            'tab' => 'reports',
+            'ct2_financial_report_id' => (int) $ct2Payload['ct2_financial_report_id'],
+            'filters_page' => $ct2FilterPage,
+        ]);
     }
 
     public function runReport(): void
@@ -113,7 +135,7 @@ final class CT2_FinancialController extends CT2_BaseController
             )
         );
 
-        $this->ct2Redirect(['module' => 'financial', 'action' => 'index', 'ct2_report_run_id' => $ct2ReportRunId, 'ct2_financial_report_id' => (int) $ct2Payload['ct2_financial_report_id']]);
+        $this->ct2Redirect(['module' => 'financial', 'action' => 'index', 'tab' => 'runs', 'ct2_report_run_id' => $ct2ReportRunId, 'ct2_financial_report_id' => (int) $ct2Payload['ct2_financial_report_id']]);
     }
 
     public function resolveFlag(): void
@@ -148,6 +170,7 @@ final class CT2_FinancialController extends CT2_BaseController
                 'source_module' => trim((string) ($_POST['source_module'] ?? '')),
                 'flag_status' => trim((string) ($_POST['flag_filter_status'] ?? '')),
                 'ct2_financial_report_id' => (int) ($_POST['ct2_financial_report_id'] ?? 0),
+                'tab' => trim((string) ($_POST['tab'] ?? 'analytics')),
             ]
         );
     }

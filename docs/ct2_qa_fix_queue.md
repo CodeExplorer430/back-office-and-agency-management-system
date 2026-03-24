@@ -1,5 +1,9 @@
 # CT2 QA Fix Queue
 
+## Historical Snapshot
+- This queue records the March 10, 2026 QA blockers that were found and cleared during that release cycle.
+- Current blocking policy for new defects is defined by `docs/ct2_quality_gate.md`.
+
 ## Resolved On March 10, 2026
 
 ### Search and filter flows crash with `SQLSTATE[HY093]`
@@ -25,3 +29,4 @@
 
 ## Open Items
 - No open blocker remains from this QA milestone.
+- New warnings, notices, deprecations, runtime hardening failures, or suite regressions are treated as immediate blockers under the current strict gate.

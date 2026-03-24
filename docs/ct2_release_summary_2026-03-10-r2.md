@@ -1,5 +1,9 @@
 # CT2 Release Summary - March 10, 2026 (R2)
 
+## Historical Snapshot
+- This summary captures the promoted `main` state as of March 10, 2026.
+- The current repo-wide quality policy is stricter and is defined in `docs/ct2_quality_gate.md`.
+
 ## Release Marker
 - Branch: `main`
 - Tag: `ct2-release-2026-03-10-r2`
@@ -26,14 +30,7 @@
   - Galaxy S10 mobile shell refinements and enterprise UI polish
 
 ## Release Validation
-- Native checks:
-  - `bash ct2_back_office/scripts/ct2_format_check.sh`
-  - `bash ct2_back_office/scripts/ct2_lint.sh`
-  - `php ct2_back_office/scripts/ct2_smoke_check.php`
-  - `php ct2_back_office/scripts/ct2_db_smoke_check.php`
-  - `bash ct2_back_office/scripts/ct2_route_matrix_check.sh`
-  - `bash ct2_back_office/scripts/ct2_browser_accessibility_check.sh`
-  - `bash ct2_back_office/scripts/ct2_nfr_sanity_check.sh`
+- Native checks at the time of the release snapshot included format, lint, smoke, DB smoke, route matrix, browser accessibility, and NFR sanity.
 - Live validation completed against the local Linux LAMP/MySQL runtime for the promoted release state.
 - Windows XAMPP validation remains a documented follow-up evidence task rather than a release blocker for `main`.
 

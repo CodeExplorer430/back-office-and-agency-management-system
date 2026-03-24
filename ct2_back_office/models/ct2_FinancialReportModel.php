@@ -142,4 +142,31 @@ final class CT2_FinancialReportModel extends CT2_BaseModel
 
         return (int) $this->ct2Pdo->lastInsertId();
     }
+
+    public function getFilterPageForId(int $ct2FinancialReportId, int $ct2ReportFilterId, int $ct2PerPage = 10): int
+    {
+        $ct2PositionStatement = $this->ct2Pdo->prepare(
+            'SELECT COUNT(*) + 1 AS record_position
+             FROM ct2_report_filters AS f
+             INNER JOIN ct2_report_filters AS target
+                ON target.ct2_report_filter_id = :target_report_filter_id
+               AND target.ct2_financial_report_id = :target_financial_report_id
+             WHERE f.ct2_financial_report_id = :current_financial_report_id
+               AND (
+                    f.sort_order < target.sort_order
+                    OR (f.sort_order = target.sort_order AND f.ct2_report_filter_id < target.ct2_report_filter_id)
+               )'
+        );
+        $ct2PositionStatement->execute(
+            [
+                'target_report_filter_id' => $ct2ReportFilterId,
+                'target_financial_report_id' => $ct2FinancialReportId,
+                'current_financial_report_id' => $ct2FinancialReportId,
+            ]
+        );
+
+        $ct2Position = (int) ($ct2PositionStatement->fetchColumn() ?: 1);
+
+        return max(1, (int) ceil($ct2Position / max(1, $ct2PerPage)));
+    }
 }

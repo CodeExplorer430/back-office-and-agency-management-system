@@ -22,7 +22,7 @@ final class CT2_AuthController extends CT2_BaseController
         if (ct2_is_post()) {
             if (!ct2_verify_csrf($_POST['ct2_csrf_token'] ?? null)) {
                 ct2_flash('error', 'Your session expired. Please try again.');
-                $this->ct2Redirect(['module' => 'auth', 'action' => 'landing']);
+                $this->ct2Redirect(['module' => 'auth', 'action' => 'login']);
             }
 
             $ct2Username = trim((string) ($_POST['username'] ?? ''));
@@ -35,7 +35,7 @@ final class CT2_AuthController extends CT2_BaseController
                 || !password_verify($ct2Password, (string) $ct2User['password_hash'])
             ) {
                 ct2_flash('error', 'Invalid username or password.');
-                $this->ct2Redirect(['module' => 'auth', 'action' => 'landing']);
+                $this->ct2Redirect(['module' => 'auth', 'action' => 'login']);
             }
 
             $this->ct2UserModel->updateLastLogin((int) $ct2User['ct2_user_id']);
@@ -44,7 +44,7 @@ final class CT2_AuthController extends CT2_BaseController
 
             if ($ct2HydratedUser === null) {
                 ct2_flash('error', 'Unable to initialize your CT2 session.');
-                $this->ct2Redirect(['module' => 'auth', 'action' => 'landing']);
+                $this->ct2Redirect(['module' => 'auth', 'action' => 'login']);
             }
 
             ct2_store_user_session($ct2HydratedUser);
@@ -69,7 +69,7 @@ final class CT2_AuthController extends CT2_BaseController
             $this->ct2Redirect(['module' => 'dashboard', 'action' => 'index']);
         }
 
-        $this->ct2Render('auth/ct2_login');
+        $this->ct2Redirect(['module' => 'auth', 'action' => 'login']);
     }
 
     public function logout(): void

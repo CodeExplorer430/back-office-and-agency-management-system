@@ -77,7 +77,7 @@ try {
             'error' => 'Marketing filtered route did not render correctly',
         ],
         [
-            'url' => $ct2BaseUrl . '?module=financial&action=index&ct2_report_run_id=' . rawurlencode($ct2ReportRunId) . '&ct2_financial_report_id=' . rawurlencode($ct2FinancialReportId),
+            'url' => $ct2BaseUrl . '?module=financial&action=index&tab=reports&ct2_report_run_id=' . rawurlencode($ct2ReportRunId) . '&ct2_financial_report_id=' . rawurlencode($ct2FinancialReportId),
             'status' => 200,
             'needle' => 'Report Catalog',
             'error' => 'Financial route did not render correctly',

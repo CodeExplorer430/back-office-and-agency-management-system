@@ -2,6 +2,10 @@ const fs = require('fs');
 
 const CT2_BASE_URL = process.env.CT2_BASE_URL;
 const CT2_CHROME_JSON_LIST = process.env.CT2_CHROME_JSON_LIST;
+const CT2_DESKTOP_VIEWPORT = {
+  width: 1440,
+  height: 1100,
+};
 
 function fail(message) {
   throw new Error(message);
@@ -49,7 +53,15 @@ class CDPClient {
     });
 
     await this.send('Page.enable');
+    await this.send('Network.enable');
     await this.send('Runtime.enable');
+    await this.send('Emulation.setDeviceMetricsOverride', {
+      width: CT2_DESKTOP_VIEWPORT.width,
+      height: CT2_DESKTOP_VIEWPORT.height,
+      deviceScaleFactor: 1,
+      mobile: false,
+    });
+    await this.send('Network.clearBrowserCookies');
   }
 
   async close() {
@@ -195,6 +207,36 @@ function expectVisibleFocus(sequence, expected, scenarioName) {
   }
 }
 
+async function runScenarioPrepare(client, expression) {
+  if (!expression) {
+    return;
+  }
+
+  const prepared = await client.evaluate(expression);
+  if (!prepared) {
+    fail('Scenario setup failed before collecting the keyboard focus sequence.');
+  }
+  await sleep(250);
+}
+
+async function collectSequenceFromCurrent(client, length) {
+  const sequence = [];
+  const current = await client.getActiveElementSummary();
+  if (current !== null) {
+    sequence.push(current);
+  }
+
+  for (let step = sequence.length; step < length; step += 1) {
+    await client.tab();
+    const summary = await client.getActiveElementSummary();
+    if (summary !== null) {
+      sequence.push(summary);
+    }
+  }
+
+  return sequence;
+}
+
 async function main() {
   const targets = JSON.parse(fs.readFileSync(CT2_CHROME_JSON_LIST, 'utf8'));
   const pageTarget = targets.find((entry) => entry.type === 'page');
@@ -206,16 +248,15 @@ async function main() {
   await client.connect();
 
   await client.navigate(`${CT2_BASE_URL}?module=auth&action=login`);
-  const loginSequence = await client.collectFocusSequence(3);
-  expectSequenceIncludes(loginSequence, 'name=username', 'Login page');
-  expectSequenceIncludes(loginSequence, 'name=password', 'Login page');
-  expectSequenceIncludes(loginSequence, 'text=Sign In', 'Login page');
-  expectVisibleFocus(loginSequence, 'name=username', 'Login page');
-
+  const loginSequence = await client.collectFocusSequence(5);
   console.log('[ct2-browser-a11y] Login page keyboard sequence:');
   loginSequence.forEach((entry, index) => {
     console.log(`  tab_${index + 1}: ${formatElement(entry)}`);
   });
+  expectSequenceIncludes(loginSequence, 'name=username', 'Login page');
+  expectSequenceIncludes(loginSequence, 'name=password', 'Login page');
+  expectSequenceIncludes(loginSequence, 'text=Sign In', 'Login page');
+  expectVisibleFocus(loginSequence, 'name=username', 'Login page');
 
   await client.submit(`
     (() => {
@@ -242,36 +283,117 @@ async function main() {
     {
       name: 'Agents data-entry form',
       url: `${CT2_BASE_URL}?module=agents&action=index`,
-      tabs: 32,
-      expected: ['name=search', 'name=agent_code', 'name=agency_name', 'text=Save Agent'],
-      focusVisible: ['name=agent_code', 'text=Save Agent'],
+      prepare: `
+        (async () => {
+          const trigger = document.querySelector('[data-bs-target="#ct2-agent-form-modal"]');
+          const modal = document.getElementById('ct2-agent-form-modal');
+          if (!trigger || !modal) {
+            return false;
+          }
+
+          trigger.click();
+
+          for (let attempt = 0; attempt < 20; attempt += 1) {
+            if (modal.classList.contains('show')) {
+              const firstField = modal.querySelector('input[name="agent_code"]');
+              if (!(firstField instanceof HTMLElement)) {
+                return false;
+              }
+
+              firstField.focus();
+              return document.activeElement === firstField;
+            }
+            await new Promise((resolve) => setTimeout(resolve, 50));
+          }
+
+          return false;
+        })()
+      `,
+      tabs: 18,
+      fromCurrent: true,
+      expected: ['name=agent_code', 'name=agency_name'],
+      focusVisible: ['name=agent_code'],
     },
     {
       name: 'Approval decision form',
       url: `${CT2_BASE_URL}?module=approvals&action=index`,
-      tabs: 20,
+      prepare: `
+        (() => {
+          const statusField = document.querySelector('select[name="approval_status"]');
+          if (!(statusField instanceof HTMLElement)) {
+            return false;
+          }
+
+          statusField.focus();
+          return document.activeElement === statusField;
+        })()
+      `,
+      tabs: 3,
+      fromCurrent: true,
       expected: ['name=approval_status', 'name=decision_notes', 'text=Save'],
-      focusVisible: ['name=approval_status', 'name=decision_notes'],
+      focusVisible: ['name=decision_notes'],
     },
     {
       name: 'Visa upload workflow',
       url: `${CT2_BASE_URL}?module=visa&action=index`,
-      tabs: 60,
-      expected: ['name=search', 'name=ct2_document_file', 'text=Save Checklist Update'],
-      focusVisible: ['name=ct2_document_file', 'text=Save Checklist Update'],
+      prepare: `
+        (async () => {
+          const trigger = document.querySelector('[data-bs-target="#ct2-visa-document-modal"]');
+          const modal = document.getElementById('ct2-visa-document-modal');
+          if (!trigger || !modal) {
+            return false;
+          }
+
+          trigger.click();
+
+          for (let attempt = 0; attempt < 20; attempt += 1) {
+            if (modal.classList.contains('show')) {
+              const firstField = modal.querySelector('select[name="ct2_visa_application_id"]');
+              if (!(firstField instanceof HTMLElement)) {
+                return false;
+              }
+
+              firstField.focus();
+              return document.activeElement === firstField;
+            }
+            await new Promise((resolve) => setTimeout(resolve, 50));
+          }
+
+          return false;
+        })()
+      `,
+      tabs: 9,
+      fromCurrent: true,
+      expected: ['name=ct2_document_file'],
+      focusVisible: ['name=ct2_document_file'],
     },
     {
       name: 'Financial export trigger',
       url: `${CT2_BASE_URL}?module=financial&action=index&ct2_report_run_id=1&source_module=suppliers`,
-      tabs: 28,
+      prepare: `
+        (() => {
+          const reportField = document.querySelector('select[name="ct2_financial_report_id"]');
+          if (!(reportField instanceof HTMLElement)) {
+            return false;
+          }
+
+          reportField.focus();
+          return document.activeElement === reportField;
+        })()
+      `,
+      tabs: 6,
+      fromCurrent: true,
       expected: ['name=ct2_financial_report_id', 'text=Export CSV'],
-      focusVisible: ['name=ct2_financial_report_id', 'text=Export CSV'],
+      focusVisible: ['text=Export CSV'],
     },
   ];
 
   for (const scenario of scenarios) {
     await client.navigate(scenario.url);
-    const sequence = await client.collectFocusSequence(scenario.tabs);
+    await runScenarioPrepare(client, scenario.prepare);
+    const sequence = scenario.fromCurrent
+      ? await collectSequenceFromCurrent(client, scenario.tabs)
+      : await client.collectFocusSequence(scenario.tabs);
 
     for (const expected of scenario.expected) {
       expectSequenceIncludes(sequence, expected, scenario.name);

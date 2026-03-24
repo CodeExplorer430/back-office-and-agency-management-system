@@ -3,6 +3,10 @@
 ## Purpose
 This backlog captures the remaining repo-owned actions surfaced by `docs/ct2_requirements_traceability_matrix.md`. It excludes upstream documentation work that belongs to other teams and focuses on the validation debt that can still be closed inside this repository.
 
+## Current Quality Gate
+- The current release and merge policy is the strict full-suite gate in `docs/ct2_quality_gate.md`.
+- This backlog tracks remaining debt after the strict suite passes; it does not authorize shipping with warnings or skipped blockers.
+
 ## Priority 1
 ### Add executed Windows XAMPP runtime evidence
 - Type: Validation gap
@@ -30,5 +34,6 @@ This backlog captures the remaining repo-owned actions surfaced by `docs/ct2_req
 
 ## Current Recommendation
 - Treat CT2 as strongly hardened for the repo-defined scope.
+- Treat the strict validation suite as mandatory for every new change before deployment or handoff.
 - Treat the remaining repo-owned debt as executed Windows XAMPP evidence rather than missing core module implementation or major Linux-side validation depth.
 - Treat Windows runtime proof as post-promotion validation debt, not as a reason to hold the current `main` release state.

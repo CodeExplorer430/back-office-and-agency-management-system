@@ -33,18 +33,28 @@ final class CT2_SupplierController extends CT2_BaseController
         $ct2SupplierId = $ct2SupplierForEdit !== null
             ? (int) $ct2SupplierForEdit['ct2_supplier_id']
             : (int) ($_GET['supplier_id'] ?? 0);
+        $ct2Suppliers = $this->ct2SupplierModel->getAll($ct2Search !== '' ? $ct2Search : null);
+        $ct2Contracts = $this->ct2SupplierContractModel->getAll();
+        $ct2Kpis = $this->ct2SupplierKpiModel->getAll();
+        $ct2RelationshipNotes = $this->ct2SupplierRelationshipNoteModel->getAll();
+        $ct2ActiveTab = $this->ct2ResolveTab(['directory', 'contracts', 'performance'], 'directory');
 
         $this->ct2Render(
             'suppliers/ct2_index',
             [
-                'ct2Suppliers' => $this->ct2SupplierModel->getAll($ct2Search !== '' ? $ct2Search : null),
+                'ct2Suppliers' => $ct2Suppliers,
                 'ct2SupplierForEdit' => $ct2SupplierForEdit,
                 'ct2SupplierSelection' => $this->ct2SupplierModel->getAllForSelection(),
                 'ct2SupplierContacts' => $this->ct2SupplierModel->getPrimaryContacts(),
                 'ct2OnboardingRecords' => $this->ct2SupplierOnboardingModel->getAll(),
-                'ct2Contracts' => $this->ct2SupplierContractModel->getAll(),
-                'ct2Kpis' => $this->ct2SupplierKpiModel->getAll(),
-                'ct2RelationshipNotes' => $this->ct2SupplierRelationshipNoteModel->getAll(),
+                'ct2Contracts' => $ct2Contracts,
+                'ct2Kpis' => $ct2Kpis,
+                'ct2RelationshipNotes' => $ct2RelationshipNotes,
+                'ct2SupplierPages' => $this->ct2PaginateArray($ct2Suppliers, 'suppliers_page'),
+                'ct2ContractPages' => $this->ct2PaginateArray($ct2Contracts, 'contracts_page'),
+                'ct2KpiPages' => $this->ct2PaginateArray($ct2Kpis, 'kpis_page'),
+                'ct2RelationshipNotePages' => $this->ct2PaginateArray($ct2RelationshipNotes, 'notes_page'),
+                'ct2ActiveTab' => $ct2ActiveTab,
                 'ct2SelectedSupplierId' => $ct2SupplierId,
                 'ct2OnboardingForSelectedSupplier' => $ct2SupplierId > 0 ? $this->ct2SupplierOnboardingModel->findBySupplierId($ct2SupplierId) : null,
                 'ct2Search' => $ct2Search,
@@ -73,7 +83,7 @@ final class CT2_SupplierController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit($ct2UserId, 'supplier', $ct2SupplierId, $ct2Action, $ct2Payload);
 
         ct2_flash('success', 'Supplier profile saved successfully.');
-        $this->ct2Redirect(['module' => 'suppliers', 'action' => 'index', 'edit_id' => $ct2SupplierId]);
+        $this->ct2Redirect(['module' => 'suppliers', 'action' => 'index', 'tab' => 'directory', 'edit_id' => $ct2SupplierId]);
     }
 
     public function saveOnboarding(): void
@@ -89,7 +99,7 @@ final class CT2_SupplierController extends CT2_BaseController
             'review_notes' => trim((string) ($_POST['review_notes'] ?? '')),
             'blocked_reason' => trim((string) ($_POST['blocked_reason'] ?? '')),
             'target_go_live_date' => trim((string) ($_POST['target_go_live_date'] ?? '')),
-            'completed_at' => trim((string) ($_POST['completed_at'] ?? '')),
+            'completed_at' => $this->ct2ResolveDateTimeInput($_POST, 'completed_at'),
         ];
 
         if ($ct2Payload['ct2_supplier_id'] < 1) {
@@ -100,7 +110,7 @@ final class CT2_SupplierController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit((int) ct2_current_user_id(), 'supplier', $ct2Payload['ct2_supplier_id'], 'suppliers.onboarding_update', $ct2Payload);
 
         ct2_flash('success', 'Supplier onboarding record updated.');
-        $this->ct2Redirect(['module' => 'suppliers', 'action' => 'index', 'supplier_id' => $ct2Payload['ct2_supplier_id']]);
+        $this->ct2Redirect(['module' => 'suppliers', 'action' => 'index', 'tab' => 'directory', 'supplier_id' => $ct2Payload['ct2_supplier_id']]);
     }
 
     public function saveContract(): void
@@ -135,7 +145,7 @@ final class CT2_SupplierController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit((int) ct2_current_user_id(), 'supplier_contract', $ct2ContractId, 'suppliers.contract_create', $ct2Payload);
 
         ct2_flash('success', 'Supplier contract registered.');
-        $this->ct2Redirect(['module' => 'suppliers', 'action' => 'index', 'supplier_id' => $ct2Payload['ct2_supplier_id']]);
+        $this->ct2Redirect(['module' => 'suppliers', 'action' => 'index', 'tab' => 'contracts', 'supplier_id' => $ct2Payload['ct2_supplier_id']]);
     }
 
     public function saveKpi(): void
@@ -162,7 +172,7 @@ final class CT2_SupplierController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit((int) ct2_current_user_id(), 'supplier_kpi', $ct2KpiId, 'suppliers.kpi_create', $ct2Payload);
 
         ct2_flash('success', 'Supplier KPI measurement saved.');
-        $this->ct2Redirect(['module' => 'suppliers', 'action' => 'index', 'supplier_id' => $ct2Payload['ct2_supplier_id']]);
+        $this->ct2Redirect(['module' => 'suppliers', 'action' => 'index', 'tab' => 'performance', 'supplier_id' => $ct2Payload['ct2_supplier_id']]);
     }
 
     public function saveNote(): void
@@ -186,7 +196,7 @@ final class CT2_SupplierController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit((int) ct2_current_user_id(), 'supplier_note', $ct2NoteId, 'suppliers.note_create', $ct2Payload);
 
         ct2_flash('success', 'Supplier relationship note recorded.');
-        $this->ct2Redirect(['module' => 'suppliers', 'action' => 'index', 'supplier_id' => $ct2Payload['ct2_supplier_id']]);
+        $this->ct2Redirect(['module' => 'suppliers', 'action' => 'index', 'tab' => 'performance', 'supplier_id' => $ct2Payload['ct2_supplier_id']]);
     }
 
     private function assertPostWithCsrf(): void

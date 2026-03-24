@@ -40,25 +40,43 @@ final class CT2_MarketingController extends CT2_BaseController
         $ct2CampaignEditId = isset($_GET['campaign_edit_id']) ? (int) $_GET['campaign_edit_id'] : 0;
         $ct2PromotionEditId = isset($_GET['promotion_edit_id']) ? (int) $_GET['promotion_edit_id'] : 0;
         $ct2AffiliateEditId = isset($_GET['affiliate_edit_id']) ? (int) $_GET['affiliate_edit_id'] : 0;
+        $ct2Campaigns = $this->ct2CampaignModel->getAll(
+            $ct2Search !== '' ? $ct2Search : null,
+            $ct2CampaignStatus !== '' ? $ct2CampaignStatus : null,
+            $ct2ChannelType !== '' ? $ct2ChannelType : null
+        );
+        $ct2Promotions = $this->ct2PromotionModel->getAll();
+        $ct2Vouchers = $this->ct2VoucherModel->getAll();
+        $ct2Affiliates = $this->ct2AffiliateModel->getAll(
+            $ct2Search !== '' ? $ct2Search : null,
+            $ct2AffiliateStatus !== '' ? $ct2AffiliateStatus : null
+        );
+        $ct2ReferralClicks = $this->ct2ReferralClickModel->getAll();
+        $ct2RedemptionLogs = $this->ct2RedemptionLogModel->getAll();
+        $ct2CampaignMetrics = $this->ct2CampaignMetricModel->getAll();
+        $ct2MarketingNotes = $this->ct2MarketingNoteModel->getAll();
+        $ct2ActiveTab = $this->ct2ResolveTab(['campaigns', 'offers', 'affiliates', 'activity'], 'campaigns');
 
         $this->ct2Render(
             'marketing/ct2_index',
             [
-                'ct2Campaigns' => $this->ct2CampaignModel->getAll(
-                    $ct2Search !== '' ? $ct2Search : null,
-                    $ct2CampaignStatus !== '' ? $ct2CampaignStatus : null,
-                    $ct2ChannelType !== '' ? $ct2ChannelType : null
-                ),
-                'ct2Promotions' => $this->ct2PromotionModel->getAll(),
-                'ct2Vouchers' => $this->ct2VoucherModel->getAll(),
-                'ct2Affiliates' => $this->ct2AffiliateModel->getAll(
-                    $ct2Search !== '' ? $ct2Search : null,
-                    $ct2AffiliateStatus !== '' ? $ct2AffiliateStatus : null
-                ),
-                'ct2ReferralClicks' => $this->ct2ReferralClickModel->getAll(),
-                'ct2RedemptionLogs' => $this->ct2RedemptionLogModel->getAll(),
-                'ct2CampaignMetrics' => $this->ct2CampaignMetricModel->getAll(),
-                'ct2MarketingNotes' => $this->ct2MarketingNoteModel->getAll(),
+                'ct2Campaigns' => $ct2Campaigns,
+                'ct2Promotions' => $ct2Promotions,
+                'ct2Vouchers' => $ct2Vouchers,
+                'ct2Affiliates' => $ct2Affiliates,
+                'ct2ReferralClicks' => $ct2ReferralClicks,
+                'ct2RedemptionLogs' => $ct2RedemptionLogs,
+                'ct2CampaignMetrics' => $ct2CampaignMetrics,
+                'ct2MarketingNotes' => $ct2MarketingNotes,
+                'ct2CampaignPages' => $this->ct2PaginateArray($ct2Campaigns, 'campaigns_page'),
+                'ct2PromotionPages' => $this->ct2PaginateArray($ct2Promotions, 'promotions_page'),
+                'ct2VoucherPages' => $this->ct2PaginateArray($ct2Vouchers, 'vouchers_page'),
+                'ct2AffiliatePages' => $this->ct2PaginateArray($ct2Affiliates, 'affiliates_page'),
+                'ct2ReferralPages' => $this->ct2PaginateArray($ct2ReferralClicks, 'referrals_page'),
+                'ct2RedemptionPages' => $this->ct2PaginateArray($ct2RedemptionLogs, 'redemptions_page'),
+                'ct2MetricPages' => $this->ct2PaginateArray($ct2CampaignMetrics, 'metrics_page'),
+                'ct2NotePages' => $this->ct2PaginateArray($ct2MarketingNotes, 'notes_page'),
+                'ct2ActiveTab' => $ct2ActiveTab,
                 'ct2CampaignSummary' => $this->ct2CampaignModel->getSummaryCounts(),
                 'ct2AffiliateSummary' => $this->ct2AffiliateModel->getSummaryCounts(),
                 'ct2TopCampaigns' => $this->ct2CampaignModel->getTopCampaigns(),
@@ -99,7 +117,7 @@ final class CT2_MarketingController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit($ct2UserId, 'campaign', $ct2CampaignId, $ct2Action, $ct2Payload);
 
         ct2_flash('success', 'Marketing campaign saved successfully.');
-        $this->ct2Redirect(['module' => 'marketing', 'action' => 'index', 'campaign_edit_id' => $ct2CampaignId]);
+        $this->ct2Redirect(['module' => 'marketing', 'action' => 'index', 'tab' => 'campaigns', 'campaign_edit_id' => $ct2CampaignId]);
     }
 
     public function savePromotion(): void
@@ -123,7 +141,7 @@ final class CT2_MarketingController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit($ct2UserId, 'promotion', $ct2PromotionId, $ct2Action, $ct2Payload);
 
         ct2_flash('success', 'Promotion saved successfully.');
-        $this->ct2Redirect(['module' => 'marketing', 'action' => 'index', 'promotion_edit_id' => $ct2PromotionId]);
+        $this->ct2Redirect(['module' => 'marketing', 'action' => 'index', 'tab' => 'offers', 'promotion_edit_id' => $ct2PromotionId]);
     }
 
     public function saveVoucher(): void
@@ -162,7 +180,7 @@ final class CT2_MarketingController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit((int) ct2_current_user_id(), 'voucher', $ct2VoucherId, $ct2Action, $ct2Payload);
 
         ct2_flash('success', 'Voucher saved successfully.');
-        $this->ct2Redirect(['module' => 'marketing', 'action' => 'index']);
+        $this->ct2Redirect(['module' => 'marketing', 'action' => 'index', 'tab' => 'offers']);
     }
 
     public function saveAffiliate(): void
@@ -185,7 +203,7 @@ final class CT2_MarketingController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit($ct2UserId, 'affiliate', $ct2AffiliateId, $ct2Action, $ct2Payload);
 
         ct2_flash('success', 'Affiliate profile saved successfully.');
-        $this->ct2Redirect(['module' => 'marketing', 'action' => 'index', 'affiliate_edit_id' => $ct2AffiliateId]);
+        $this->ct2Redirect(['module' => 'marketing', 'action' => 'index', 'tab' => 'affiliates', 'affiliate_edit_id' => $ct2AffiliateId]);
     }
 
     public function saveReferral(): void
@@ -197,7 +215,7 @@ final class CT2_MarketingController extends CT2_BaseController
             'ct2_affiliate_id' => (int) ($_POST['ct2_affiliate_id'] ?? 0),
             'ct2_campaign_id' => (int) ($_POST['ct2_campaign_id'] ?? 0),
             'referral_code' => trim((string) ($_POST['referral_code'] ?? '')),
-            'click_date' => (string) ($_POST['click_date'] ?? ''),
+            'click_date' => $this->ct2ResolveDateTimeInput($_POST, 'click_date'),
             'landing_page' => trim((string) ($_POST['landing_page'] ?? '')),
             'external_customer_id' => trim((string) ($_POST['external_customer_id'] ?? '')),
             'external_booking_id' => trim((string) ($_POST['external_booking_id'] ?? '')),
@@ -213,7 +231,7 @@ final class CT2_MarketingController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit((int) ct2_current_user_id(), 'referral_click', $ct2ReferralId, 'marketing.referral_create', $ct2Payload);
 
         ct2_flash('success', 'Referral click recorded.');
-        $this->ct2Redirect(['module' => 'marketing', 'action' => 'index']);
+        $this->ct2Redirect(['module' => 'marketing', 'action' => 'index', 'tab' => 'activity']);
     }
 
     public function saveRedemption(): void
@@ -225,7 +243,7 @@ final class CT2_MarketingController extends CT2_BaseController
             'ct2_campaign_id' => (int) ($_POST['ct2_campaign_id'] ?? 0),
             'ct2_promotion_id' => (int) ($_POST['ct2_promotion_id'] ?? 0),
             'ct2_voucher_id' => (int) ($_POST['ct2_voucher_id'] ?? 0),
-            'redemption_date' => (string) ($_POST['redemption_date'] ?? ''),
+            'redemption_date' => $this->ct2ResolveDateTimeInput($_POST, 'redemption_date'),
             'external_customer_id' => trim((string) ($_POST['external_customer_id'] ?? '')),
             'external_booking_id' => trim((string) ($_POST['external_booking_id'] ?? '')),
             'redeemed_amount' => number_format((float) ($_POST['redeemed_amount'] ?? 0), 2, '.', ''),
@@ -241,7 +259,7 @@ final class CT2_MarketingController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit((int) ct2_current_user_id(), 'redemption_log', $ct2RedemptionId, 'marketing.redemption_create', $ct2Payload);
 
         ct2_flash('success', 'Redemption recorded successfully.');
-        $this->ct2Redirect(['module' => 'marketing', 'action' => 'index']);
+        $this->ct2Redirect(['module' => 'marketing', 'action' => 'index', 'tab' => 'activity']);
     }
 
     public function saveMetric(): void
@@ -272,7 +290,7 @@ final class CT2_MarketingController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit((int) ct2_current_user_id(), 'campaign_metric', $ct2MetricId, 'marketing.metric_create', $ct2Payload);
 
         ct2_flash('success', 'Campaign metrics saved.');
-        $this->ct2Redirect(['module' => 'marketing', 'action' => 'index']);
+        $this->ct2Redirect(['module' => 'marketing', 'action' => 'index', 'tab' => 'activity']);
     }
 
     public function saveNote(): void
@@ -297,7 +315,7 @@ final class CT2_MarketingController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit((int) ct2_current_user_id(), 'marketing_note', $ct2NoteId, 'marketing.note_create', $ct2Payload);
 
         ct2_flash('success', 'Marketing note recorded.');
-        $this->ct2Redirect(['module' => 'marketing', 'action' => 'index']);
+        $this->ct2Redirect(['module' => 'marketing', 'action' => 'index', 'tab' => 'activity']);
     }
 
     private function assertPostWithCsrf(): void

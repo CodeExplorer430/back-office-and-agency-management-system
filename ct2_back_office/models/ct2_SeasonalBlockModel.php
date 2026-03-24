@@ -10,7 +10,7 @@ final class CT2_SeasonalBlockModel extends CT2_BaseModel
             'SELECT b.*, r.resource_name
              FROM ct2_seasonal_blocks AS b
              INNER JOIN ct2_inventory_resources AS r ON r.ct2_resource_id = b.ct2_resource_id
-             ORDER BY b.start_date DESC'
+             ORDER BY b.created_at DESC, b.ct2_block_id DESC'
         );
 
         return $ct2Statement->fetchAll();

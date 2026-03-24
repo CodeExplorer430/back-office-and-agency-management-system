@@ -3,6 +3,10 @@
 ## Purpose
 Use this template to return the executed Windows XAMPP evidence in a form that can be copied directly into the CT2 repo docs. Fill this out after completing `docs/ct2_windows_xampp_validation_pack.md`.
 
+## Current Quality Gate
+- The Windows run is expected to satisfy the same strict policy defined in `docs/ct2_quality_gate.md`.
+- Record any warning, notice, deprecation, or skipped validation step as a failure, not as informational noise.
+
 ## Environment
 - Date:
 - Operator:
@@ -18,11 +22,13 @@ Use this template to return the executed Windows XAMPP evidence in a form that c
 ## Native Validation Results
 | Check | Result | Notes |
 | --- | --- | --- |
+| `ct2_validation_suite.ps1` | `pass / fail` | Required top-level gate for Windows evidence. |
 | `ct2_format_check.ps1` | `pass / fail` |  |
 | `ct2_lint.ps1` | `pass / fail` |  |
 | `ct2_smoke_check.ps1` | `pass / fail` |  |
 | `ct2_db_smoke_check.ps1` | `pass / fail` |  |
 | `ct2_browser_accessibility_check.ps1` or manual keyboard walkthrough | `pass / fail` |  |
+| `ct2_ui_regression_check.ps1` | `pass / fail` | Sidebar, modal, tabs, pagination, toast, and split date/time UI contract. |
 | `ct2_load_profile_check.ps1` | `pass / fail` |  |
 | `ct2_route_matrix_check.ps1` | `pass / fail` |  |
 | `ct2_runtime_hardening_check.ps1` | `pass / fail` |  |
@@ -69,3 +75,4 @@ paste the timing summary output
 ## Promotion Recommendation
 - Ready to promote `develop` to `main`: `yes / no`
 - Reason:
+- Confirm the recommendation is `no` if any strict-gate item failed or was skipped.

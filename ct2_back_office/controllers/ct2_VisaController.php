@@ -36,22 +36,40 @@ final class CT2_VisaController extends CT2_BaseController
         $ct2VisaTypeFilter = isset($_GET['ct2_visa_type_id']) ? (int) $_GET['ct2_visa_type_id'] : 0;
         $ct2VisaTypeEditId = isset($_GET['visa_type_edit_id']) ? (int) $_GET['visa_type_edit_id'] : 0;
         $ct2ApplicationEditId = isset($_GET['application_edit_id']) ? (int) $_GET['application_edit_id'] : 0;
+        $ct2VisaTypes = $this->ct2VisaTypeModel->getAll();
+        $ct2Applications = $this->ct2VisaApplicationModel->getAll(
+            $ct2Search !== '' ? $ct2Search : null,
+            $ct2Status !== '' ? $ct2Status : null,
+            $ct2VisaTypeFilter > 0 ? $ct2VisaTypeFilter : null
+        );
+        $ct2ChecklistTemplates = $this->ct2VisaChecklistModel->getTemplateItems();
+        $ct2ApplicationChecklist = $this->ct2VisaChecklistModel->getApplicationChecklist();
+        $ct2Documents = $this->ct2DocumentRegistryModel->getVisaDocuments();
+        $ct2Payments = $this->ct2VisaPaymentModel->getAll();
+        $ct2Notifications = $this->ct2NotificationLogModel->getAll();
+        $ct2VisaNotes = $this->ct2VisaNoteModel->getAll();
+        $ct2ActiveTab = $this->ct2ResolveTab(['cases', 'setup', 'documents', 'activity'], 'cases');
 
         $this->ct2Render(
             'visa/ct2_index',
             [
-                'ct2VisaTypes' => $this->ct2VisaTypeModel->getAll(),
-                'ct2Applications' => $this->ct2VisaApplicationModel->getAll(
-                    $ct2Search !== '' ? $ct2Search : null,
-                    $ct2Status !== '' ? $ct2Status : null,
-                    $ct2VisaTypeFilter > 0 ? $ct2VisaTypeFilter : null
-                ),
-                'ct2ChecklistTemplates' => $this->ct2VisaChecklistModel->getTemplateItems(),
-                'ct2ApplicationChecklist' => $this->ct2VisaChecklistModel->getApplicationChecklist(),
-                'ct2Documents' => $this->ct2DocumentRegistryModel->getVisaDocuments(),
-                'ct2Payments' => $this->ct2VisaPaymentModel->getAll(),
-                'ct2Notifications' => $this->ct2NotificationLogModel->getAll(),
-                'ct2VisaNotes' => $this->ct2VisaNoteModel->getAll(),
+                'ct2VisaTypes' => $ct2VisaTypes,
+                'ct2Applications' => $ct2Applications,
+                'ct2ChecklistTemplates' => $ct2ChecklistTemplates,
+                'ct2ApplicationChecklist' => $ct2ApplicationChecklist,
+                'ct2Documents' => $ct2Documents,
+                'ct2Payments' => $ct2Payments,
+                'ct2Notifications' => $ct2Notifications,
+                'ct2VisaNotes' => $ct2VisaNotes,
+                'ct2ApplicationPages' => $this->ct2PaginateArray($ct2Applications, 'applications_page'),
+                'ct2VisaTypePages' => $this->ct2PaginateArray($ct2VisaTypes, 'visa_types_page'),
+                'ct2ChecklistTemplatePages' => $this->ct2PaginateArray($ct2ChecklistTemplates, 'checklist_templates_page'),
+                'ct2ApplicationChecklistPages' => $this->ct2PaginateArray($ct2ApplicationChecklist, 'application_checklist_page'),
+                'ct2DocumentPages' => $this->ct2PaginateArray($ct2Documents, 'documents_page'),
+                'ct2PaymentPages' => $this->ct2PaginateArray($ct2Payments, 'payments_page'),
+                'ct2NotificationPages' => $this->ct2PaginateArray($ct2Notifications, 'notifications_page'),
+                'ct2VisaNotePages' => $this->ct2PaginateArray($ct2VisaNotes, 'visa_notes_page'),
+                'ct2ActiveTab' => $ct2ActiveTab,
                 'ct2VisaSummary' => $this->ct2VisaApplicationModel->getSummaryCounts(),
                 'ct2VisaTypeSelection' => $this->ct2VisaTypeModel->getAllForSelection(),
                 'ct2ApplicationSelection' => $this->ct2VisaApplicationModel->getAllForSelection(),
@@ -99,7 +117,7 @@ final class CT2_VisaController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit((int) ct2_current_user_id(), 'visa_type', $ct2VisaTypeId, $ct2Action, $ct2Payload);
 
         ct2_flash('success', 'Visa type saved successfully.');
-        $this->ct2Redirect(['module' => 'visa', 'action' => 'index', 'visa_type_edit_id' => $ct2VisaTypeId]);
+        $this->ct2Redirect(['module' => 'visa', 'action' => 'index', 'tab' => 'setup', 'visa_type_edit_id' => $ct2VisaTypeId]);
     }
 
     public function saveApplication(): void
@@ -128,7 +146,7 @@ final class CT2_VisaController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit($ct2UserId, 'visa_application', $ct2VisaApplicationId, $ct2Action, $ct2Payload);
 
         ct2_flash('success', 'Visa application saved successfully.');
-        $this->ct2Redirect(['module' => 'visa', 'action' => 'index', 'application_edit_id' => $ct2VisaApplicationId]);
+        $this->ct2Redirect(['module' => 'visa', 'action' => 'index', 'tab' => 'cases', 'application_edit_id' => $ct2VisaApplicationId]);
     }
 
     public function saveChecklistTemplate(): void
@@ -154,7 +172,7 @@ final class CT2_VisaController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit((int) ct2_current_user_id(), 'visa_checklist_template', $ct2ChecklistTemplateId, 'visa.checklist_template_create', $ct2Payload);
 
         ct2_flash('success', 'Checklist template item saved.');
-        $this->ct2Redirect(['module' => 'visa', 'action' => 'index']);
+        $this->ct2Redirect(['module' => 'visa', 'action' => 'index', 'tab' => 'setup']);
     }
 
     public function saveDocumentChecklist(): void
@@ -235,7 +253,7 @@ final class CT2_VisaController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit((int) ct2_current_user_id(), 'visa_application', $ct2ResolvedApplicationId, 'visa.document_checklist_update', $ct2Payload + ['ct2_application_checklist_id' => $ct2ApplicationChecklistId]);
 
         ct2_flash('success', 'Document and checklist status updated.');
-        $this->ct2Redirect(['module' => 'visa', 'action' => 'index']);
+        $this->ct2Redirect(['module' => 'visa', 'action' => 'index', 'tab' => 'documents']);
     }
 
     public function savePayment(): void
@@ -251,7 +269,7 @@ final class CT2_VisaController extends CT2_BaseController
             'currency' => trim((string) ($_POST['currency'] ?? 'PHP')),
             'payment_method' => trim((string) ($_POST['payment_method'] ?? 'Manual')),
             'payment_status' => (string) ($_POST['payment_status'] ?? 'pending'),
-            'paid_at' => trim((string) ($_POST['paid_at'] ?? '')),
+            'paid_at' => $this->ct2ResolveDateTimeInput($_POST, 'paid_at'),
             'source_system' => trim((string) ($_POST['source_system'] ?? '')),
         ];
 
@@ -263,7 +281,7 @@ final class CT2_VisaController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit((int) ct2_current_user_id(), 'visa_payment', $ct2VisaPaymentId, 'visa.payment_create', $ct2Payload);
 
         ct2_flash('success', 'Visa payment recorded.');
-        $this->ct2Redirect(['module' => 'visa', 'action' => 'index']);
+        $this->ct2Redirect(['module' => 'visa', 'action' => 'index', 'tab' => 'activity']);
     }
 
     public function saveNotification(): void
@@ -288,7 +306,7 @@ final class CT2_VisaController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit((int) ct2_current_user_id(), 'visa_notification', $ct2NotificationLogId, 'visa.notification_create', $ct2Payload);
 
         ct2_flash('success', 'Notification log saved.');
-        $this->ct2Redirect(['module' => 'visa', 'action' => 'index']);
+        $this->ct2Redirect(['module' => 'visa', 'action' => 'index', 'tab' => 'activity']);
     }
 
     public function saveNote(): void
@@ -311,7 +329,7 @@ final class CT2_VisaController extends CT2_BaseController
         $this->ct2AuditLogModel->recordAudit((int) ct2_current_user_id(), 'visa_note', $ct2VisaNoteId, 'visa.note_create', $ct2Payload);
 
         ct2_flash('success', 'Visa case note recorded.');
-        $this->ct2Redirect(['module' => 'visa', 'action' => 'index']);
+        $this->ct2Redirect(['module' => 'visa', 'action' => 'index', 'tab' => 'activity']);
     }
 
     private function assertPostWithCsrf(): void
@@ -332,7 +350,7 @@ final class CT2_VisaController extends CT2_BaseController
             'source_system' => trim((string) ($ct2Input['source_system'] ?? '')),
             'status' => (string) ($ct2Input['status'] ?? 'submitted'),
             'submission_date' => (string) ($ct2Input['submission_date'] ?? ''),
-            'appointment_date' => trim((string) ($ct2Input['appointment_date'] ?? '')),
+            'appointment_date' => $this->ct2ResolveDateTimeInput($ct2Input, 'appointment_date'),
             'embassy_reference' => trim((string) ($ct2Input['embassy_reference'] ?? '')),
             'approval_status' => (string) ($ct2Input['approval_status'] ?? 'not_required'),
             'remarks' => trim((string) ($ct2Input['remarks'] ?? '')),

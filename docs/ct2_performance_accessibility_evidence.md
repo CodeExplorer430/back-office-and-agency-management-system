@@ -3,13 +3,20 @@
 ## Purpose
 This document records the lightweight, repeatable evidence currently available for CT2 performance sanity and accessibility structure. It is not a formal audit. It captures what was actually checked in-repo, what passed on the seeded local environment, and what still requires human-operated follow-up.
 
+## Current Quality Gate
+- The browser, load, and NFR checks documented here are part of the blocking strict suite in `docs/ct2_quality_gate.md`.
+- A clean accessibility or load result does not override failures elsewhere in the suite.
+
 ## Evidence Sources
+- `bash ct2_back_office/scripts/ct2_validation_suite.sh`
 - `bash ct2_back_office/scripts/ct2_browser_accessibility_check.sh`
+- `bash ct2_back_office/scripts/ct2_ui_regression_check.sh`
 - `bash ct2_back_office/scripts/ct2_load_profile_check.sh`
 - `bash ct2_back_office/scripts/ct2_nfr_sanity_check.sh`
 - `docs/ct2_nfr_evidence.md`
 - `docs/ct2_manual_qa_pack.md`
 - `docs/ct2_windows_xampp_validation_pack.md`
+- `docs/ct2_quality_gate.md`
 
 ## Local Performance Sanity Run
 - Date: March 10, 2026
@@ -57,6 +64,24 @@ This document records the lightweight, repeatable evidence currently available f
 
 ### Accessibility interpretation
 - Structural heading and label coverage is now directly checked in-repo.
+
+## Shared UI Regression Review
+- Environment: local Linux LAMP-style PHP/MySQL stack plus headless Chrome
+- Entry point: `bash ct2_back_office/scripts/ct2_ui_regression_check.sh`
+- Method: live browser assertions against the shared authenticated shell and representative module modals after seeded admin login
+
+| Scenario Family | Result | Evidence |
+| --- | --- | --- |
+| Sidebar geometry | Pass | Expanded and collapsed sidebar states are asserted against the content shell so overlap regressions fail the gate. |
+| Collapsed alignment | Pass | Logo, toggle, and active nav icon centering are checked in the collapsed rail. |
+| Modal geometry and footer safety | Pass | Representative supplier modal is required to mount at the top-level modal host, center in the viewport, remain clickable, and keep the last field clear of the footer actions. |
+| Toast and modal layering | Pass | The toast stack is required to stay below the modal layer and must not intercept submit-button clicks while a modal is open. |
+| Tabs and pagination state | Pass | Financial tab links and supplier pagination links are required to preserve relevant query state such as active tab, source module, and page/filter params. |
+| Split date/time controls | Pass | Visa application, visa payment, and availability dispatch modals are required to render date/time fields as separate controls with no legacy `datetime-local` inputs. |
+
+### UI regression interpretation
+- CT2 now has repeatable browser-driven proof for the exact shared UI contracts that previously caused layout and modal regressions.
+- The gate is targeted rather than exhaustive, but it is designed to fail early on shell, modal, tab, pagination, and split date/time regressions that materially affect operator use.
 
 ## Browser Keyboard And Focus Walkthrough
 - Date: March 10, 2026

@@ -9,7 +9,7 @@ final class CT2_DispatchModel extends CT2_BaseModel
         $ct2Statement = $this->ct2Pdo->query(
             'SELECT *
              FROM ct2_dispatch_vehicles
-             ORDER BY plate_number ASC'
+             ORDER BY created_at DESC, ct2_vehicle_id DESC'
         );
 
         return $ct2Statement->fetchAll();
@@ -34,7 +34,7 @@ final class CT2_DispatchModel extends CT2_BaseModel
         $ct2Statement = $this->ct2Pdo->query(
             'SELECT *
              FROM ct2_dispatch_drivers
-             ORDER BY full_name ASC'
+             ORDER BY created_at DESC, ct2_driver_id DESC'
         );
 
         return $ct2Statement->fetchAll();
@@ -103,7 +103,7 @@ final class CT2_DispatchModel extends CT2_BaseModel
             'SELECT m.*, v.plate_number
              FROM ct2_maintenance_logs AS m
              INNER JOIN ct2_dispatch_vehicles AS v ON v.ct2_vehicle_id = m.ct2_vehicle_id
-             ORDER BY m.service_date DESC'
+             ORDER BY m.created_at DESC, m.ct2_maintenance_log_id DESC'
         );
 
         return $ct2Statement->fetchAll();

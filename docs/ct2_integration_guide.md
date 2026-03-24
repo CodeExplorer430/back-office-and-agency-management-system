@@ -43,7 +43,7 @@ When CT2 stores external IDs such as booking, customer, supplier, or payment ref
 ## Data And API Integration
 - JSON endpoints live under `ct2_back_office/api/`.
 - API responses must stay JSON-only with no HTML or PHP warning leakage.
-- Protected endpoints require an authenticated user and appropriate permissions such as `api.access`.
+- Protected endpoints require an authenticated user and the permissions enforced by the endpoint. `api.access` is the common baseline for the current API surface, but module-specific write authorization should still mirror the browser-side permission model.
 - Session-based browser authentication remains the default application contract.
 - Any external caller or connector should assume CT2 is enforcing role and permission checks, not anonymous public API access.
 

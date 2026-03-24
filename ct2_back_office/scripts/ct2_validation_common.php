@@ -54,6 +54,12 @@ if (!defined('CT2_VALIDATION_COMMON_LOADED')) {
         return $ct2BaseDir;
     }
 
+    function ct2SelectPort(int $preferredPort, int $maxAttempts = 25): int
+    {
+        $ct2Offset = abs((int) getmypid()) % max(1, $maxAttempts);
+        return $preferredPort + $ct2Offset;
+    }
+
     function ct2RemoveDir(string $path): void
     {
         if (!is_dir($path)) {
@@ -86,9 +92,10 @@ if (!defined('CT2_VALIDATION_COMMON_LOADED')) {
     }
 
     /**
+     * @param array<string, string> $env
      * @return array{proc: resource, log_file: string}
      */
-    function ct2StartPhpServer(int $port, string $tempDir, string $readinessPath = '?module=auth&action=login'): array
+    function ct2StartPhpServer(int $port, string $tempDir, string $readinessPath = '?module=auth&action=login', array $env = []): array
     {
         $ct2LogFile = $tempDir . DIRECTORY_SEPARATOR . 'ct2_php_server.log';
         $ct2LogHandle = fopen($ct2LogFile, 'ab');
@@ -111,7 +118,8 @@ if (!defined('CT2_VALIDATION_COMMON_LOADED')) {
                 2 => $ct2LogHandle,
             ],
             $ct2Pipes,
-            ct2RepoRoot()
+            ct2RepoRoot(),
+            $env === [] ? null : array_merge($_ENV, $env)
         );
 
         if (!is_resource($ct2Proc)) {
@@ -381,10 +389,24 @@ if (!defined('CT2_VALIDATION_COMMON_LOADED')) {
         }
     }
 
+    function ct2AssertNotContains(string $haystack, string $needle, string $message, string $prefix): void
+    {
+        if (str_contains($haystack, $needle)) {
+            ct2Fail($prefix, $message);
+        }
+    }
+
     function ct2AssertEquals(string $expected, string $actual, string $message, string $prefix): void
     {
         if ($expected !== $actual) {
             ct2Fail($prefix, sprintf('%s (expected %s, got %s)', $message, $expected, $actual));
+        }
+    }
+
+    function ct2AssertNotEquals(string $unexpected, string $actual, string $message, string $prefix): void
+    {
+        if ($unexpected === $actual) {
+            ct2Fail($prefix, sprintf('%s (unexpected %s)', $message, $actual));
         }
     }
 
@@ -457,9 +479,9 @@ if (!defined('CT2_VALIDATION_COMMON_LOADED')) {
         return trim(implode(PHP_EOL, $ct2Output));
     }
 
-    function ct2ApiLogCount(string $endpoint, int $statusCode): int
+    function ct2ApiLogCount(string $endpoint, int $statusCode, string $method = 'POST'): int
     {
-        return (int) ct2Probe('api-log-count', $endpoint, 'POST', (string) $statusCode);
+        return (int) ct2Probe('api-log-count', $endpoint, strtoupper($method), (string) $statusCode);
     }
 
     function ct2JsonValue(array $data, string $path): string
@@ -613,5 +635,46 @@ if (!defined('CT2_VALIDATION_COMMON_LOADED')) {
         if ($ct2PngData === false || file_put_contents($targetPath, $ct2PngData) === false) {
             throw new RuntimeException('Unable to build the CT2 upload fixture.');
         }
+    }
+
+    function ct2SessionCookieValue(array $session, string $cookieName = 'ct2_session'): string
+    {
+        $ct2CookieFile = $session['cookie_file'] ?? '';
+        if ($ct2CookieFile === '' || !is_file($ct2CookieFile)) {
+            throw new RuntimeException('Unable to resolve the CT2 cookie jar.');
+        }
+
+        $ct2Lines = file($ct2CookieFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        if (!is_array($ct2Lines)) {
+            throw new RuntimeException('Unable to read the CT2 cookie jar.');
+        }
+
+        $ct2CookieValue = null;
+        foreach ($ct2Lines as $ct2Line) {
+            if ($ct2Line === '') {
+                continue;
+            }
+
+            if (str_starts_with($ct2Line, '#HttpOnly_')) {
+                $ct2Line = substr($ct2Line, 10);
+            } elseif (str_starts_with($ct2Line, '#')) {
+                continue;
+            }
+
+            $ct2Parts = explode("\t", $ct2Line);
+            if (count($ct2Parts) < 7) {
+                continue;
+            }
+
+            if ($ct2Parts[5] === $cookieName) {
+                $ct2CookieValue = $ct2Parts[6];
+            }
+        }
+
+        if (!is_string($ct2CookieValue) || $ct2CookieValue === '') {
+            throw new RuntimeException('Unable to resolve cookie value for ' . $cookieName . '.');
+        }
+
+        return $ct2CookieValue;
     }
 }

@@ -11,7 +11,7 @@ Use this checklist after importing the seeded CT2 database to verify representat
 ## Preconditions
 - Import `ct2_back_office/ct2_setup.sql`.
 - Run `bash ct2_back_office/scripts/ct2_validation_suite.sh`.
-- Authenticate with a seeded account that has `api.access`, or use the browser session after logging in with `ct2admin`.
+- Authenticate with a seeded account that has `api.access`, or use the browser session after logging in with `ct2admin`. For mutating endpoint review, also confirm the caller has the module-specific permission that should govern the same action in the browser.
 
 ## Core API Expectations
 - Every endpoint returns `Content-Type: application/json`.
@@ -87,3 +87,4 @@ Use this checklist after importing the seeded CT2 database to verify representat
 - `ct2_api_post_regression_check.sh` now covers representative success, malformed-payload, and permission-boundary checks for the stable CT2 POST endpoints.
 - `ct2_role_uat_check.sh` complements the API pass by proving the seeded browser-side permission boundaries for manager, front desk, and accounting roles.
 - Manual API validation should focus on endpoint families not yet included in the scripted regression pass or on business-intent interpretation beyond raw contract safety.
+- The current scripted baseline now proves representative non-admin API RBAC parity for both read and write flows, but manual API review can still be used for deeper business-intent interpretation beyond the core contract and permission checks.

@@ -38,8 +38,9 @@ final class CT2_AuthController extends CT2_BaseController
                 $this->ct2Redirect(['module' => 'auth', 'action' => 'login']);
             }
 
+            $ct2SessionIdentifier = ct2_rotate_session_for_auth();
             $this->ct2UserModel->updateLastLogin((int) $ct2User['ct2_user_id']);
-            $this->ct2UserModel->recordSession((int) $ct2User['ct2_user_id'], session_id());
+            $this->ct2UserModel->recordSession((int) $ct2User['ct2_user_id'], $ct2SessionIdentifier);
             $ct2HydratedUser = $this->ct2UserModel->getHydratedUser((int) $ct2User['ct2_user_id']);
 
             if ($ct2HydratedUser === null) {
@@ -95,7 +96,7 @@ final class CT2_AuthController extends CT2_BaseController
         }
 
         ct2_clear_user_session();
-        session_regenerate_id(true);
+        ct2_rotate_session_for_auth();
         ct2_flash('success', 'You have been signed out.');
         $this->ct2Redirect(['module' => 'auth', 'action' => 'login']);
     }

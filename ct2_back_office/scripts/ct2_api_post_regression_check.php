@@ -12,7 +12,8 @@ $ct2Server = null;
 $ct2RunId = (string) time();
 
 try {
-    $ct2ApiBaseUrl = 'http://127.0.0.1:8094/api';
+    $ct2Port = ct2SelectPort(8094);
+    $ct2ApiBaseUrl = 'http://127.0.0.1:' . $ct2Port . '/api';
     $ct2Today = date('Y-m-d');
     $ct2Tomorrow = date('Y-m-d', strtotime('+1 day'));
     $ct2NextWeek = date('Y-m-d', strtotime('+7 day'));
@@ -40,10 +41,12 @@ try {
     $ct2FlagNote = 'CT2 API flag note ' . $ct2RunId;
 
     ct2Log($ct2Prefix, 'Starting local CT2 PHP server.');
-    $ct2Server = ct2StartPhpServer(8094, $ct2TempDir, '/api/ct2_module_status.php');
+    $ct2Server = ct2StartPhpServer($ct2Port, $ct2TempDir, '/api/ct2_module_status.php');
 
     $ct2AdminSession = ct2CreateHttpSession($ct2TempDir);
     $ct2DeskSession = ct2CreateHttpSession($ct2TempDir);
+    $ct2FinanceSession = ct2CreateHttpSession($ct2TempDir);
+    $ct2InactiveSession = ct2CreateHttpSession($ct2TempDir);
 
     $ct2PostJson = static function (?array $session, string $path, array $payload) use ($ct2ApiBaseUrl): array {
         return ct2HttpRequest('POST', $ct2ApiBaseUrl . '/' . $path, $session, [], [], json_encode($payload, JSON_UNESCAPED_SLASHES));
@@ -65,6 +68,9 @@ try {
     };
 
     ct2Log($ct2Prefix, 'Validating API authentication.');
+    $ct2ModuleStatus = $ct2GetJson($ct2AdminSession, 'ct2_module_status.php');
+    $ct2AssertJson(200, $ct2ModuleStatus, true, 'API module-status warmup did not return JSON 200');
+    $ct2AdminSessionBeforeLogin = ct2SessionCookieValue($ct2AdminSession);
     $ct2Auth401Before = ct2ApiLogCount('ct2_auth_login', 401);
     $ct2InvalidLogin = $ct2LoginApi($ct2AdminSession, 'ct2admin', 'WrongPassword!', 401, false);
     ct2AssertContains($ct2InvalidLogin['error'] ?? '', 'Invalid credentials.', 'API login invalid-credential error was not returned', $ct2Prefix);
@@ -73,14 +79,74 @@ try {
     $ct2Auth200Before = ct2ApiLogCount('ct2_auth_login', 200);
     $ct2AdminLogin = $ct2LoginApi($ct2AdminSession, 'ct2admin', 'ChangeMe123!', 200, true);
     ct2AssertEquals('ct2admin', ct2JsonValue($ct2AdminLogin, 'data.user.username'), 'API login success did not return the admin user', $ct2Prefix);
+    $ct2AdminSessionAfterLogin = ct2SessionCookieValue($ct2AdminSession);
+    ct2AssertNotEquals($ct2AdminSessionBeforeLogin, $ct2AdminSessionAfterLogin, 'API login did not rotate the CT2 session identifier', $ct2Prefix);
     ct2AssertEquals((string) ($ct2Auth200Before + 1), (string) ct2ApiLogCount('ct2_auth_login', 200), 'API login 200 log count did not increment', $ct2Prefix);
     $ct2LoginApi($ct2DeskSession, 'ct2desk', 'ChangeMe123!', 200, true);
+    $ct2LoginApi($ct2FinanceSession, 'ct2finance', 'ChangeMe123!', 200, true);
+
+    $ct2InactiveUsername = 'ct2inactive' . substr($ct2RunId, -6);
+    ct2Probe('ensure-user', $ct2InactiveUsername, 'ChangeMe123!', '0');
+    $ct2InactiveLastLoginBefore = ct2Probe('user-field', $ct2InactiveUsername, 'last_login_at');
+    $ct2InactiveSessionLogsBefore = ct2Probe('session-log-count-by-user', $ct2InactiveUsername);
+    $ct2InactiveLogin = $ct2LoginApi($ct2InactiveSession, $ct2InactiveUsername, 'ChangeMe123!', 401, false);
+    ct2AssertContains($ct2InactiveLogin['error'] ?? '', 'Invalid credentials.', 'Inactive-user API login did not return the generic auth failure message', $ct2Prefix);
+    ct2AssertEquals($ct2InactiveLastLoginBefore, ct2Probe('user-field', $ct2InactiveUsername, 'last_login_at'), 'Inactive-user API login changed last_login_at', $ct2Prefix);
+    ct2AssertEquals($ct2InactiveSessionLogsBefore, ct2Probe('session-log-count-by-user', $ct2InactiveUsername), 'Inactive-user API login created a session log entry', $ct2Prefix);
 
     ct2Log($ct2Prefix, 'Checking anonymous API denial.');
     $ct2Anon403Before = ct2ApiLogCount('ct2_agents', 403);
     $ct2AnonAgent = $ct2PostJson(null, 'ct2_agents.php', ['agent_code' => 'ANON']);
     $ct2AssertJson(403, $ct2AnonAgent, false, 'Anonymous agent POST did not return JSON 403');
     ct2AssertEquals((string) ($ct2Anon403Before + 1), (string) ct2ApiLogCount('ct2_agents', 403), 'Anonymous agent POST log count did not increment', $ct2Prefix);
+
+    ct2Log($ct2Prefix, 'Checking API permission parity for seeded non-admin roles.');
+    $ct2AgentGet403Before = ct2ApiLogCount('ct2_agents', 403, 'GET');
+    $ct2DeskAgentGet = $ct2GetJson($ct2DeskSession, 'ct2_agents.php');
+    $ct2AssertJson(403, $ct2DeskAgentGet, false, 'Desk agent GET did not return JSON 403', $ct2Prefix);
+    ct2AssertEquals((string) ($ct2AgentGet403Before + 1), (string) ct2ApiLogCount('ct2_agents', 403, 'GET'), 'Desk agent GET 403 log count did not increment', $ct2Prefix);
+
+    $ct2AgentPost403Before = ct2ApiLogCount('ct2_agents', 403);
+    $ct2DeskAgentPost = $ct2PostJson($ct2DeskSession, 'ct2_agents.php', ['agent_code' => 'DENIED']);
+    $ct2AssertJson(403, $ct2DeskAgentPost, false, 'Desk agent POST did not return JSON 403', $ct2Prefix);
+    ct2AssertEquals((string) ($ct2AgentPost403Before + 1), (string) ct2ApiLogCount('ct2_agents', 403), 'Desk agent POST 403 log count did not increment', $ct2Prefix);
+
+    $ct2ApprovalsGet = $ct2GetJson($ct2FinanceSession, 'ct2_approvals.php');
+    $ct2AssertJson(200, $ct2ApprovalsGet, true, 'Finance approvals GET did not return JSON 200', $ct2Prefix);
+
+    $ct2Approvals403Before = ct2ApiLogCount('ct2_approvals', 403);
+    $ct2FinanceApprovalPost = $ct2PostJson($ct2FinanceSession, 'ct2_approvals.php', ['ct2_approval_workflow_id' => 1, 'approval_status' => 'approved']);
+    $ct2AssertJson(403, $ct2FinanceApprovalPost, false, 'Finance approvals POST did not return JSON 403', $ct2Prefix);
+    ct2AssertEquals((string) ($ct2Approvals403Before + 1), (string) ct2ApiLogCount('ct2_approvals', 403), 'Finance approvals POST 403 log count did not increment', $ct2Prefix);
+
+    $ct2SuppliersGet = $ct2GetJson($ct2FinanceSession, 'ct2_suppliers.php');
+    $ct2AssertJson(200, $ct2SuppliersGet, true, 'Finance suppliers GET did not return JSON 200', $ct2Prefix);
+
+    $ct2Suppliers403Before = ct2ApiLogCount('ct2_suppliers', 403);
+    $ct2FinanceSupplierPost = $ct2PostJson($ct2FinanceSession, 'ct2_suppliers.php', ['supplier_code' => 'DENIED']);
+    $ct2AssertJson(403, $ct2FinanceSupplierPost, false, 'Finance suppliers POST did not return JSON 403', $ct2Prefix);
+    ct2AssertEquals((string) ($ct2Suppliers403Before + 1), (string) ct2ApiLogCount('ct2_suppliers', 403), 'Finance suppliers POST 403 log count did not increment', $ct2Prefix);
+
+    $ct2MarketingGet = $ct2GetJson($ct2FinanceSession, 'ct2_marketing_campaigns.php');
+    $ct2AssertJson(200, $ct2MarketingGet, true, 'Finance marketing GET did not return JSON 200', $ct2Prefix);
+
+    $ct2Marketing403Before = ct2ApiLogCount('ct2_marketing_campaigns', 403);
+    $ct2FinanceMarketingPost = $ct2PostJson($ct2FinanceSession, 'ct2_marketing_campaigns.php', ['campaign_code' => 'DENIED']);
+    $ct2AssertJson(403, $ct2FinanceMarketingPost, false, 'Finance marketing POST did not return JSON 403', $ct2Prefix);
+    ct2AssertEquals((string) ($ct2Marketing403Before + 1), (string) ct2ApiLogCount('ct2_marketing_campaigns', 403), 'Finance marketing POST 403 log count did not increment', $ct2Prefix);
+
+    $ct2VisaGet = $ct2GetJson($ct2FinanceSession, 'ct2_visa_applications.php');
+    $ct2AssertJson(200, $ct2VisaGet, true, 'Finance visa GET did not return JSON 200', $ct2Prefix);
+
+    $ct2Visa403Before = ct2ApiLogCount('ct2_visa_status', 403);
+    $ct2FinanceVisaPost = $ct2PostJson($ct2FinanceSession, 'ct2_visa_status.php', ['ct2_visa_application_id' => 1, 'status' => 'approved']);
+    $ct2AssertJson(403, $ct2FinanceVisaPost, false, 'Finance visa status POST did not return JSON 403', $ct2Prefix);
+    ct2AssertEquals((string) ($ct2Visa403Before + 1), (string) ct2ApiLogCount('ct2_visa_status', 403), 'Finance visa status POST 403 log count did not increment', $ct2Prefix);
+
+    $ct2AvailabilityGet403Before = ct2ApiLogCount('ct2_resources', 403, 'GET');
+    $ct2FinanceResourcesGet = $ct2GetJson($ct2FinanceSession, 'ct2_resources.php');
+    $ct2AssertJson(403, $ct2FinanceResourcesGet, false, 'Finance resources GET did not return JSON 403', $ct2Prefix);
+    ct2AssertEquals((string) ($ct2AvailabilityGet403Before + 1), (string) ct2ApiLogCount('ct2_resources', 403, 'GET'), 'Finance resources GET 403 log count did not increment', $ct2Prefix);
 
     ct2Log($ct2Prefix, 'Creating agent through API.');
     $ct2Agents422Before = ct2ApiLogCount('ct2_agents', 422);

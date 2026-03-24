@@ -42,3 +42,9 @@ This register captures repo-owned CT2 debt that is still relevant after the curr
 ### Remove duplicated validation configuration between Bash and PowerShell entrypoints
 - Candidate areas: shared parameter loading, shared host/port handling, and a common validation manifest.
 - Current mitigation: keep both `ct2_validation_suite.sh` and `ct2_validation_suite.ps1` aligned to `docs/ct2_quality_gate.md`.
+
+## Recently Resolved In Repo
+- Browser and API login now rotate the session identifier, refresh the auth-bound CSRF token, and record the post-rotation session ID.
+- API login now rejects inactive users with the same `401 Invalid credentials.` contract as other auth failures and does not mutate login metadata on rejection.
+- Browser-mode unexpected exceptions now render a generic 500 response with no internal detail leakage.
+- API read/write permissions now mirror the browser-side module permission model, and the strict suite directly proves representative non-admin denials.

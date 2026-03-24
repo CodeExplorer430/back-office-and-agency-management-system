@@ -17,18 +17,23 @@ $ct2UserModel = new CT2_UserModel();
 $ct2AuditLogModel = new CT2_AuditLogModel();
 $ct2User = $ct2UserModel->findByUsername($ct2Username);
 
-if ($ct2User === null || !password_verify($ct2Password, (string) $ct2User['password_hash'])) {
+if (
+    $ct2User === null
+    || (int) ($ct2User['is_active'] ?? 0) !== 1
+    || !password_verify($ct2Password, (string) $ct2User['password_hash'])
+) {
     ct2_record_api_log('ct2_auth_login', 'POST', 401, ['username' => $ct2Username], ['message' => 'Invalid credentials']);
     ct2_json_response(false, [], 'Invalid credentials.', 401);
 }
 
+$ct2SessionIdentifier = ct2_rotate_session_for_auth();
 $ct2UserModel->updateLastLogin((int) $ct2User['ct2_user_id']);
-$ct2UserModel->recordSession((int) $ct2User['ct2_user_id'], session_id());
+$ct2UserModel->recordSession((int) $ct2User['ct2_user_id'], $ct2SessionIdentifier);
 $ct2HydratedUser = $ct2UserModel->getHydratedUser((int) $ct2User['ct2_user_id']);
 
 if ($ct2HydratedUser === null) {
-    ct2_record_api_log('ct2_auth_login', 'POST', 500, ['username' => $ct2Username], ['message' => 'Hydration failed']);
-    ct2_json_response(false, [], 'Unable to initialize session.', 500);
+    ct2_record_api_log('ct2_auth_login', 'POST', 401, ['username' => $ct2Username], ['message' => 'Invalid credentials']);
+    ct2_json_response(false, [], 'Invalid credentials.', 401);
 }
 
 ct2_store_user_session($ct2HydratedUser);

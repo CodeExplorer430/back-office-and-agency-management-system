@@ -27,6 +27,10 @@ if (!isset($ct2ControllerMap[$ct2Module])) {
 }
 
 try {
+    if (ct2_is_validation_mode() && (string) ($_GET['ct2_validation_crash'] ?? '') === '1') {
+        throw new RuntimeException('CT2 validation fault injection.');
+    }
+
     $ct2ControllerClass = $ct2ControllerMap[$ct2Module];
     $ct2Controller = new $ct2ControllerClass();
 
@@ -43,6 +47,15 @@ try {
     $ct2FallbackAction = $ct2Module === 'auth' ? 'login' : 'index';
     ct2_redirect(['module' => $ct2FallbackModule, 'action' => $ct2FallbackAction]);
 } catch (Throwable $ct2Exception) {
-    http_response_code(500);
-    echo 'CT2 application error: ' . htmlspecialchars($ct2Exception->getMessage(), ENT_QUOTES, 'UTF-8');
+    error_log(
+        sprintf(
+            '[CT2 BROWSER ERROR] %s/%s %s: %s',
+            $ct2Module,
+            $ct2Action,
+            get_class($ct2Exception),
+            $ct2Exception->getMessage()
+        )
+    );
+
+    ct2_render_error_page(500, 'An unexpected error occurred. Please contact support.');
 }

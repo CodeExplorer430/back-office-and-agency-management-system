@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/config/ct2_bootstrap.php';
 
-if (ct2_current_user() === null || !ct2_has_permission('api.access') || !ct2_has_permission('financial.export')) {
-    ct2_record_api_log('ct2_financial_exports', $_SERVER['REQUEST_METHOD'] ?? 'GET', 403);
-    ct2_json_response(false, [], 'Forbidden.', 403);
-}
+ct2_require_api_permission('ct2_financial_exports', 'financial.export', 'financial.export');
 
 if (strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
     ct2_record_api_log('ct2_financial_exports', $_SERVER['REQUEST_METHOD'] ?? 'GET', 405);

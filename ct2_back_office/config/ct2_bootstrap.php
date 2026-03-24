@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 error_reporting(E_ALL);
-ini_set('display_errors', '1');
+ini_set('display_errors', PHP_SAPI === 'cli' ? '1' : '0');
 
 define('CT2_BASE_PATH', dirname(__DIR__));
 define('CT2_CONFIG_PATH', CT2_BASE_PATH . '/config');
@@ -22,6 +22,22 @@ if (!is_dir($ct2SessionSavePath)) {
 }
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
+    $ct2IsHttps = (
+        (!empty($_SERVER['HTTPS']) && strtolower((string) $_SERVER['HTTPS']) !== 'off')
+        || (int) ($_SERVER['SERVER_PORT'] ?? 0) === 443
+        || strtolower((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https'
+    );
+
+    ini_set('session.use_strict_mode', '1');
+    session_set_cookie_params(
+        [
+            'lifetime' => 0,
+            'path' => '/',
+            'secure' => $ct2IsHttps,
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]
+    );
     session_name('ct2_session');
     session_save_path($ct2SessionSavePath);
     session_start();
@@ -99,9 +115,15 @@ function ct2_flash(string $ct2Key, ?string $ct2Message = null): ?string
 function ct2_csrf_token(): string
 {
     if (!isset($_SESSION['ct2_csrf_token'])) {
-        $_SESSION['ct2_csrf_token'] = bin2hex(random_bytes(32));
+        return ct2_regenerate_csrf_token();
     }
 
+    return (string) $_SESSION['ct2_csrf_token'];
+}
+
+function ct2_regenerate_csrf_token(): string
+{
+    $_SESSION['ct2_csrf_token'] = bin2hex(random_bytes(32));
     return (string) $_SESSION['ct2_csrf_token'];
 }
 
@@ -138,6 +160,17 @@ function ct2_store_user_session(array $ct2User): void
 function ct2_clear_user_session(): void
 {
     unset($_SESSION['ct2_user']);
+}
+
+function ct2_rotate_session_for_auth(): string
+{
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_regenerate_id(true);
+    }
+
+    ct2_regenerate_csrf_token();
+
+    return session_id();
 }
 
 function ct2_has_permission(string $ct2PermissionKey): bool
@@ -215,6 +248,28 @@ function ct2_json_response(bool $ct2Success, array $ct2Data = [], ?string $ct2Er
     exit;
 }
 
+function ct2_api_forbidden(string $ct2EndpointName): never
+{
+    ct2_record_api_log($ct2EndpointName, strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET'), 403);
+    ct2_json_response(false, [], 'Forbidden.', 403);
+}
+
+function ct2_require_api_permission(string $ct2EndpointName, string $ct2ReadPermission, ?string $ct2WritePermission = null): void
+{
+    if (ct2_current_user() === null || !ct2_has_permission('api.access')) {
+        ct2_api_forbidden($ct2EndpointName);
+    }
+
+    $ct2Method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+    $ct2RequiredPermission = in_array($ct2Method, ['GET', 'HEAD'], true)
+        ? $ct2ReadPermission
+        : ($ct2WritePermission ?? $ct2ReadPermission);
+
+    if (!ct2_has_permission($ct2RequiredPermission)) {
+        ct2_api_forbidden($ct2EndpointName);
+    }
+}
+
 function ct2_is_api_request(): bool
 {
     $ct2ScriptFilename = realpath((string) ($_SERVER['SCRIPT_FILENAME'] ?? ''));
@@ -223,6 +278,23 @@ function ct2_is_api_request(): bool
     return $ct2ScriptFilename !== false
         && $ct2ApiPath !== false
         && strpos($ct2ScriptFilename, $ct2ApiPath . DIRECTORY_SEPARATOR) === 0;
+}
+
+function ct2_is_validation_mode(): bool
+{
+    return getenv('CT2_VALIDATION_MODE') === '1';
+}
+
+function ct2_render_error_page(int $ct2StatusCode, string $ct2Message): never
+{
+    http_response_code($ct2StatusCode);
+    header('Content-Type: text/html; charset=utf-8');
+
+    echo '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>CORE TRANSACTION 2</title></head><body>';
+    echo '<h1>CORE TRANSACTION 2</h1>';
+    echo '<p>' . htmlspecialchars($ct2Message, ENT_QUOTES, 'UTF-8') . '</p>';
+    echo '</body></html>';
+    exit;
 }
 
 function ct2_current_api_endpoint_name(): string

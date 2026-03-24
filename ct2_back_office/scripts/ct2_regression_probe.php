@@ -200,6 +200,24 @@ try {
             echo (string) ct2ProbeFlagField($ct2Pdo, $ct2SourceModule, $ct2ReferenceCode, $ct2Field);
             break;
 
+        case 'ensure-user':
+            $ct2Username = $argv[2] ?? '';
+            $ct2Password = $argv[3] ?? '';
+            $ct2IsActive = (int) ($argv[4] ?? 1);
+            echo (string) ct2EnsureValidationUser($ct2Pdo, $ct2Username, $ct2Password, $ct2IsActive);
+            break;
+
+        case 'user-field':
+            $ct2Username = $argv[2] ?? '';
+            $ct2Field = $argv[3] ?? '';
+            echo (string) ct2ProbeUserField($ct2Pdo, $ct2Username, $ct2Field);
+            break;
+
+        case 'session-log-count-by-user':
+            $ct2Username = $argv[2] ?? '';
+            echo (string) ct2ProbeSessionLogCountByUser($ct2Pdo, $ct2Username);
+            break;
+
         default:
             throw new InvalidArgumentException('Unknown CT2 regression probe command: ' . $ct2Command);
     }
@@ -459,6 +477,87 @@ function ct2ProbeFlagField(PDO $ct2Pdo, string $ct2SourceModule, string $ct2Refe
     }
 
     return (string) $ct2Value;
+}
+
+function ct2EnsureValidationUser(PDO $ct2Pdo, string $ct2Username, string $ct2Password, int $ct2IsActive): int
+{
+    if ($ct2Username === '' || $ct2Password === '') {
+        throw new InvalidArgumentException('ensure-user requires username and password.');
+    }
+
+    $ct2Statement = $ct2Pdo->prepare(
+        'INSERT INTO ct2_users (
+            username, email, password_hash, display_name, is_active, last_login_at
+         ) VALUES (
+            :username, :email, :password_hash, :display_name, :is_active, NULL
+         )
+         ON DUPLICATE KEY UPDATE
+            email = VALUES(email),
+            password_hash = VALUES(password_hash),
+            display_name = VALUES(display_name),
+            is_active = VALUES(is_active),
+            last_login_at = NULL'
+    );
+    $ct2Statement->execute(
+        [
+            'username' => $ct2Username,
+            'email' => $ct2Username . '@example.com',
+            'password_hash' => password_hash($ct2Password, PASSWORD_DEFAULT),
+            'display_name' => 'CT2 Validation User ' . $ct2Username,
+            'is_active' => $ct2IsActive === 1 ? 1 : 0,
+        ]
+    );
+
+    return (int) ct2ProbeUserField($ct2Pdo, $ct2Username, 'ct2_user_id');
+}
+
+function ct2ProbeUserField(PDO $ct2Pdo, string $ct2Username, string $ct2Field): string
+{
+    $ct2AllowedFields = ['ct2_user_id', 'last_login_at', 'is_active'];
+    if ($ct2Username === '') {
+        throw new InvalidArgumentException('user-field requires a username.');
+    }
+
+    if (!in_array($ct2Field, $ct2AllowedFields, true)) {
+        throw new InvalidArgumentException('Unsupported user field: ' . $ct2Field);
+    }
+
+    $ct2Statement = $ct2Pdo->prepare(
+        sprintf(
+            'SELECT %s FROM ct2_users WHERE username = :username LIMIT 1',
+            $ct2Field
+        )
+    );
+    $ct2Statement->execute(['username' => $ct2Username]);
+    $ct2Value = $ct2Statement->fetchColumn();
+
+    if ($ct2Value === false) {
+        throw new RuntimeException('Unable to resolve user: ' . $ct2Username);
+    }
+
+    return $ct2Value === null ? 'null' : (string) $ct2Value;
+}
+
+function ct2ProbeSessionLogCountByUser(PDO $ct2Pdo, string $ct2Username): int
+{
+    if ($ct2Username === '') {
+        throw new InvalidArgumentException('session-log-count-by-user requires a username.');
+    }
+
+    $ct2Statement = $ct2Pdo->prepare(
+        'SELECT COUNT(*)
+         FROM ct2_session_logs AS sl
+         INNER JOIN ct2_users AS u ON u.ct2_user_id = sl.ct2_user_id
+         WHERE u.username = :username'
+    );
+    $ct2Statement->execute(['username' => $ct2Username]);
+    $ct2Value = $ct2Statement->fetchColumn();
+
+    if ($ct2Value === false) {
+        throw new RuntimeException('Unable to count session logs for user: ' . $ct2Username);
+    }
+
+    return (int) $ct2Value;
 }
 
 function ct2ProbeFlagReferenceTarget(string $ct2SourceModule): array

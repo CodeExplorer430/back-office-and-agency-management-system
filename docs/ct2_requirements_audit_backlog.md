@@ -28,12 +28,16 @@ This backlog captures the remaining repo-owned actions surfaced by `docs/ct2_req
 - Add real browser-driven keyboard and focus evidence for login, nav, approvals, visa upload, and financial export.
 - Add broader repeated load sampling beyond the earlier single-pass timing run.
 - Add seeded role-specific UAT evidence for manager, front desk, and accounting workflows.
+- Rotate the browser and API session identifier after successful login and refresh the auth-bound CSRF token lifecycle.
+- Align representative API read and write permissions to the browser-side module RBAC model and prove seeded non-admin denials in the strict suite.
+- Sanitize browser-mode unexpected exceptions behind a generic 500 contract and prove it with a validation-only fault path.
+- Add inactive-account API login regression coverage and consistent `401` handling with no side effects.
 
 ## External Dependency Note
 - Upstream CT2 module workflow diagrams and requirements packs are still absent from `docs/diagrams/`. The organizational chart is intentionally separate actor/context material and does not replace the missing workflow diagrams. That source-of-truth gap is owned by the documentation teams rather than this CT2 implementation workstream.
 
 ## Current Recommendation
-- Treat CT2 as strongly hardened for the repo-defined scope.
+- Treat CT2 as broadly implemented and well-covered by validators, including the auth/session and API hardening batch completed on March 25, 2026.
 - Treat the strict validation suite as mandatory for every new change before deployment or handoff.
-- Treat the remaining repo-owned debt as executed Windows XAMPP evidence rather than missing core module implementation or major Linux-side validation depth.
+- Treat the remaining repo-owned debt as executed Windows XAMPP evidence rather than missing broad module implementation or core Linux-side hardening.
 - Treat Windows runtime proof as post-promotion validation debt, not as a reason to hold the current `main` release state.

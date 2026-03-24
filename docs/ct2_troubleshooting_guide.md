@@ -46,7 +46,7 @@ Use this guide to diagnose and recover from the most common CT2 setup, deploymen
 - Re-run the runtime hardening suite if the failure followed a code or deployment change.
 
 ### Export or API failures
-- Confirm the user has the required permission such as `financial.export` or `api.access`.
+- Confirm the user has the required permission such as `financial.export` or `api.access`, plus any module-specific permission expected for the same action in the browser.
 - Confirm the endpoint returns JSON or CSV with the correct headers.
 - Check for HTML leakage, PHP notices, or warning text in the response body.
 - Re-run:

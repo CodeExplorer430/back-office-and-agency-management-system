@@ -32,10 +32,14 @@ This document records the direct non-functional evidence that currently exists i
 
 ## Directly Proven
 ### Security controls
-- Session-backed authentication and role-based route/API restrictions are exercised through the DB smoke check, manual QA pack, runtime hardening script, and the API POST regression script.
+- Session-backed authentication and representative route/API restrictions are exercised through the DB smoke check, manual QA pack, runtime hardening script, and the API POST regression script.
+- Successful browser and API login are now directly proven to rotate the CT2 session identifier, and the browser hardening path now directly proves the auth-bound CSRF token changes after login.
 - Invalid CSRF tokens are now directly proven to be rejected for representative protected browser writes in approvals, supplier onboarding, availability resource creation, marketing campaign save, visa checklist verification, and financial report generation.
 - Stale-session write attempts are directly proven to be redirected to the login flow without persisting an update on both agent and financial write paths.
 - Protected API failures are directly proven to stay JSON-shaped on representative `401`, `403`, `405`, and `422` paths.
+- Inactive-user API login is now directly proven to fail with the generic `401` auth contract and without session-log or `last_login_at` side effects.
+- Representative browser/API permission parity is now directly proven for seeded non-admin roles across agent, approvals, supplier, marketing, visa, availability, and financial endpoint families.
+- Unexpected browser exceptions are now directly proven to return a generic 500 response with no leaked internal exception detail.
 
 ### Audit logging
 - Representative write paths now have direct repeatable audit evidence:
@@ -97,13 +101,17 @@ This document records the direct non-functional evidence that currently exists i
   and split date/time modal controls on visa and availability flows.
 - The API POST regression script now covers:
   auth login,
+  session rotation on successful API login,
+  inactive-user API denial with no side effects,
   anonymous denial,
   malformed-payload `422` handling,
   representative create/update flows across agents, staff, suppliers, approvals, availability, marketing, visa, and financial modules,
-  and permission-sensitive `403` handling for financial write endpoints.
+  and permission-sensitive `403` handling for representative non-admin read/write paths across CT2.
 - The runtime hardening script now covers:
   admin sign-in,
+  browser session rotation and CSRF refresh after login,
   dashboard load,
+  generic browser 500 handling through a validation-only fault path,
   availability search/read path,
   agent update,
   supplier onboarding, contract, KPI, and relationship-note paths,
@@ -150,6 +158,6 @@ This document records the direct non-functional evidence that currently exists i
 - Formatting checks now exist repo-wide, but they must still be kept in the active validation workflow whenever docs, scripts, SQL, or CSS are touched.
 
 ## Current Recommendation
-- Treat CT2 security, audit, API write coverage, route breadth, keyboard/focus reachability, repeated load sanity, and role/UAT evidence as materially stronger than the earlier release-only state.
-- Treat the executed Windows XAMPP run as the main remaining repo-owned non-functional validation debt.
+- Treat CT2 security, audit, route breadth, keyboard/focus reachability, repeated load sanity, and role/UAT evidence as materially stronger than the earlier release-only state.
+- Treat the executed Windows XAMPP run as the main remaining repo-owned non-functional debt.
 - Treat that Windows evidence gap as deferred cross-platform follow-up rather than a blocker for the current approved `main` release baseline.

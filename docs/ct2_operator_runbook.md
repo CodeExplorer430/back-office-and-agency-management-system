@@ -102,7 +102,7 @@ Use `docs/ct2_troubleshooting_guide.md` for the detailed recovery playbook. The 
 - Confirm the uploaded document matches the allowed file types in the visa workflow.
 
 ### API problems
-- Confirm the user has `api.access` when required.
+- Confirm the user has `api.access` when required, plus any module-specific permission expected for the same action in the browser.
 - Verify the endpoint still returns `application/json`.
 - Check for PHP notices or HTML leakage in the response body.
 

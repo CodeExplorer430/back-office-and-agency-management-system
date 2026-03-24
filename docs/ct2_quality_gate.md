@@ -24,10 +24,16 @@ Run:
 
 `bash ct2_back_office/scripts/ct2_validation_suite.sh`
 
+If browser accessibility or UI regression will run on Node.js 20.10+, export
+`NODE_OPTIONS=--experimental-websocket` first. Node.js 22+ does not require the flag.
+
 ### Windows and native PowerShell environments
 Run:
 
 `powershell -ExecutionPolicy Bypass -File .\ct2_back_office\scripts\ct2_validation_suite.ps1`
+
+If browser accessibility or UI regression will run on Node.js 20.10+, set
+`NODE_OPTIONS=--experimental-websocket` first. Node.js 22+ does not require the flag.
 
 ## CI And Deployment Enforcement
 - The repository-level blocking gate is `.github/workflows/ct2_quality_gate.yml`.

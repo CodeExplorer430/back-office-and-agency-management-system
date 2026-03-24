@@ -36,6 +36,7 @@ jobs:
       CT2_DB_NAME: ct2_back_office
       CT2_DB_USER: root
       CT2_DB_PASS: root
+      NODE_OPTIONS: --experimental-websocket
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -104,6 +105,7 @@ jobs:
       CT2_DB_NAME: ct2_back_office
       CT2_DB_USER: root
       CT2_DB_PASS: root
+      NODE_OPTIONS: --experimental-websocket
     steps:
       - name: Check out repository
         uses: actions/checkout@v4

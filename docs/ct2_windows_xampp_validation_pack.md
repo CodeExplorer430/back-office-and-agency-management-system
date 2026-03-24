@@ -15,6 +15,7 @@ Use `docs/ct2_windows_xampp_result_template.md` as the required return format fo
 - PHP with `pdo_mysql` enabled
 - Windows PowerShell
 - PowerShell for the native CT2 validation entrypoints
+- Node.js 22 or newer, or Node.js 20.10+ with `NODE_OPTIONS=--experimental-websocket`, for browser accessibility and UI regression automation
 
 ## Configuration Steps
 1. Check out the validated CT2 branch you intend to verify.
@@ -30,6 +31,7 @@ Use `docs/ct2_windows_xampp_result_template.md` as the required return format fo
 Run the blocking aggregate suite from Windows PowerShell in the repo root:
 
 ```powershell
+$env:NODE_OPTIONS="--experimental-websocket"
 powershell -ExecutionPolicy Bypass -File .\ct2_back_office\scripts\ct2_validation_suite.ps1
 ```
 

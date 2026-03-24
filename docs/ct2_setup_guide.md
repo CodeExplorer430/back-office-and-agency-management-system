@@ -16,7 +16,9 @@ Use this guide to stand up CT2 for the first time in a local, staging, or produc
   - `ct2_back_office/storage/sessions/`
   - `ct2_back_office/storage/uploads/`
 - Browser access for the manual verification flow
-- Chrome or Chromium plus `node` if the full browser/runtime suite will run on the target
+- Chrome or Chromium plus `node`
+- For the browser accessibility and UI regression runners:
+  use Node.js 22 or newer, or Node.js 20.10+ with `NODE_OPTIONS=--experimental-websocket`
 
 ## Setup Steps
 ### 1. Place the code or release artifact
@@ -60,6 +62,8 @@ Use this guide to stand up CT2 for the first time in a local, staging, or produc
 - Run the blocking validation suite:
   - `bash ct2_back_office/scripts/ct2_validation_suite.sh`
   - `powershell -ExecutionPolicy Bypass -File .\ct2_back_office\scripts\ct2_validation_suite.ps1`
+- If the suite will execute browser accessibility or UI regression on Node.js 20, export
+  `NODE_OPTIONS=--experimental-websocket` before running the suite.
 - Then run the human walkthroughs as needed:
   - `docs/ct2_manual_qa_pack.md`
   - `docs/ct2_api_validation.md`

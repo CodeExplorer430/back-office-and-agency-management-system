@@ -63,6 +63,8 @@ Use this guide to diagnose and recover from the most common CT2 setup, deploymen
 ### Strict suite failure
 - Read the first failing gate in `ct2_validation_suite.sh`; do not treat later gates as actionable until the first one is fixed.
 - Warnings, notices, and deprecations are blockers, not informational output.
+- If browser accessibility or UI regression fails with `WebSocket is not defined`, run the suite on Node.js 22+ or set
+  `NODE_OPTIONS=--experimental-websocket` on Node.js 20.10+ before rerunning.
 
 ### GitHub Actions passes but cPanel fails
 - Compare runtime config, writable paths, and PHP extension state between CI and cPanel.

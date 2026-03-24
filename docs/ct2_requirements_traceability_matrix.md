@@ -15,7 +15,7 @@ This matrix traces the current `CORE TRANSACTION 2: Back-Office and Agency Manag
 - `docs/ct2_api_validation.md`
 - `docs/ct2_qa_execution_report.md`
 - `docs/ct2_nfr_evidence.md`
-- `docs/ct2_release_summary_2026-03-10-r2.md`
+- `docs/ct2_release_summary_2026-03-24-r1.md`
 - `docs/ct2_deployment_guide.md`
 - `docs/ct2_operator_runbook.md`
 - `docs/ct2_technical_debt_register.md`

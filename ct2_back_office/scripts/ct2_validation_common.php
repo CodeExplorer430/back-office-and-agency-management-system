@@ -56,8 +56,27 @@ if (!defined('CT2_VALIDATION_COMMON_LOADED')) {
 
     function ct2SelectPort(int $preferredPort, int $maxAttempts = 25): int
     {
-        $ct2Offset = abs((int) getmypid()) % max(1, $maxAttempts);
-        return $preferredPort + $ct2Offset;
+        $ct2Attempts = max(1, $maxAttempts);
+        $ct2StartOffset = abs((int) getmypid()) % $ct2Attempts;
+
+        for ($ct2Index = 0; $ct2Index < $ct2Attempts; $ct2Index++) {
+            $ct2Candidate = $preferredPort + (($ct2StartOffset + $ct2Index) % $ct2Attempts);
+            $ct2Socket = @stream_socket_client(
+                'tcp://127.0.0.1:' . $ct2Candidate,
+                $ct2ErrorCode,
+                $ct2ErrorMessage,
+                0.2
+            );
+            if (!is_resource($ct2Socket)) {
+                return $ct2Candidate;
+            }
+
+            if (is_resource($ct2Socket)) {
+                fclose($ct2Socket);
+            }
+        }
+
+        throw new RuntimeException('Unable to select a free local validation port.');
     }
 
     function ct2RemoveDir(string $path): void

@@ -95,7 +95,12 @@ try {
     ct2AssertContains($ct2Dashboard['body'], 'Back-Office Dashboard', 'Dashboard content did not render', $ct2Prefix);
 
     ct2Log($ct2Prefix, 'Verifying generic browser 500 handling.');
-    $ct2Fault = $ct2Get($ct2BaseUrl . '?module=auth&action=login&ct2_validation_crash=1');
+    $ct2Fault = ct2HttpRequest(
+        'GET',
+        $ct2BaseUrl . '?module=auth&action=login&ct2_validation_crash=1',
+        $ct2Session,
+        ['X-CT2-Validation-Mode' => '1']
+    );
     ct2AssertStatus(500, $ct2Fault, 'Validation-only browser fault did not return 500', $ct2Prefix);
     ct2AssertContains($ct2Fault['body'], 'An unexpected error occurred. Please contact support.', 'Browser 500 response did not render the generic message', $ct2Prefix);
     ct2AssertNotContains($ct2Fault['body'], 'CT2 validation fault injection.', 'Browser 500 response leaked the validation exception message', $ct2Prefix);

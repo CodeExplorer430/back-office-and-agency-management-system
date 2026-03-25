@@ -35,7 +35,7 @@ This guide is the client-facing handoff for deploying `CORE TRANSACTION 2: Back-
   `ct2_back_office/storage/uploads/`
 
 ## Pre-Install Checklist
-1. Use the validated release artifact produced by `.github/workflows/ct2_cpanel_release.yml` or build one locally with `bash ct2_back_office/scripts/ct2_release_artifact.sh`.
+1. Use the validated release artifact produced by `.github/workflows/ct2_cpanel_release_pipeline.yml` or build one locally with `bash ct2_back_office/scripts/ct2_release_artifact.sh`.
 2. Create a MySQL database named `ct2_back_office`.
 3. Confirm the target host can reach MySQL over TCP, typically `127.0.0.1:3306`.
 4. Confirm PHP can write to `ct2_back_office/storage/`.

@@ -30,6 +30,10 @@ This document defines the release path for the primary CT2 hosting target: cPane
 - `CT2_CPANEL_HEALTHCHECK_USERNAME`
 - `CT2_CPANEL_HEALTHCHECK_PASSWORD`
 
+## Optional GitHub Secrets
+- `CT2_CPANEL_PUBLIC_PATH`
+  Use this when CT2 is exposed under a shared-domain path such as `/ct2` instead of a dedicated cPanel document root. The workflow passes it through to the deploy script, which maintains a symlink like `public_html/ct2 -> <deploy-path>/current/ct2_back_office`.
+
 ## Required cPanel Directory Contract
 - Release root: `<deploy-path>/releases/<release-name>`
 - Active symlink: `<deploy-path>/current`
@@ -37,6 +41,13 @@ This document defines the release path for the primary CT2 hosting target: cPane
 - Shared uploads: `<deploy-path>/shared/storage/uploads/`
 - Shared sessions: `<deploy-path>/shared/storage/sessions/`
 - cPanel document root should resolve to `<deploy-path>/current/ct2_back_office`
+
+## Shared-Domain Path Contract
+- For shared cPanel accounts hosting multiple systems on one domain, keep CT2 isolated outside `public_html` at a dedicated deploy root such as `/home/<user>/apps/ct2`.
+- Set `CT2_CPANEL_PUBLIC_PATH` to a public path such as `/home/<user>/public_html/ct2`.
+- The deploy workflow will refresh that path to point at `<deploy-path>/current/ct2_back_office` on each successful release.
+- Set `CT2_CPANEL_BASE_URL` to the matching public URL, for example `https://example.com/ct2`.
+- Do not place CT2 releases, shared config, or writable storage directly inside another system's public tree.
 
 ## Validation Split
 ### In GitHub Actions

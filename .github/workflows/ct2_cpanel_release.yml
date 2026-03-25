@@ -110,6 +110,7 @@ jobs:
           CT2_DEPLOY_PORT: ${{ secrets.CT2_CPANEL_PORT }}
           CT2_DEPLOY_USER: ${{ secrets.CT2_CPANEL_USER }}
           CT2_DEPLOY_PATH: ${{ secrets.CT2_CPANEL_DEPLOY_PATH }}
+          CT2_PUBLIC_PATH: ${{ secrets.CT2_CPANEL_PUBLIC_PATH }}
           CT2_SSH_KEY_PATH: ~/.ssh/ct2_cpanel_key
           CT2_BASE_URL: ${{ secrets.CT2_CPANEL_BASE_URL }}
           CT2_HEALTHCHECK_USERNAME: ${{ secrets.CT2_CPANEL_HEALTHCHECK_USERNAME }}

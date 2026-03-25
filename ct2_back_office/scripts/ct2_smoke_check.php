@@ -93,7 +93,7 @@ $ct2RequiredFiles = [
     __DIR__ . '/../../docs/ct2_quality_gate.md',
     __DIR__ . '/../../docs/ct2_cpanel_release_flow.md',
     __DIR__ . '/../../.github/workflows/ct2_quality_gate.yml',
-    __DIR__ . '/../../.github/workflows/ct2_cpanel_release.yml',
+    __DIR__ . '/../../.github/workflows/ct2_cpanel_release_pipeline.yml',
 ];
 
 $ct2MissingFiles = [];

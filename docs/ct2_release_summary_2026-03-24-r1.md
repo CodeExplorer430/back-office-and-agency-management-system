@@ -42,7 +42,7 @@
 
 ## Deployment Notes
 - Deploy the validated artifact built from `main`, not a feature branch checkout.
-- Use `.github/workflows/ct2_cpanel_release.yml` or `bash ct2_back_office/scripts/ct2_release_artifact.sh` to produce the release artifact.
+- Use `.github/workflows/ct2_cpanel_release_pipeline.yml` or `bash ct2_back_office/scripts/ct2_release_artifact.sh` to produce the release artifact.
 - Import `ct2_back_office/ct2_setup.sql` into a clean `ct2_back_office` database for first-time setup.
 - Keep runtime credentials in shared config or environment variables, not in the release tree.
 - Treat `bash ct2_back_office/scripts/ct2_cpanel_post_deploy_check.sh` and `bash ct2_back_office/scripts/ct2_live_http_health_check.sh` as blocking for cPanel completion.

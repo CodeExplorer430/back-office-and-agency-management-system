@@ -32,7 +32,7 @@
 
 ## Deployment Notes
 - Deploy the validated artifact built from `main`, not a feature branch checkout.
-- Use `.github/workflows/ct2_cpanel_release.yml` or `bash ct2_back_office/scripts/ct2_release_artifact.sh` to produce the release artifact.
+- Use `.github/workflows/ct2_cpanel_release_pipeline.yml` or `bash ct2_back_office/scripts/ct2_release_artifact.sh` to produce the release artifact.
 - Keep runtime credentials in shared config or environment variables, not in the release tree.
 - Use the shared cPanel contract:
   - deploy root: `/home/icarusim/apps/ct2`

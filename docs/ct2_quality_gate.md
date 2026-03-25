@@ -37,7 +37,7 @@ If browser accessibility or UI regression will run on Node.js 20.10+, set
 
 ## CI And Deployment Enforcement
 - The repository-level blocking gate is `.github/workflows/ct2_quality_gate.yml`.
-- cPanel release packaging and optional SSH deployment are orchestrated by `.github/workflows/ct2_cpanel_release.yml`.
+- cPanel release packaging and optional SSH deployment are orchestrated by `.github/workflows/ct2_cpanel_release_pipeline.yml`.
 - The supported CI baseline is GitHub-hosted runners. If self-hosted GitHub Actions runners are introduced later, validate that their runner version satisfies the minimum requirements of the pinned Node 24-based marketplace actions before treating them as equivalent.
 - Artifact publication is allowed only after the strict suite is green.
 - Shared-domain cPanel deployments may additionally use `CT2_CPANEL_PUBLIC_PATH` so the deploy workflow can refresh a public path such as `public_html/ct2` to the active `current/ct2_back_office` release.

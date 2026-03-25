@@ -17,7 +17,7 @@ This runbook is for the technical deployment or support team responsible for ope
 ## Branch And Release Policy
 - `develop` is the current integrated CT2 branch.
 - `main` is the release branch.
-- The current approved CT2 release is tracked in `docs/ct2_release_summary_2026-03-25-r1.md`.
+- The current approved CT2 release is tracked in `docs/ct2_release_summary_2026-03-25-r2.md`.
 - GitHub Actions is the blocking release gate and cPanel is the primary deployment target.
 - Windows XAMPP evidence remains a deferred cross-platform validation task. It should be completed and copied back into the repo, but it no longer blocks promotion of the current approved release state into `main`.
 - Do not deploy directly from unreviewed feature branches.

@@ -24,6 +24,7 @@ CT2_RELEASE_NAME="${CT2_RELEASE_NAME:-$(basename "$CT2_ARTIFACT_PATH" .tar.gz)}"
 CT2_KEEP_RELEASES="${CT2_KEEP_RELEASES:-5}"
 CT2_REMOTE_ARTIFACT="/tmp/${CT2_RELEASE_NAME}.tar.gz"
 CT2_PUBLIC_PATH="${CT2_PUBLIC_PATH:-}"
+CT2_SSH_KEY_USE_AGENT="${CT2_SSH_KEY_USE_AGENT:-0}"
 ct2_base_url_q="$(printf '%q' "$CT2_BASE_URL")"
 ct2_health_user_q="$(printf '%q' "${CT2_HEALTHCHECK_USERNAME:-}")"
 ct2_health_pass_q="$(printf '%q' "${CT2_HEALTHCHECK_PASSWORD:-}")"
@@ -35,13 +36,23 @@ if [[ ! -f "$CT2_ARTIFACT_PATH" ]]; then
 fi
 
 ct2_ssh() {
-  ssh -i "$CT2_SSH_KEY_PATH" -p "$CT2_DEPLOY_PORT" -o StrictHostKeyChecking=no \
-    "$CT2_DEPLOY_USER@$CT2_DEPLOY_HOST" "$@"
+  if [[ "$CT2_SSH_KEY_USE_AGENT" == '1' ]]; then
+    ssh -p "$CT2_DEPLOY_PORT" -o StrictHostKeyChecking=no \
+      "$CT2_DEPLOY_USER@$CT2_DEPLOY_HOST" "$@"
+  else
+    ssh -i "$CT2_SSH_KEY_PATH" -p "$CT2_DEPLOY_PORT" -o StrictHostKeyChecking=no \
+      "$CT2_DEPLOY_USER@$CT2_DEPLOY_HOST" "$@"
+  fi
 }
 
 ct2_scp() {
-  scp -i "$CT2_SSH_KEY_PATH" -P "$CT2_DEPLOY_PORT" -o StrictHostKeyChecking=no \
-    "$CT2_ARTIFACT_PATH" "$CT2_DEPLOY_USER@$CT2_DEPLOY_HOST:$CT2_REMOTE_ARTIFACT"
+  if [[ "$CT2_SSH_KEY_USE_AGENT" == '1' ]]; then
+    scp -P "$CT2_DEPLOY_PORT" -o StrictHostKeyChecking=no \
+      "$CT2_ARTIFACT_PATH" "$CT2_DEPLOY_USER@$CT2_DEPLOY_HOST:$CT2_REMOTE_ARTIFACT"
+  else
+    scp -i "$CT2_SSH_KEY_PATH" -P "$CT2_DEPLOY_PORT" -o StrictHostKeyChecking=no \
+      "$CT2_ARTIFACT_PATH" "$CT2_DEPLOY_USER@$CT2_DEPLOY_HOST:$CT2_REMOTE_ARTIFACT"
+  fi
 }
 
 printf '[ct2-cpanel-deploy] Uploading validated artifact.\n'

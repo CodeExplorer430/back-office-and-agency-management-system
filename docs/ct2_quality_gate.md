@@ -41,6 +41,7 @@ If browser accessibility or UI regression will run on Node.js 20.10+, set
 - The supported CI baseline is GitHub-hosted runners. If self-hosted GitHub Actions runners are introduced later, validate that their runner version satisfies the minimum requirements of the pinned Node 24-based marketplace actions before treating them as equivalent.
 - Artifact publication is allowed only after the strict suite is green.
 - Shared-domain cPanel deployments may additionally use `CT2_CPANEL_PUBLIC_PATH` so the deploy workflow can refresh a public path such as `public_html/ct2` to the active `current/ct2_back_office` release.
+- If `CT2_CPANEL_SSH_KEY` is encrypted, provide `CT2_CPANEL_SSH_PASSPHRASE` so the deploy workflow can unlock the key in `ssh-agent` before upload and release activation.
 - cPanel deployment is not complete until the post-deploy verification path passes:
   - `bash ct2_back_office/scripts/ct2_cpanel_post_deploy_check.sh`
   - `bash ct2_back_office/scripts/ct2_live_http_health_check.sh`

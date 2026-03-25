@@ -33,6 +33,8 @@ This document defines the release path for the primary CT2 hosting target: cPane
 ## Optional GitHub Secrets
 - `CT2_CPANEL_PUBLIC_PATH`
   Use this when CT2 is exposed under a shared-domain path such as `/ct2` instead of a dedicated cPanel document root. The workflow passes it through to the deploy script, which maintains a symlink like `public_html/ct2 -> <deploy-path>/current/ct2_back_office`.
+- `CT2_CPANEL_SSH_PASSPHRASE`
+  Use this when `CT2_CPANEL_SSH_KEY` is encrypted. The release workflow unlocks the deploy key in `ssh-agent` before the cPanel deploy step runs.
 
 ## Required cPanel Directory Contract
 - Release root: `<deploy-path>/releases/<release-name>`

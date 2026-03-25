@@ -117,10 +117,7 @@ jobs:
           echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> "$GITHUB_ENV"
           echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> "$GITHUB_ENV"
           if [ -n "${CT2_SSH_KEY_PASSPHRASE:-}" ]; then
-            cat > ~/.ssh/ct2_askpass.sh <<'EOF'
-#!/usr/bin/env bash
-printf '%s\n' "$CT2_SSH_KEY_PASSPHRASE"
-EOF
+            printf '%s\n' '#!/usr/bin/env bash' "printf '%s\n' \"\$CT2_SSH_KEY_PASSPHRASE\"" > ~/.ssh/ct2_askpass.sh
             chmod 700 ~/.ssh/ct2_askpass.sh
             export SSH_ASKPASS=~/.ssh/ct2_askpass.sh
             export SSH_ASKPASS_REQUIRE=force

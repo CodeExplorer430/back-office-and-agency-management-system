@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>CT2 System Workflow And Process Guide</title>
+  <style>
+    body {
+      font-family: "Liberation Sans", Arial, sans-serif;
+      color: #1f2933;
+      margin: 2.2cm;
+      line-height: 1.45;
+    }
+    h1, h2, h3 {
+      color: #102a43;
+      page-break-after: avoid;
+    }
+    h1 {
+      font-size: 24pt;
+      margin-bottom: 0.2cm;
+    }
+    h2 {
+      font-size: 16pt;
+      margin-top: 0.8cm;
+      border-bottom: 1px solid #bcccdc;
+      padding-bottom: 0.12cm;
+    }
+    h3 {
+      font-size: 12pt;
+      margin-top: 0.55cm;
+    }
+    p, li {
+      font-size: 10.5pt;
+    }
+    .subtitle {
+      color: #486581;
+      font-size: 11pt;
+      margin-bottom: 0.8cm;
+    }
+    .meta {
+      background: #f0f4f8;
+      border: 1px solid #d9e2ec;
+      padding: 0.35cm 0.45cm;
+      margin: 0.5cm 0 0.8cm;
+    }
+    .meta p {
+      margin: 0.08cm 0;
+    }
+    .note {
+      background: #fffbea;
+      border-left: 4px solid #f0b429;
+      padding: 0.3cm 0.4cm;
+      margin: 0.45cm 0;
+    }
+    .grid {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.35cm 0 0.6cm;
+    }
+    .grid th,
+    .grid td {
+      border: 1px solid #bcccdc;
+      padding: 0.2cm 0.24cm;
+      vertical-align: top;
+      text-align: left;
+      font-size: 9.8pt;
+    }
+    .grid th {
+      background: #f0f4f8;
+      color: #102a43;
+    }
+    code {
+      font-family: "Liberation Mono", "Courier New", monospace;
+      font-size: 9.5pt;
+    }
+    ul, ol {
+      margin-top: 0.15cm;
+      margin-bottom: 0.25cm;
+    }
+  </style>
+</head>
+<body>
+  <h1>CT2 System Workflow And Process Guide</h1>
+  <p class="subtitle">Core Transaction 2: Back-Office and Agency Management System</p>
+
+  <div class="meta">
+    <p><strong>Audience:</strong> owners, operators, deployment engineers, QA leads, and support staff</p>
+    <p><strong>Application root:</strong> <code>ct2_back_office/</code></p>
+    <p><strong>Entry point:</strong> <code>ct2_back_office/ct2_index.php</code></p>
+    <p><strong>Release workflow:</strong> <code>.github/workflows/ct2_cpanel_release_pipeline.yml</code></p>
+    <p><strong>Primary hosting model:</strong> validated artifact deployment to cPanel with shared config and storage</p>
+  </div>
+
+  <h2>1. Executive Overview</h2>
+  <p>
+    CT2 is the back-office operating layer for travel-and-tours processing. It gives staff a controlled browser and
+    API surface for operational work across agents, suppliers, approvals, availability, marketing, visa operations,
+    staff administration, and financial reporting. CT2 is not the owner of every business record in the wider ERP.
+    It is designed to reference upstream records where necessary while keeping ownership of its own workflow,
+    approval, audit, reporting, and operational state.
+  </p>
+  <p>
+    In practice, CT2 acts as the controlled execution layer between source systems and human operators. The system is
+    optimized for internal users, not for anonymous public traffic, and its deployment and release process is built
+    around a strict validation gate, artifact packaging, and cPanel deployment over SSH.
+  </p>
+
+  <h2>2. System Boundaries</h2>
+  <h3>What CT2 owns</h3>
+  <ul>
+    <li>Back-office workflow state for agents, suppliers, staffing, availability, marketing, visa cases, and approvals</li>
+    <li>Internal audit logs, approval decisions, relationship notes, KPI notes, report definitions, and operational uploads</li>
+    <li>Session-based browser authentication and the CT2 browser/API permission model</li>
+  </ul>
+
+  <h3>What CT2 does not own</h3>
+  <ul>
+    <li>CT1 or other upstream booking-origin records</li>
+    <li>Customer master data managed in external systems</li>
+    <li>External payment platforms and authoritative finance ledgers</li>
+    <li>Third-party identity or SSO ownership</li>
+  </ul>
+
+  <div class="note">
+    <strong>Boundary rule:</strong> when CT2 stores a booking ID, customer ID, supplier reference, or payment reference,
+    it is storing a linkage pointer, not taking ownership of the source record.
+  </div>
+
+  <h2>3. Architecture And Runtime Model</h2>
+  <table class="grid">
+    <thead>
+      <tr>
+        <th>Layer</th>
+        <th>Current implementation</th>
+        <th>Operational meaning</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Presentation</td>
+        <td>Vanilla PHP views in <code>ct2_back_office/views/</code></td>
+        <td>Browser-facing modules render directly through PHP without a framework build step</td>
+      </tr>
+      <tr>
+        <td>Routing</td>
+        <td><code>ct2_back_office/ct2_index.php</code></td>
+        <td>Module and action are selected through query parameters such as <code>?module=auth&amp;action=login</code></td>
+      </tr>
+      <tr>
+        <td>Controllers</td>
+        <td><code>ct2_back_office/controllers/</code></td>
+        <td>Controllers coordinate request validation, permissions, model calls, and rendering</td>
+      </tr>
+      <tr>
+        <td>Models</td>
+        <td><code>ct2_back_office/models/</code></td>
+        <td>Models encapsulate MySQL persistence and reporting reads/writes</td>
+      </tr>
+      <tr>
+        <td>API surface</td>
+        <td><code>ct2_back_office/api/</code></td>
+        <td>JSON endpoints mirror protected CT2 operations for scripted or AJAX use</td>
+      </tr>
+      <tr>
+        <td>Runtime bootstrap</td>
+        <td><code>ct2_back_office/config/ct2_bootstrap.php</code></td>
+        <td>Starts sessions, loads config, enforces shared helpers, CSRF, auth, and error handling</td>
+      </tr>
+      <tr>
+        <td>Database</td>
+        <td>MySQL or MariaDB seeded from <code>ct2_back_office/ct2_setup.sql</code></td>
+        <td>Provides schema, roles, demo users, and baseline validation data</td>
+      </tr>
+      <tr>
+        <td>Writable state</td>
+        <td><code>storage/sessions/</code> and <code>storage/uploads/</code></td>
+        <td>Must stay writable and outside version control; in cPanel they are linked from shared storage</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>4. Primary Modules And Their Operational Workflow</h2>
+  <table class="grid">
+    <thead>
+      <tr>
+        <th>Module</th>
+        <th>Operational purpose</th>
+        <th>Typical process flow</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Dashboard</td>
+        <td>Operational summary and queue visibility</td>
+        <td>Login, review counts and exceptions, identify pending work, drill into the owning module</td>
+      </tr>
+      <tr>
+        <td>Agents</td>
+        <td>Back-office registry of agency relationships and assignments</td>
+        <td>Create or update agent records, link staff assignments, review approvals, monitor bookings and commissions</td>
+      </tr>
+      <tr>
+        <td>Suppliers</td>
+        <td>Partner onboarding, contracts, KPI tracking, and relationship notes</td>
+        <td>Review supplier readiness, update onboarding blockers, inspect contracts and KPIs, add notes, move records through approval</td>
+      </tr>
+      <tr>
+        <td>Availability</td>
+        <td>Packages, resource allocation, vehicle/driver dispatch, and seasonal or maintenance scheduling</td>
+        <td>Match resources to demand, dispatch assignments, record seasonal blocks, adjust availability constraints</td>
+      </tr>
+      <tr>
+        <td>Marketing</td>
+        <td>Campaign workflow, promotions, vouchers, affiliate tracking, and metrics</td>
+        <td>Prepare campaigns, review approval state, track clicks and redemptions, update notes, publish or revise offers</td>
+      </tr>
+      <tr>
+        <td>Financial</td>
+        <td>Snapshot reporting, reconciliation flags, and export generation</td>
+        <td>Review report runs, inspect open flags, update reconciliation state, export CSV for operational reporting</td>
+      </tr>
+      <tr>
+        <td>Visa</td>
+        <td>Visa application workflow, document checklist, payment tracking, and notifications</td>
+        <td>Intake cases, update checklist state, upload supporting files, monitor payments and appointment status, resolve exceptions</td>
+      </tr>
+      <tr>
+        <td>Staff</td>
+        <td>Internal staff records and assignment context</td>
+        <td>Maintain operating staff information, support agent and dispatch workflows, enforce role-aware visibility</td>
+      </tr>
+      <tr>
+        <td>Approvals</td>
+        <td>Decision queue for cross-module controlled changes</td>
+        <td>Review pending approvals, record decision notes, approve or reject, propagate final state to the owning module</td>
+      </tr>
+      <tr>
+        <td>Auth</td>
+        <td>Entry, session lifecycle, and logout</td>
+        <td>Authenticate through session-based login, rotate session identifiers, refresh CSRF state, terminate securely on logout</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>5. End-To-End Business Process Sequence</h2>
+  <ol>
+    <li>An operator signs in through the browser login route and lands on the dashboard.</li>
+    <li>The dashboard highlights pending operational items across agents, suppliers, dispatch, approvals, visa cases, and finance.</li>
+    <li>The operator enters the appropriate module, reviews seeded or live rows, and performs the required action.</li>
+    <li>State-changing operations are protected by session auth, CSRF validation, and permission checks.</li>
+    <li>Representative updates generate audit-log entries so operator actions remain traceable.</li>
+    <li>Where approval is required, the change is surfaced in the approvals queue and must be decided by an authorized role.</li>
+    <li>Uploads and exports use persistent runtime storage and must survive release switches.</li>
+    <li>Operational reporting and CSV output are treated as CT2 outputs, not as the master finance ledger.</li>
+  </ol>
+
+  <h2>6. Roles And Permission Model</h2>
+  <p>
+    CT2 uses a seeded role model to separate administrative, managerial, operational, and finance access. Browser access
+    is session-based, while protected JSON endpoints require authentication and permission checks that mirror the same
+    module boundaries.
+  </p>
+  <table class="grid">
+    <thead>
+      <tr>
+        <th>Seeded user</th>
+        <th>Role</th>
+        <th>Primary use</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>ct2admin</code></td>
+        <td><code>system_admin</code></td>
+        <td>Full cross-module administration and validation</td>
+      </tr>
+      <tr>
+        <td><code>ct2manager</code></td>
+        <td><code>back_office_manager</code></td>
+        <td>Approvals, dashboard review, supplier and marketing management</td>
+      </tr>
+      <tr>
+        <td><code>ct2lead</code></td>
+        <td><code>team_lead</code></td>
+        <td>Supplier follow-up, availability planning, and operational coordination</td>
+      </tr>
+      <tr>
+        <td><code>ct2desk</code></td>
+        <td><code>front_desk_agent</code></td>
+        <td>Visa intake and front-office operational flows</td>
+      </tr>
+      <tr>
+        <td><code>ct2finance</code></td>
+        <td><code>accounting_staff</code></td>
+        <td>Financial review, reconciliation, and export operations</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>
+    The current hardened contract requires browser and API authorization to stay aligned. Read actions must require the
+    same view permissions as the equivalent browser module, and mutating actions must require the corresponding manage,
+    decide, dispatch, or export permission as applicable.
+  </p>
+
+  <h2>7. Request, Session, API, And Audit Flow</h2>
+  <h3>Browser request lifecycle</h3>
+  <ol>
+    <li>The browser hits <code>ct2_index.php</code> with a target module and action.</li>
+    <li>Bootstrap loads configuration, current session state, CSRF helpers, and permission helpers.</li>
+    <li>The front controller maps the module to a controller class.</li>
+    <li>The controller validates access, reads or writes through the model layer, and renders the matching PHP view.</li>
+    <li>Unexpected browser exceptions are logged server-side and shown to the user as a generic error page, not raw exception text.</li>
+  </ol>
+
+  <h3>Authentication and session hardening</h3>
+  <ul>
+    <li>Successful browser and API login rotates the session identifier.</li>
+    <li>CSRF state is refreshed when auth state changes.</li>
+    <li>Inactive users are denied consistently.</li>
+    <li>Logout closes the current session context and starts a fresh unauthenticated session state.</li>
+  </ul>
+
+  <h3>API contract</h3>
+  <ul>
+    <li>JSON endpoints live under <code>ct2_back_office/api/</code>.</li>
+    <li>Responses must remain JSON-only, with no HTML or warning leakage.</li>
+    <li>Endpoints inherit session-authenticated access and permission enforcement.</li>
+    <li><code>api.access</code> remains the baseline gate, with module-level permissions applied for read and write parity.</li>
+  </ul>
+
+  <h3>Audit and traceability</h3>
+  <ul>
+    <li>Representative operational writes create <code>ct2_audit_logs</code> rows.</li>
+    <li>Approval decisions, supplier updates, visa checklist changes, and financial flag updates are part of the hardened write surface.</li>
+    <li>Operators should treat missing audit rows for successful writes as a regression.</li>
+  </ul>
+
+  <h2>8. Data Flow Between CT2 And External Systems</h2>
+  <p>
+    CT2 is designed to sit beside upstream systems rather than replace them. A booking may originate in CT1 or another
+    source platform, while CT2 stores the back-office workflow that surrounds that booking: supplier readiness, resource
+    allocation, dispatch context, approvals, visa progression, and financial reporting snapshots.
+  </p>
+  <p>
+    This means reconciliation work often crosses system boundaries. When an incident touches booking truth, customer
+    truth, or external payments, the support team should capture the CT2 reference IDs and escalate to the system that
+    owns the source data rather than trying to force CT2 into becoming the system of record.
+  </p>
+
+  <h2>9. Environment Setup And Branch Model</h2>
+  <h3>Local and validation environment</h3>
+  <ul>
+    <li>PHP CLI with <code>pdo_mysql</code> is required.</li>
+    <li>Local MySQL should be reachable through explicit TCP configuration.</li>
+    <li>Node and Chrome or Chromium are required for browser-heavy validators.</li>
+    <li>The seeded schema baseline comes from <code>ct2_back_office/ct2_setup.sql</code>.</li>
+  </ul>
+
+  <h3>Branch policy</h3>
+  <ul>
+    <li><code>develop</code> is the integration branch for ongoing CT2 work.</li>
+    <li><code>main</code> is the approved release branch.</li>
+    <li>Deployments should be built from approved release state, not from unreviewed feature branches.</li>
+  </ul>
+
+  <h2>10. Quality Gate And CI</h2>
+  <p>
+    Every tracked repo change closes on the strict full-suite gate. CT2 does not allow formatter drift, lint findings,
+    PHP warnings, HTML leakage in JSON, partial pass output, or skipped runtime/security validation without a documented
+    blocker. Targeted checks can be used during debugging, but they do not replace the full suite.
+  </p>
+  <table class="grid">
+    <thead>
+      <tr>
+        <th>Gate</th>
+        <th>Purpose</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Format check</td><td>Prevents style drift</td></tr>
+      <tr><td>PHP lint</td><td>Blocks parse or syntax regressions</td></tr>
+      <tr><td>Structural smoke</td><td>Confirms expected file and app structure</td></tr>
+      <tr><td>DB smoke</td><td>Confirms runtime database connectivity and seed readiness</td></tr>
+      <tr><td>Browser accessibility</td><td>Checks keyboard focus and browser reachability</td></tr>
+      <tr><td>UI regression</td><td>Protects the shared shell, modal, toast, and split date/time contract</td></tr>
+      <tr><td>Load profile</td><td>Samples repeated timings for critical flows</td></tr>
+      <tr><td>Route matrix</td><td>Proves breadth of browser and representative JSON routes</td></tr>
+      <tr><td>Runtime hardening</td><td>Checks write-path security, session, CSRF, and audit expectations</td></tr>
+      <tr><td>API POST regression</td><td>Validates representative mutating JSON endpoints</td></tr>
+      <tr><td>NFR sanity</td><td>Checks non-functional guardrails and representative timings</td></tr>
+      <tr><td>Role UAT</td><td>Confirms seeded role expectations across browser flows</td></tr>
+    </tbody>
+  </table>
+  <p>
+    Repository-level CI enforcement is handled by <code>.github/workflows/ct2_quality_gate.yml</code>. Release packaging
+    and optional cPanel deployment are handled by <code>.github/workflows/ct2_cpanel_release_pipeline.yml</code>.
+  </p>
+
+  <h2>11. cPanel Release, Deployment, And Rollback</h2>
+  <h3>Release flow</h3>
+  <ol>
+    <li>GitHub Actions runs the strict suite on the release candidate.</li>
+    <li>A validated artifact is built with <code>ct2_release_artifact.sh</code>.</li>
+    <li>The artifact is uploaded to cPanel over SSH.</li>
+    <li>A new release directory is created under <code>&lt;deploy-path&gt;/releases/</code>.</li>
+    <li>Shared config and writable storage are linked into the new release.</li>
+    <li>Pre-live checks run on the target before the release is switched live.</li>
+    <li>The <code>current</code> symlink is advanced.</li>
+    <li>A live HTTP health check validates the public URL.</li>
+    <li>If the post-switch check fails, the workflow restores the previous release.</li>
+  </ol>
+
+  <h3>cPanel directory contract</h3>
+  <table class="grid">
+    <thead>
+      <tr>
+        <th>Path type</th>
+        <th>Contract</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Deploy root</td>
+        <td><code>&lt;deploy-path&gt;/releases/&lt;release-name&gt;</code></td>
+      </tr>
+      <tr>
+        <td>Active release</td>
+        <td><code>&lt;deploy-path&gt;/current</code></td>
+      </tr>
+      <tr>
+        <td>Shared config</td>
+        <td><code>&lt;deploy-path&gt;/shared/config/ct2_local.php</code></td>
+      </tr>
+      <tr>
+        <td>Shared uploads</td>
+        <td><code>&lt;deploy-path&gt;/shared/storage/uploads/</code></td>
+      </tr>
+      <tr>
+        <td>Shared sessions</td>
+        <td><code>&lt;deploy-path&gt;/shared/storage/sessions/</code></td>
+      </tr>
+      <tr>
+        <td>Shared public mapping</td>
+        <td><code>CT2_CPANEL_PUBLIC_PATH</code> may point to <code>/home/&lt;user&gt;/public_html/ct2</code> for shared-domain deployment</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Current hosted model</h3>
+  <p>
+    CT2 is designed to coexist with multiple systems on a single cPanel account. The correct model is to keep CT2
+    releases isolated outside <code>public_html</code>, for example under <code>/home/&lt;user&gt;/apps/ct2</code>, and
+    expose the active release through a public path such as <code>/home/&lt;user&gt;/public_html/ct2</code>. This keeps
+    config, storage, and release lifecycle separate from other hosted applications.
+  </p>
+
+  <h3>Rollback scope</h3>
+  <ul>
+    <li>Restore the previous <code>current</code> symlink or release pointer</li>
+    <li>Restore the pre-deploy MySQL backup if schema or seeded data was changed</li>
+    <li>Restore uploads if the failed release affected shared upload state</li>
+    <li>Re-run post-deploy and live health checks before reopening access</li>
+  </ul>
+
+  <h2>12. Daily Operations And Support Workflow</h2>
+  <ol>
+    <li>Confirm login still works for an authorized account.</li>
+    <li>Confirm the dashboard loads without warnings or broken counts.</li>
+    <li>Check the approvals queue, visa workflow, and one representative JSON endpoint.</li>
+    <li>Verify exports still download and uploads still write to shared storage.</li>
+    <li>Review GitHub Actions and the latest release evidence before any change window.</li>
+    <li>Back up the database and uploads before every update deployment.</li>
+  </ol>
+
+  <h2>13. Troubleshooting Entry Points</h2>
+  <table class="grid">
+    <thead>
+      <tr>
+        <th>Symptom</th>
+        <th>First checks</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Database connection failure</td>
+        <td>Check <code>ct2_local.php</code>, verify host/port/user/password, confirm grants, run DB smoke</td>
+      </tr>
+      <tr>
+        <td>Login or session failure</td>
+        <td>Check writable sessions path, active-user status, and session rotation behavior</td>
+      </tr>
+      <tr>
+        <td>Upload failure</td>
+        <td>Check shared uploads path, file size limits, and visa document flow</td>
+      </tr>
+      <tr>
+        <td>API regression</td>
+        <td>Confirm JSON-only responses, auth, permission parity, and absence of warning leakage</td>
+      </tr>
+      <tr>
+        <td>Release failure</td>
+        <td>Inspect strict-suite logs, packaging step, SSH auth, shared config linkage, and live HTTP health check</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>14. Current Constraints And Open Operational Notes</h2>
+  <ul>
+    <li>Windows XAMPP evidence remains a documented follow-up item even though the primary cPanel release path is active.</li>
+    <li>Seeded accounts and demo data are for validation and UAT only and must not remain as production credentials.</li>
+    <li>Any change that touches auth, API contracts, deployment scripts, or the shared UI shell should be assumed to require the full strict suite.</li>
+    <li>cPanel deployment is artifact-based. Direct server-side branch pulls are outside the supported release contract.</li>
+  </ul>
+
+  <h2>15. Reference Documents</h2>
+  <ul>
+    <li><code>docs/ct2_integration_guide.md</code></li>
+    <li><code>docs/ct2_deployment_guide.md</code></li>
+    <li><code>docs/ct2_operator_runbook.md</code></li>
+    <li><code>docs/ct2_quality_gate.md</code></li>
+    <li><code>docs/ct2_cpanel_release_flow.md</code></li>
+    <li><code>docs/ct2_manual_qa_pack.md</code></li>
+  </ul>
+</body>
+</html>

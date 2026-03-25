@@ -282,7 +282,12 @@ function ct2_is_api_request(): bool
 
 function ct2_is_validation_mode(): bool
 {
-    return getenv('CT2_VALIDATION_MODE') === '1';
+    if (getenv('CT2_VALIDATION_MODE') === '1') {
+        return true;
+    }
+
+    return PHP_SAPI === 'cli-server'
+        && (string) ($_SERVER['HTTP_X_CT2_VALIDATION_MODE'] ?? '') === '1';
 }
 
 function ct2_render_error_page(int $ct2StatusCode, string $ct2Message): never

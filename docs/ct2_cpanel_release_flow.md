@@ -1,7 +1,7 @@
-# CT2 cPanel Release Flow
+# CT2 cPanel Release Pipeline Flow
 
 ## Purpose
-This document defines the release path for the primary CT2 hosting target: cPanel with SSH access. The workflow is intentionally split into an off-host blocking gate and an on-host post-deploy verification pass.
+This document defines the release path for the primary CT2 hosting target: cPanel with SSH access. The `CT2 cPanel Release Pipeline` workflow is intentionally split into an off-host blocking gate and an on-host post-deploy verification pass.
 
 ## Related Guides
 - Setup and environment preparation: `docs/ct2_setup_guide.md`

@@ -1,4 +1,11 @@
-name: CT2 cPanel Release
+name: CT2 cPanel Release Pipeline
+
+run-name: >-
+  CT2 cPanel Release Pipeline / ${{
+    github.event.inputs.release_version || github.ref_name
+  }} / ${{
+    github.event.inputs.deploy_to_cpanel == 'true' && 'deploy' || 'package'
+  }}
 
 permissions:
   contents: read

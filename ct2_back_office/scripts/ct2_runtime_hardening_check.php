@@ -54,7 +54,7 @@ try {
     $ct2RunLabel = 'CT2 Hardening Run ' . $ct2RunId;
 
     ct2Log($ct2Prefix, 'Starting local CT2 PHP server.');
-    $ct2Server = ct2StartPhpServer($ct2Port, $ct2TempDir, '?module=auth&action=login', ['CT2_VALIDATION_MODE' => '1']);
+    $ct2Server = ct2StartPhpServer($ct2Port, $ct2TempDir, '?module=auth&action=login');
     $ct2Session = ct2CreateHttpSession($ct2TempDir);
 
     $ct2Get = static function (string $url) use ($ct2Session): array {

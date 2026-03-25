@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/config/ct2_bootstrap.php';
 
-if (ct2_current_user() === null || !ct2_has_permission('api.access') || !ct2_has_permission('financial.view')) {
-    ct2_record_api_log('ct2_financial_snapshots', $_SERVER['REQUEST_METHOD'] ?? 'GET', 403);
-    ct2_json_response(false, [], 'Forbidden.', 403);
-}
+ct2_require_api_permission('ct2_financial_snapshots', 'financial.view', 'financial.manage');
 
 $ct2FinancialAnalyticsModel = new CT2_FinancialAnalyticsModel();
 $ct2AuditLogModel = new CT2_AuditLogModel();
@@ -44,11 +41,6 @@ if ($ct2Method === 'GET') {
 if ($ct2Method !== 'POST') {
     ct2_record_api_log('ct2_financial_snapshots', $ct2Method, 405);
     ct2_json_response(false, [], 'Method not allowed.', 405);
-}
-
-if (!ct2_has_permission('financial.manage')) {
-    ct2_record_api_log('ct2_financial_snapshots', 'POST', 403);
-    ct2_json_response(false, [], 'Forbidden.', 403);
 }
 
 $ct2Payload = ct2_json_input() + [

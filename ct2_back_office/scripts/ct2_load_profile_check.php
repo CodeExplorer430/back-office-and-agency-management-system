@@ -14,9 +14,10 @@ $ct2MaxSeconds = 5.0;
 
 try {
     ct2Log($ct2Prefix, 'Starting local CT2 PHP server.');
-    $ct2Server = ct2StartPhpServer(8098, $ct2TempDir);
-    $ct2BaseUrl = 'http://127.0.0.1:8098/ct2_index.php';
-    $ct2ApiBaseUrl = 'http://127.0.0.1:8098/api';
+    $ct2Port = ct2SelectPort(8098);
+    $ct2Server = ct2StartPhpServer($ct2Port, $ct2TempDir);
+    $ct2BaseUrl = 'http://127.0.0.1:' . $ct2Port . '/ct2_index.php';
+    $ct2ApiBaseUrl = 'http://127.0.0.1:' . $ct2Port . '/api';
     $ct2Stats = [
         'login_get' => [],
         'login_post' => [],

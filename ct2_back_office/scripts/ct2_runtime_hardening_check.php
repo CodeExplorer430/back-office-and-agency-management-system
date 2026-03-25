@@ -23,8 +23,9 @@ try {
     $ct2FourDaysLocal = date('Y-m-d\TH:i', strtotime('+4 day'));
     $ct2VisaNoteNextAction = date('Y-m-d', strtotime('+3 day'));
 
-    $ct2BaseUrl = 'http://127.0.0.1:8092/ct2_index.php';
-    $ct2ApiBaseUrl = 'http://127.0.0.1:8092/api';
+    $ct2Port = ct2SelectPort(8092);
+    $ct2BaseUrl = 'http://127.0.0.1:' . $ct2Port . '/ct2_index.php';
+    $ct2ApiBaseUrl = 'http://127.0.0.1:' . $ct2Port . '/api';
 
     $ct2ResourceName = 'CT2 Hardening Resource ' . $ct2RunId;
     $ct2PackageName = 'CT2 Hardening Package ' . $ct2RunId;
@@ -53,7 +54,7 @@ try {
     $ct2RunLabel = 'CT2 Hardening Run ' . $ct2RunId;
 
     ct2Log($ct2Prefix, 'Starting local CT2 PHP server.');
-    $ct2Server = ct2StartPhpServer(8092, $ct2TempDir);
+    $ct2Server = ct2StartPhpServer($ct2Port, $ct2TempDir, '?module=auth&action=login', ['CT2_VALIDATION_MODE' => '1']);
     $ct2Session = ct2CreateHttpSession($ct2TempDir);
 
     $ct2Get = static function (string $url) use ($ct2Session): array {
@@ -71,6 +72,7 @@ try {
     ct2Log($ct2Prefix, 'Signing in as seeded CT2 administrator.');
     $ct2LoginPage = $ct2Get($ct2BaseUrl . '?module=auth&action=login');
     ct2AssertStatus(200, $ct2LoginPage, 'Login page did not load', $ct2Prefix);
+    $ct2SessionBeforeLogin = ct2SessionCookieValue($ct2Session);
     $ct2Csrf = ct2ExtractCsrf($ct2LoginPage['body']);
     $ct2Login = $ct2Post(
         $ct2BaseUrl . '?module=auth&action=login',
@@ -82,11 +84,22 @@ try {
     );
     ct2AssertStatus(200, $ct2Login, 'Login submission did not complete', $ct2Prefix);
     ct2AssertContains($ct2Login['body'], 'Back-Office Dashboard', 'Login did not land on the dashboard', $ct2Prefix);
+    $ct2SessionAfterLogin = ct2SessionCookieValue($ct2Session);
+    ct2AssertNotEquals($ct2SessionBeforeLogin, $ct2SessionAfterLogin, 'Browser login did not rotate the CT2 session identifier', $ct2Prefix);
+    $ct2DashboardCsrf = ct2ExtractCsrf($ct2Login['body']);
+    ct2AssertNotEquals($ct2Csrf, $ct2DashboardCsrf, 'Browser login did not refresh the CT2 CSRF token after authentication', $ct2Prefix);
 
     ct2Log($ct2Prefix, 'Verifying dashboard and seeded read paths.');
     $ct2Dashboard = $ct2Get($ct2BaseUrl . '?module=dashboard&action=index');
     ct2AssertStatus(200, $ct2Dashboard, 'Dashboard route did not return 200', $ct2Prefix);
     ct2AssertContains($ct2Dashboard['body'], 'Back-Office Dashboard', 'Dashboard content did not render', $ct2Prefix);
+
+    ct2Log($ct2Prefix, 'Verifying generic browser 500 handling.');
+    $ct2Fault = $ct2Get($ct2BaseUrl . '?module=auth&action=login&ct2_validation_crash=1');
+    ct2AssertStatus(500, $ct2Fault, 'Validation-only browser fault did not return 500', $ct2Prefix);
+    ct2AssertContains($ct2Fault['body'], 'An unexpected error occurred. Please contact support.', 'Browser 500 response did not render the generic message', $ct2Prefix);
+    ct2AssertNotContains($ct2Fault['body'], 'CT2 validation fault injection.', 'Browser 500 response leaked the validation exception message', $ct2Prefix);
+    ct2AssertNotContains($ct2Fault['body'], 'RuntimeException', 'Browser 500 response leaked the exception class name', $ct2Prefix);
 
     $ct2AvailabilityRead = $ct2Get($ct2BaseUrl . '?module=availability&action=index&search=Skyline');
     ct2AssertStatus(200, $ct2AvailabilityRead, 'Availability search route did not return 200', $ct2Prefix);

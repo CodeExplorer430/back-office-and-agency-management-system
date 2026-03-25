@@ -158,7 +158,8 @@ This report records the first live execution of the CT2 manual QA pack against t
 
 ### Expanded rerun conclusion
 - No new blocker or regression was found during the CT2-wide scripted coverage expansion.
-- The remaining validation debt is now concentrated in performance/accessibility evidence, executed Windows XAMPP runtime evidence, and a small set of less-used manual/API mutation paths rather than the core CT2 browser workflows.
+- The subsequent March 25, 2026 auth/API hardening batch closed the earlier session lifecycle, browser exception, and API RBAC parity gaps.
+- The main remaining repo-owned validation gap is now the executed Windows XAMPP runtime evidence rather than the core CT2 Linux-side browser or API flows.
 
 ## API POST Regression Rerun
 - Date: March 10, 2026

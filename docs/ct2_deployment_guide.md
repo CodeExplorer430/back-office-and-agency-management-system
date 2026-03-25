@@ -23,7 +23,7 @@ This guide is the client-facing handoff for deploying `CORE TRANSACTION 2: Back-
 - Release artifact builder: `ct2_back_office/scripts/ct2_release_artifact.sh`
 - cPanel deployment automation: `ct2_back_office/scripts/ct2_cpanel_deploy.sh`
 - cPanel post-deploy verification: `ct2_back_office/scripts/ct2_cpanel_post_deploy_check.sh`
-- Approved release summary: `docs/ct2_release_summary_2026-03-25-r1.md`
+- Approved release summary: `docs/ct2_release_summary_2026-03-25-r2.md`
 - Post-install validation: `docs/ct2_manual_qa_pack.md`, `docs/ct2_api_validation.md`, and `docs/ct2_windows_xampp_validation_pack.md`
 
 ## Supported Runtime
@@ -73,9 +73,11 @@ On Windows XAMPP, run the PowerShell equivalent:
 3. Store writable runtime data at:
    `shared/storage/uploads/`
    `shared/storage/sessions/`
-4. Upload the validated artifact and deploy over SSH with `bash ct2_back_office/scripts/ct2_cpanel_deploy.sh`.
-5. Require both the pre-live cPanel verification and the live HTTP health check to pass before considering the release complete.
-6. Use `docs/ct2_cpanel_release_flow.md` as the source of truth for the cPanel directory and rollback contract.
+4. If CT2 must live under a shared-domain path such as `https://example.com/ct2`, keep the deploy root outside `public_html` and set `CT2_CPANEL_PUBLIC_PATH` to the public path, for example `/home/<user>/public_html/ct2`.
+5. In that shared-domain mode, set `CT2_CPANEL_BASE_URL` to the matching public URL, for example `https://example.com/ct2`.
+6. Upload the validated artifact and deploy over SSH with `bash ct2_back_office/scripts/ct2_cpanel_deploy.sh`.
+7. Require both the pre-live cPanel verification and the live HTTP health check to pass before considering the release complete.
+8. Use `docs/ct2_cpanel_release_flow.md` as the source of truth for the cPanel directory and rollback contract.
 
 ### 6. Open the application
 1. Serve `ct2_back_office/` through Apache, the PHP built-in server, or XAMPP.
@@ -118,5 +120,6 @@ Run the acceptance flow in this order:
 ## Release Baseline
 - `develop` remains the integration baseline for ongoing CT2 work.
 - `main` is the approved release branch.
-- The current validated CT2 release is summarized in `docs/ct2_release_summary_2026-03-25-r1.md`.
+- The current validated CT2 release is summarized in `docs/ct2_release_summary_2026-03-25-r2.md`.
 - For cPanel, deploy the artifact built from the approved release state rather than pulling a branch directly on the server.
+- On shared cPanel hosting, prefer a dedicated deploy root plus an optional public path mapping such as `public_html/ct2` rather than placing CT2 releases directly in `public_html`.

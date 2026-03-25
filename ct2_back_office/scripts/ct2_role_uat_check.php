@@ -13,8 +13,9 @@ $ct2RunId = 'ROLE-UAT-' . time();
 
 try {
     ct2Log($ct2Prefix, 'Starting local CT2 PHP server.');
-    $ct2Server = ct2StartPhpServer(8099, $ct2TempDir);
-    $ct2BaseUrl = 'http://127.0.0.1:8099/ct2_index.php';
+    $ct2Port = ct2SelectPort(8099);
+    $ct2Server = ct2StartPhpServer($ct2Port, $ct2TempDir);
+    $ct2BaseUrl = 'http://127.0.0.1:' . $ct2Port . '/ct2_index.php';
 
     $ct2ManagerSession = ct2CreateHttpSession($ct2TempDir);
     $ct2DeskSession = ct2CreateHttpSession($ct2TempDir);

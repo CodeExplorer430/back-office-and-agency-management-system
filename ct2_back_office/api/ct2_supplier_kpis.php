@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/config/ct2_bootstrap.php';
 
-if (ct2_current_user() === null || !ct2_has_permission('api.access')) {
-    ct2_record_api_log('ct2_supplier_kpis', $_SERVER['REQUEST_METHOD'] ?? 'GET', 403);
-    ct2_json_response(false, [], 'Forbidden.', 403);
-}
+ct2_require_api_permission('ct2_supplier_kpis', 'suppliers.view', 'suppliers.manage');
 
 $ct2SupplierKpiModel = new CT2_SupplierKpiModel();
 $ct2AuditLogModel = new CT2_AuditLogModel();

@@ -21,7 +21,8 @@ try {
     }
 
     ct2Log($ct2Prefix, 'Starting local CT2 PHP server.');
-    $ct2Server = ct2StartPhpServer(8098, $ct2TempDir);
+    $ct2Port = ct2SelectPort(8198);
+    $ct2Server = ct2StartPhpServer($ct2Port, $ct2TempDir);
 
     $ct2ChromePort = 9225;
     $ct2ChromeLog = $ct2TempDir . DIRECTORY_SEPARATOR . 'ct2_chrome.log';
@@ -62,7 +63,7 @@ try {
     $ct2Environment = array_merge(
         $_ENV,
         [
-            'CT2_BASE_URL' => 'http://127.0.0.1:8098/ct2_index.php',
+            'CT2_BASE_URL' => 'http://127.0.0.1:' . $ct2Port . '/ct2_index.php',
             'CT2_CHROME_JSON_LIST' => $ct2ChromeJsonList,
         ]
     );

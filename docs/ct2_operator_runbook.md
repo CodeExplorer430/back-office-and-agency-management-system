@@ -17,7 +17,7 @@ This runbook is for the technical deployment or support team responsible for ope
 ## Branch And Release Policy
 - `develop` is the current integrated CT2 branch.
 - `main` is the release branch.
-- The current approved CT2 release is tracked in `docs/ct2_release_summary_2026-03-25-r1.md`.
+- The current approved CT2 release is tracked in `docs/ct2_release_summary_2026-03-25-r2.md`.
 - GitHub Actions is the blocking release gate and cPanel is the primary deployment target.
 - Windows XAMPP evidence remains a deferred cross-platform validation task. It should be completed and copied back into the repo, but it no longer blocks promotion of the current approved release state into `main`.
 - Do not deploy directly from unreviewed feature branches.
@@ -34,8 +34,9 @@ This runbook is for the technical deployment or support team responsible for ope
 2. Create the cPanel shared paths for config and writable storage.
 3. Import `ct2_back_office/ct2_setup.sql` into a clean `ct2_back_office` database.
 4. Put `ct2_local.php` in the shared config path, not inside the release tree.
-5. Deploy with `bash ct2_back_office/scripts/ct2_cpanel_deploy.sh`.
-6. Execute the acceptance flow from `docs/ct2_manual_qa_pack.md`.
+5. If CT2 must share the main domain under a path such as `/ct2`, set `CT2_CPANEL_PUBLIC_PATH` to the matching public path, for example `/home/<user>/public_html/ct2`.
+6. Deploy with `bash ct2_back_office/scripts/ct2_cpanel_deploy.sh`.
+7. Execute the acceptance flow from `docs/ct2_manual_qa_pack.md`.
 
 ### Update deployment
 1. Back up the existing MySQL database.
@@ -54,6 +55,7 @@ This runbook is for the technical deployment or support team responsible for ope
 - Environment variables override `ct2_local.php` when both are present.
 - Never commit local credentials.
 - Keep the storage path local to the target machine; do not redirect uploads or sessions into tracked repo paths.
+- On shared cPanel hosting, keep CT2 releases under a dedicated deploy root and expose the active release through `CT2_CPANEL_PUBLIC_PATH` rather than mixing CT2 files into another system's web directory.
 
 ## Backups And Rollback
 ### Minimum backup scope
@@ -102,7 +104,7 @@ Use `docs/ct2_troubleshooting_guide.md` for the detailed recovery playbook. The 
 - Confirm the uploaded document matches the allowed file types in the visa workflow.
 
 ### API problems
-- Confirm the user has `api.access` when required.
+- Confirm the user has `api.access` when required, plus any module-specific permission expected for the same action in the browser.
 - Verify the endpoint still returns `application/json`.
 - Check for PHP notices or HTML leakage in the response body.
 

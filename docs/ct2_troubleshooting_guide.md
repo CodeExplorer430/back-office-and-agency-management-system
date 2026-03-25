@@ -25,12 +25,14 @@ Use this guide to diagnose and recover from the most common CT2 setup, deploymen
 ### Artifact deployment fails before go-live
 - Confirm the release artifact exists and the SHA256 file matches.
 - Confirm SSH credentials, deploy path, and shared directories are correct.
+- If shared-domain path hosting is enabled, confirm `CT2_CPANEL_PUBLIC_PATH` points at the intended public path and is not occupied by a real directory from another system.
 - Run:
   `bash ct2_back_office/scripts/ct2_cpanel_post_deploy_check.sh`
 
 ### Live health check fails after deployment
 - Confirm `CT2_BASE_URL` points to the active cPanel URL.
 - Confirm the document root resolves to the active release’s `ct2_back_office/`.
+- If using `/ct2` or another shared-domain path, confirm the public path symlink resolves to `<deploy-path>/current/ct2_back_office`.
 - Confirm the health-check credentials are valid if authenticated health verification is enabled.
 - Roll back to the previous `current` symlink if the environment cannot be restored quickly.
 
@@ -46,7 +48,7 @@ Use this guide to diagnose and recover from the most common CT2 setup, deploymen
 - Re-run the runtime hardening suite if the failure followed a code or deployment change.
 
 ### Export or API failures
-- Confirm the user has the required permission such as `financial.export` or `api.access`.
+- Confirm the user has the required permission such as `financial.export` or `api.access`, plus any module-specific permission expected for the same action in the browser.
 - Confirm the endpoint returns JSON or CSV with the correct headers.
 - Check for HTML leakage, PHP notices, or warning text in the response body.
 - Re-run:

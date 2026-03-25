@@ -23,9 +23,12 @@ CT2_DEPLOY_PORT="${CT2_DEPLOY_PORT:-22}"
 CT2_RELEASE_NAME="${CT2_RELEASE_NAME:-$(basename "$CT2_ARTIFACT_PATH" .tar.gz)}"
 CT2_KEEP_RELEASES="${CT2_KEEP_RELEASES:-5}"
 CT2_REMOTE_ARTIFACT="/tmp/${CT2_RELEASE_NAME}.tar.gz"
+CT2_PUBLIC_PATH="${CT2_PUBLIC_PATH:-}"
+CT2_SSH_KEY_USE_AGENT="${CT2_SSH_KEY_USE_AGENT:-0}"
 ct2_base_url_q="$(printf '%q' "$CT2_BASE_URL")"
 ct2_health_user_q="$(printf '%q' "${CT2_HEALTHCHECK_USERNAME:-}")"
 ct2_health_pass_q="$(printf '%q' "${CT2_HEALTHCHECK_PASSWORD:-}")"
+ct2_public_path_q="$(printf '%q' "$CT2_PUBLIC_PATH")"
 
 if [[ ! -f "$CT2_ARTIFACT_PATH" ]]; then
   printf 'Artifact not found: %s\n' "$CT2_ARTIFACT_PATH" >&2
@@ -33,13 +36,23 @@ if [[ ! -f "$CT2_ARTIFACT_PATH" ]]; then
 fi
 
 ct2_ssh() {
-  ssh -i "$CT2_SSH_KEY_PATH" -p "$CT2_DEPLOY_PORT" -o StrictHostKeyChecking=no \
-    "$CT2_DEPLOY_USER@$CT2_DEPLOY_HOST" "$@"
+  if [[ "$CT2_SSH_KEY_USE_AGENT" == '1' ]]; then
+    ssh -p "$CT2_DEPLOY_PORT" -o StrictHostKeyChecking=no \
+      "$CT2_DEPLOY_USER@$CT2_DEPLOY_HOST" "$@"
+  else
+    ssh -i "$CT2_SSH_KEY_PATH" -p "$CT2_DEPLOY_PORT" -o StrictHostKeyChecking=no \
+      "$CT2_DEPLOY_USER@$CT2_DEPLOY_HOST" "$@"
+  fi
 }
 
 ct2_scp() {
-  scp -i "$CT2_SSH_KEY_PATH" -P "$CT2_DEPLOY_PORT" -o StrictHostKeyChecking=no \
-    "$CT2_ARTIFACT_PATH" "$CT2_DEPLOY_USER@$CT2_DEPLOY_HOST:$CT2_REMOTE_ARTIFACT"
+  if [[ "$CT2_SSH_KEY_USE_AGENT" == '1' ]]; then
+    scp -P "$CT2_DEPLOY_PORT" -o StrictHostKeyChecking=no \
+      "$CT2_ARTIFACT_PATH" "$CT2_DEPLOY_USER@$CT2_DEPLOY_HOST:$CT2_REMOTE_ARTIFACT"
+  else
+    scp -i "$CT2_SSH_KEY_PATH" -P "$CT2_DEPLOY_PORT" -o StrictHostKeyChecking=no \
+      "$CT2_ARTIFACT_PATH" "$CT2_DEPLOY_USER@$CT2_DEPLOY_HOST:$CT2_REMOTE_ARTIFACT"
+  fi
 }
 
 printf '[ct2-cpanel-deploy] Uploading validated artifact.\n'
@@ -78,6 +91,21 @@ ct2_ssh "
 printf '[ct2-cpanel-deploy] Switching current release.\n'
 ct2_previous_release="$(ct2_ssh "if [ -L '$CT2_DEPLOY_PATH/current' ]; then readlink '$CT2_DEPLOY_PATH/current'; fi")"
 ct2_ssh "ln -sfn '$CT2_DEPLOY_PATH/releases/$CT2_RELEASE_NAME' '$CT2_DEPLOY_PATH/current'"
+
+if [[ -n "$CT2_PUBLIC_PATH" ]]; then
+  printf '[ct2-cpanel-deploy] Updating public path mapping.\n'
+  ct2_ssh "
+    set -euo pipefail
+    export CT2_PUBLIC_PATH=$ct2_public_path_q
+    ct2_public_parent=\$(dirname \"\$CT2_PUBLIC_PATH\")
+    if [ -e \"\$CT2_PUBLIC_PATH\" ] && [ ! -L \"\$CT2_PUBLIC_PATH\" ]; then
+      echo 'CT2 public path exists and is not a symlink: '"\$CT2_PUBLIC_PATH" >&2
+      exit 1
+    fi
+    mkdir -p \"\$ct2_public_parent\"
+    ln -sfn '$CT2_DEPLOY_PATH/current/ct2_back_office' \"\$CT2_PUBLIC_PATH\"
+  "
+fi
 
 printf '[ct2-cpanel-deploy] Running live HTTP health check against the cPanel URL.\n'
 if ! ct2_ssh "

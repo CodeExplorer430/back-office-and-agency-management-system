@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>CT2 Client Presentation Guide</title>
+  <style>
+    body {
+      font-family: "Liberation Sans", Arial, sans-serif;
+      color: #1f2933;
+      margin: 2.1cm;
+      line-height: 1.48;
+    }
+    h1, h2, h3 {
+      color: #102a43;
+      page-break-after: avoid;
+    }
+    h1 {
+      font-size: 24pt;
+      margin-bottom: 0.18cm;
+    }
+    h2 {
+      font-size: 16pt;
+      margin-top: 0.8cm;
+      border-bottom: 1px solid #d9e2ec;
+      padding-bottom: 0.12cm;
+    }
+    h3 {
+      font-size: 12pt;
+      margin-top: 0.5cm;
+    }
+    p, li {
+      font-size: 10.5pt;
+    }
+    .subtitle {
+      color: #486581;
+      font-size: 11pt;
+      margin-bottom: 0.75cm;
+    }
+    .meta,
+    .speaker,
+    .simple,
+    .panel {
+      padding: 0.35cm 0.42cm;
+      margin: 0.4cm 0 0.55cm;
+    }
+    .meta {
+      background: #f0f4f8;
+      border: 1px solid #d9e2ec;
+    }
+    .speaker {
+      background: #fffbea;
+      border-left: 4px solid #f0b429;
+    }
+    .simple {
+      background: #f0fff4;
+      border-left: 4px solid #2f855a;
+    }
+    .panel {
+      background: #f3ebff;
+      border-left: 4px solid #7f5af0;
+    }
+    .meta p,
+    .speaker p,
+    .simple p,
+    .panel p {
+      margin: 0.08cm 0;
+    }
+    .grid {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.3cm 0 0.55cm;
+    }
+    .grid th,
+    .grid td {
+      border: 1px solid #bcccdc;
+      padding: 0.18cm 0.22cm;
+      text-align: left;
+      vertical-align: top;
+      font-size: 9.8pt;
+    }
+    .grid th {
+      background: #f0f4f8;
+      color: #102a43;
+    }
+    code {
+      font-family: "Liberation Mono", "Courier New", monospace;
+      font-size: 9.3pt;
+    }
+    ul, ol {
+      margin-top: 0.14cm;
+      margin-bottom: 0.22cm;
+    }
+  </style>
+</head>
+<body>
+  <h1>CT2 Client Presentation Guide</h1>
+  <p class="subtitle">How Core Transaction 2 works inside the Travel and Tours ERP</p>
+
+  <div class="meta">
+    <p><strong>Document purpose:</strong> explain CT2 in a way that a junior BSIT student can present clearly to technical panelists</p>
+    <p><strong>Main subject:</strong> Core Transaction 2: Back-Office and Agency Management System</p>
+    <p><strong>Best use:</strong> project presentation, oral defense, client walkthrough, and technical panel Q&amp;A preparation</p>
+  </div>
+
+  <h2>1. What CT2 Is</h2>
+  <p>
+    CT2 stands for <strong>Core Transaction 2</strong>. In the Travel and Tours ERP, CT2 is the
+    <strong>back-office operating system</strong>. It helps the company manage internal travel operations after a booking
+    or transaction already exists. It is focused on coordination, approvals, resource planning, supplier follow-up,
+    promotions, visa assistance, and reporting.
+  </p>
+
+  <div class="simple">
+    <p><strong>Simple explanation:</strong> CT2 is the part of the ERP that helps employees organize and control operations behind the scenes.</p>
+  </div>
+
+  <div class="speaker">
+    <p><strong>Speaking cue:</strong> “If CT1 captures and manages the actual customer booking transaction, CT2 manages the back-office work needed to support that transaction.”</p>
+  </div>
+
+  <h2>2. Where CT2 Fits In The Whole ERP</h2>
+  <p>
+    The Travel and Tours ERP is not only one system. It is a collection of connected systems that support different
+    business areas such as human resources, logistics, administration, finance, booking operations, and back-office work.
+    CT2 belongs to the travel-and-tours operational side, but it is focused specifically on internal coordination.
+  </p>
+
+  <table class="grid">
+    <thead>
+      <tr>
+        <th>ERP area</th>
+        <th>Main purpose</th>
+        <th>How CT2 relates to it</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Core Transaction 1</td>
+        <td>Customer booking and main tour transaction processing</td>
+        <td>CT2 uses booking, customer, or payment references from CT1 when back-office follow-up is needed</td>
+      </tr>
+      <tr>
+        <td>Financials</td>
+        <td>General ledger, AP/AR, collection, budget, and official accounting</td>
+        <td>CT2 produces operational reports and financial snapshots, but Financials remains the official accounting system</td>
+      </tr>
+      <tr>
+        <td>Logistics and Fleet</td>
+        <td>Procurement, warehouse, fleet, dispatch, and transport optimization</td>
+        <td>CT2 plans travel resources and dispatch for tours, while enterprise-wide fleet ownership may still belong to logistics systems</td>
+      </tr>
+      <tr>
+        <td>Human Resources</td>
+        <td>Employee records, performance, scheduling, compensation, and development</td>
+        <td>CT2 uses staff information for operational assignment and coordination, but HR remains the master system for employee lifecycle data</td>
+      </tr>
+      <tr>
+        <td>Administrative</td>
+        <td>Document archiving, legal records, and visitor or support services</td>
+        <td>CT2 may reference documents or approvals that connect to administrative records, but CT2 is not the full legal or archive system</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="panel">
+    <p><strong>Panel-ready point:</strong> CT2 is a connected subsystem inside the ERP, not a standalone island. It focuses on internal operational workflow, while other ERP systems remain the source of truth for their own domains.</p>
+  </div>
+
+  <h2>3. What CT2 Owns And What It Only References</h2>
+  <table class="grid">
+    <thead>
+      <tr>
+        <th>CT2 owns</th>
+        <th>CT2 only references</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          supplier onboarding status<br>
+          approval decisions<br>
+          resource planning and dispatch workflow<br>
+          marketing campaign workflow<br>
+          visa assistance workflow<br>
+          internal audit logs<br>
+          reporting snapshots
+        </td>
+        <td>
+          customer IDs<br>
+          booking IDs<br>
+          payment references<br>
+          employee records from HR<br>
+          enterprise-wide accounting truth<br>
+          broader logistics master records
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="simple">
+    <p><strong>Simple explanation:</strong> CT2 stores the work process, not all of the original business data.</p>
+  </div>
+
+  <h2>4. Main Modules Inside CT2</h2>
+  <table class="grid">
+    <thead>
+      <tr>
+        <th>Module</th>
+        <th>What it does</th>
+        <th>Example use</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Dashboard</td>
+        <td>Shows summary counts, pending work, and quick visibility of operations</td>
+        <td>A manager checks what needs approval or action today</td>
+      </tr>
+      <tr>
+        <td>Agents</td>
+        <td>Manages travel agents, partner details, assignment links, and approval state</td>
+        <td>Update an agency profile or monitor commission-related information</td>
+      </tr>
+      <tr>
+        <td>Suppliers</td>
+        <td>Handles supplier onboarding, contracts, KPI tracking, and partner notes</td>
+        <td>Review whether a hotel or transport partner is ready for operations</td>
+      </tr>
+      <tr>
+        <td>Availability</td>
+        <td>Supports tour package planning, resource allocation, vehicles, drivers, and dispatch</td>
+        <td>Reserve a vehicle and driver for a scheduled tour booking</td>
+      </tr>
+      <tr>
+        <td>Marketing</td>
+        <td>Manages campaigns, promotions, vouchers, affiliate data, and engagement metrics</td>
+        <td>Launch a promotion and monitor how many users redeemed it</td>
+      </tr>
+      <tr>
+        <td>Financial</td>
+        <td>Shows operational reports, reconciliation flags, and exportable summaries</td>
+        <td>Generate a CSV report for supplier or visa-related financial review</td>
+      </tr>
+      <tr>
+        <td>Visa</td>
+        <td>Tracks visa applications, checklist items, supporting documents, and payments</td>
+        <td>Upload a passport scan and update checklist verification</td>
+      </tr>
+      <tr>
+        <td>Staff</td>
+        <td>Maintains operational staff records used by CT2 processes</td>
+        <td>Assign a staff member to support a travel operation</td>
+      </tr>
+      <tr>
+        <td>Approvals</td>
+        <td>Centralizes decisions for pending back-office actions across modules</td>
+        <td>Approve a supplier, campaign, or exception request</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>5. General Process Flow Of CT2</h2>
+  <ol>
+    <li>A user logs into CT2.</li>
+    <li>The dashboard shows pending back-office work.</li>
+    <li>The user opens the correct module depending on the task.</li>
+    <li>The user views data, updates workflow state, uploads documents, or triggers an approval.</li>
+    <li>If a decision is sensitive, the request goes through the approvals process.</li>
+    <li>The system records the action in the audit trail.</li>
+    <li>The result appears in reports, dashboards, or exports for management use.</li>
+  </ol>
+
+  <div class="speaker">
+    <p><strong>Speaking cue:</strong> “The easiest way to understand CT2 is to see it as the internal workflow engine of the travel operations team. It receives references from the main transaction flow, then organizes the support work needed to complete operations.”</p>
+  </div>
+
+  <h2>6. Example End-To-End Scenario</h2>
+  <h3>Scenario: a customer booking needs back-office support</h3>
+  <ol>
+    <li>A booking is created in Core Transaction 1.</li>
+    <li>CT2 uses the booking reference for internal follow-up.</li>
+    <li>The supplier module checks whether the required partner is approved and ready.</li>
+    <li>The availability module assigns transport or resources for the trip.</li>
+    <li>If there is a promotion, the marketing module tracks the related campaign or voucher.</li>
+    <li>If the trip requires a visa, the visa module tracks checklist items and document uploads.</li>
+    <li>The approvals module handles any pending decisions.</li>
+    <li>The financial module summarizes the operational result for reporting.</li>
+  </ol>
+
+  <div class="simple">
+    <p><strong>Simple explanation:</strong> CT2 connects the support work around the booking, even if the booking itself started somewhere else.</p>
+  </div>
+
+  <h2>7. How CT2 Connects To Other Systems</h2>
+  <h3>CT1 connection</h3>
+  <p>
+    CT1 is closer to customer booking transactions, itinerary scheduling, reservations, and customer-facing processing.
+    CT2 can use CT1 references such as booking IDs, customer IDs, and payment references so the back-office team can do
+    the supporting operational work.
+  </p>
+
+  <h3>Financials connection</h3>
+  <p>
+    CT2 can create financial reports, flags, and exports for operations, but it should not replace the Financials
+    module for official accounting, general ledger, accounts payable, accounts receivable, and collections.
+  </p>
+
+  <h3>HR connection</h3>
+  <p>
+    CT2 may use staff data for assignments and operations, but HR systems remain responsible for the full employee
+    lifecycle such as onboarding, timekeeping, payroll, and performance.
+  </p>
+
+  <h3>Logistics connection</h3>
+  <p>
+    CT2 can schedule tour resources, vehicles, drivers, and dispatch information for operational use. If the company
+    uses a broader fleet or logistics system, CT2 should work beside it rather than replace it.
+  </p>
+
+  <h2>8. Technical Flow In Simple Terms</h2>
+  <table class="grid">
+    <thead>
+      <tr>
+        <th>Technical layer</th>
+        <th>What happens</th>
+        <th>Why it matters</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Browser request</td>
+        <td>The user opens a CT2 page through the main entry point</td>
+        <td>This is how the user chooses a module such as suppliers or visa</td>
+      </tr>
+      <tr>
+        <td>Controller logic</td>
+        <td>The controller checks the request and calls the correct model</td>
+        <td>This controls what business action will happen</td>
+      </tr>
+      <tr>
+        <td>Database layer</td>
+        <td>The model reads or saves workflow data in MySQL</td>
+        <td>This stores the current status of suppliers, approvals, reports, and more</td>
+      </tr>
+      <tr>
+        <td>Session and auth</td>
+        <td>The user must be logged in with correct permissions</td>
+        <td>This prevents unauthorized access or unsafe changes</td>
+      </tr>
+      <tr>
+        <td>Audit logging</td>
+        <td>Important actions are recorded</td>
+        <td>This supports accountability and traceability</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>9. Why CT2 Is Important</h2>
+  <ul>
+    <li>It centralizes back-office operations in one controlled system.</li>
+    <li>It reduces scattered manual tracking across spreadsheets or separate tools.</li>
+    <li>It gives managers a structured approval and monitoring process.</li>
+    <li>It improves visibility over suppliers, resources, marketing actions, and visa support work.</li>
+    <li>It produces operational reports that help management decision-making.</li>
+  </ul>
+
+  <h2>10. Security And Reliability In Presentation Terms</h2>
+  <p>
+    Even though CT2 is a student project presentation subject, it is built with real operational controls. Users must
+    log in, access is permission-based, sensitive writes are protected, and important actions are logged. The project
+    also includes automated validation before release so changes are tested before deployment.
+  </p>
+
+  <div class="panel">
+    <p><strong>Panel-ready point:</strong> CT2 is not only a CRUD system. It includes workflow control, permission control, validation, and deployment checks, which makes it closer to a real internal enterprise subsystem.</p>
+  </div>
+
+  <h2>11. How To Explain CT2 In A Presentation</h2>
+  <h3>One-minute version</h3>
+  <p>
+    “CT2 is the back-office and agency management system of the Travel and Tours ERP. It is responsible for internal
+    operational workflows such as supplier management, resource planning, promotions, financial reporting, visa
+    assistance, staff coordination, and approvals. It connects with other ERP systems by using reference data such as
+    booking IDs or customer IDs, but it mainly owns the workflow and coordination process rather than all source data.”
+  </p>
+
+  <h3>Three-minute version</h3>
+  <p>
+    “The Travel and Tours ERP is composed of several subsystems, and CT2 is the one focused on back-office operations.
+    While CT1 handles more of the booking-side transaction flow, CT2 manages the internal support work behind those
+    transactions. For example, once a booking exists, CT2 can help check suppliers, allocate resources, dispatch
+    transport, track marketing offers, manage visa requirements, request approvals, and generate reports. This makes
+    CT2 a workflow-centered subsystem. It does not replace the financial, HR, or logistics systems, but it interacts
+    with them through references and operational coordination.”
+  </p>
+
+  <h2>12. Suggested Slide Flow</h2>
+  <ol>
+    <li>Introduce the full Travel and Tours ERP.</li>
+    <li>Show where CT2 fits inside the ERP.</li>
+    <li>Explain the purpose of CT2.</li>
+    <li>Present CT2 modules one by one.</li>
+    <li>Show one end-to-end sample process.</li>
+    <li>Explain integration with CT1, Financials, HR, and Logistics.</li>
+    <li>Explain security, permissions, and audit logging.</li>
+    <li>End with the business value of CT2.</li>
+  </ol>
+
+  <h2>13. Possible Questions From Technical Panelists</h2>
+  <table class="grid">
+    <thead>
+      <tr>
+        <th>Possible question</th>
+        <th>Suggested answer</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>What is the difference between CT1 and CT2?</td>
+        <td>CT1 is closer to core booking and customer transaction processing, while CT2 is focused on back-office operational workflow and internal coordination.</td>
+      </tr>
+      <tr>
+        <td>Does CT2 store all data of the ERP?</td>
+        <td>No. CT2 stores workflow-specific data and references other systems when needed. It is not the owner of all master records.</td>
+      </tr>
+      <tr>
+        <td>Why is CT2 modular?</td>
+        <td>Because back-office work covers different domains such as suppliers, availability, marketing, financial summaries, and visa support. Each module handles a specific part of the workflow.</td>
+      </tr>
+      <tr>
+        <td>How does CT2 interact with other systems?</td>
+        <td>It uses external IDs and business references, such as booking or payment references, and coordinates internal work based on those connected records.</td>
+      </tr>
+      <tr>
+        <td>Why not put everything in one system only?</td>
+        <td>Because each subsystem has a different business responsibility. CT2 is specialized for back-office control, while other systems remain responsible for their own domains.</td>
+      </tr>
+      <tr>
+        <td>What makes CT2 secure?</td>
+        <td>It uses login authentication, permission checks, protected form submissions, audit logging, and validation before deployment.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>14. Final Presentation Summary</h2>
+  <p>
+    CT2 is a focused back-office subsystem inside a larger Travel and Tours ERP. Its role is to manage internal
+    workflows that support the business after or around a transaction, such as supplier follow-up, resource planning,
+    approvals, promotions, visa processing, and reporting. It is best understood as a workflow and coordination engine
+    connected to other enterprise systems, not as the single owner of all enterprise data.
+  </p>
+
+  <div class="speaker">
+    <p><strong>Final speaking cue:</strong> “Our system is important because it turns complex back-office travel operations into a structured, trackable, and secure workflow. That is the real role of CT2 in the ERP.”</p>
+  </div>
+</body>
+</html>
